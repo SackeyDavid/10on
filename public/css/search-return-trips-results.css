@@ -1,0 +1,62 @@
+hr {
+                display: block;
+                height: 1px;
+                border: 0;
+                border-top: 1px solid #ccc;
+                margin: 1em 0;
+                padding: 0; 
+            }
+
+            #filter_drives::-webkit-input-placeholder {
+                font-size: 18px;
+                text-align: center;
+                color: #000;
+                position: center;
+            }
+
+            .card-body {
+                padding: 8px;
+
+            }
+
+            .card-header {
+                border-top: 5px solid #6495ED;
+
+            }
+
+            .trip_details {
+                font-weight: 600;
+                color: #000;
+                font-size: 14px;
+
+            }
+
+            .trip_host {
+                font-weight: 900;
+                font-size: 13px;
+            }
+
+            .well {
+                padding: 0px;
+            }
+
+            a {
+                text-decoration: none;
+            }
+
+            .nav_item_anchor_tags {
+                color: #777;
+
+            }
+            .nav_item_links {
+                 font-size: 12px;
+                 color: #000;
+            }
+
+            .card-default {
+                background-color: #fff;
+                border: 0.5px solid #ccc;
+                box-shadow: none;
+                margin-bottom: 2%;
+                border-top: 1px solid #6495ED;
+            }

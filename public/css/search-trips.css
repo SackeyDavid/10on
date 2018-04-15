@@ -1,0 +1,154 @@
+            .navbars {
+                margin: 0 auto;
+                display: table;
+                table-layout: auto;
+                float: center;
+                width: 100%;
+            }
+            .navbars>li {
+                display: table-cell;
+                float: center;
+                /*text-align: center;*/
+            }
+
+            .tab-heading {
+                margin-top: -5%;
+            }
+
+            .tab-content .well {
+                background-color: #fff;
+                border: none;
+                
+            }
+
+            div .well {
+                margin-top: -5%;
+                box-shadow: none;
+            }
+
+            .list-unstyled li input {
+                padding-bottom: 12%; 
+            }
+
+            .search-trip-bar {
+                height: 10vh;
+                /*padding-bottom: 0%;*/
+                font-size: 24px;
+                /*margin-left: 0%;
+                margin-right: 0%;*/
+            }
+
+            .passenger_num_buttons {
+                background-color: white;
+                border: 1px solid #ccc;
+                color: #ff3345;
+                padding: 12px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 15px;
+                margin: 4px 2px;
+            }
+
+            #passenger_num {
+                background-color: #fff;
+                border: none;
+                box-shadow: none;
+            }
+
+            
+            .search-trip-bar::-webkit-input-placeholder {
+                font-size: 18px;
+                line-height: 3;
+            }
+
+            #passenger_num::-webkit-input-placeholder {
+                font-size: 18px;
+                color: #000;
+                font-weight: 900;
+                line-height: 3;
+            }
+
+            .search-trip-bar:focus::-webkit-input-placeholder {
+                 /*padding-left:1px;*/
+                 /*padding-top: -20%;*/
+            }
+
+            .footer-styles {
+                color: #ccc; font-weight: 400; opacity: 0.5;
+            }
+
+            .footer-heads {
+                font-family: Tahoma;
+                color: #fff; font-weight: 500; opacity: 0.9; 
+            }
+
+            #selectDates {
+                
+                z-index: 1999; 
+
+            }
+
+            
+
+            #searchstation {
+                z-index: 2000;
+            }
+
+            #search-arrival-station {
+                z-index: 2001;
+            }
+
+            #selectDates2 {
+                
+                z-index: 2002; 
+
+            }
+
+            .modal-dialog {
+              width: 100%;
+              height: 100%;
+              margin: 0;
+              padding: 0;
+            }
+
+            .modal-content {
+              height: auto;
+              min-height: 100%;
+              border-radius: 0;
+            }
+
+            #my2ndTab li {
+              /*padding: 2%;*/
+              border-radius: 1px;
+              border: 1px solid #ccc;
+              
+              
+
+            }
+
+            .datepicker,
+            .table-condensed {
+              width: 99.5%;
+              height:50%;
+              box-shadow: none;
+              border-radius: 0;
+            }
+
+            .title-center {
+                font-family: Century Gothic;
+                font-size: 16px;
+                font-weight: 400;
+                position: absolute;
+                right: 22%;
+            }
+
+            .top-left1 {
+                position: absolute;
+                right: -1%;
+                margin-top: -3%;
+            }
+
+            .searchstation .modal-header {
+                /*padding-bottom: -20%;*/
+            }
