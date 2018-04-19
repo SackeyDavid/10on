@@ -9,8 +9,10 @@ use App\TransportCompany;
 use App\Admin;
 use Mail;
 use App\Client;
+use App\Kilometers;
 use Storage;
 use Auth;
+use DB;
 
 class TransportCompanyController extends Controller
 {
@@ -61,32 +63,11 @@ class TransportCompanyController extends Controller
             'for_transport_company' => $request->for_transport_company,
             'password' => $password
         ]);
-
-
     	
     	
-  //   	$input['super_admin'] = $request->super_admin;
-    
-  //       $input['username'] = $request->username;
-
-  //       $input['email'] = $request->email;
-
-  //       $input['for_transport_company'] = $request->for_transport_company;  
-
-  //   	$input['password'] = str_random(10);
-
-    	
-         
-		// Client::create($input);
-
-		
-
+  
 		$id = $request->for_transport_company;
 
-		// View::composer('mail.client-registered', function ($view) use ($id) {
-  //            $transport_company = App\TransportCompany::find($id);
-  //            $view->with('transport_company', $transport_company);
-  // 		});
 
         $transport_company = TransportCompany::find($request->for_transport_company);
 
@@ -94,8 +75,7 @@ class TransportCompanyController extends Controller
 
         $email = $request->email;
 
-        //$transport_company = TransportCompany::find($id);
-
+        
     	$customer = $client;
 
     	
@@ -110,8 +90,52 @@ class TransportCompanyController extends Controller
     	});
 
     	return redirect()->route('admin.dashboard')->with('msg', 'Client has been saved!');
-        //return redirect()->route('mail.send', $email, $name, $id, serialize($client));
+        
 	}
 
+    public function addKilometer(Request $request, $id) 
+    {
+        
+        $duration_via_automobile = "";
+
+            if ($request->duration_via_automobile_hrs <= 1 && $request->duration_via_automobile_mins <= 0) 
+            {
+                 $duration_via_automobile = $request->duration_via_automobile_hrs . ' hr ' . $request->duration_via_automobile_mins . ' min';
+            }
+            else 
+            {
+               
+                 $duration_via_automobile = $request->duration_via_automobile_hrs . ' hrs ' . $request->duration_via_automobile_mins . ' mins';
+            }
+
+            $kilometer = Kilometers::create([
+            'from' => $request->from,
+            'from_developer' => Auth::user()->id,
+            'to' => $request->to,
+            'via' => $request->via,
+            'kilometers' => $request->kilometers,
+            'duration_via_automobile' => $duration_via_automobile,
+            'for_trip' => $id
+
+            ]);
+
+            DB::table('trips')->where('id', $id)->update(['kilometers' => $request->kilometers]);
+
+        return redirect()->route('admin.dashboard')->with('msg', 'Kilometer has been saved and Trip updated!');
+
+    }
+
+    public function deleteKilometer($id, $for_trip) 
+    {
+            $kilometer = Kilometers::find($id);
+
+            $kilometer->delete();
+            
+
+            DB::table('trips')->where('id', $for_trip)->update(['kilometers' => null]);
+
+        return redirect()->route('admin.dashboard')->with('msg', 'Kilometer has been deleted and Trip updated!');
+
+    }
 
 }

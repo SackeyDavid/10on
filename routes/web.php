@@ -40,7 +40,12 @@ Route::prefix('admin')->group(function(){
   Route::get('/', 'AdminController@index')->name('admin.dashboard');
 
   Route::post('/clients/add', 'Auth\TransportCompanyController@addClient')->name('client.add');
+  
   Route::post('/transport_company/add', 'Auth\TransportCompanyController@addTransportCompany')->name('transport.company.add');
+  
+  Route::post('/kilometer/add/{id}', 'Auth\TransportCompanyController@addKilometer')->name('kilometer.add');
+
+  Route::post('/kilometer/delete/{id}/{for_trip}', 'Auth\TransportCompanyController@deleteKilometer')->name('kilometer.delete');
   
   // Route::post('/logout', 'Auth\AdminLoginController@logout')->name('admin.logout');
   View::composer(['admin', 'components.addTransportCompany', 'components.addClient', 'components.addKilometer'], function ($view) {

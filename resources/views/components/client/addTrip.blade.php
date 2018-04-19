@@ -146,7 +146,7 @@
                                 @endforeach
                             </select>
                         @endif    
-                            {{ $fares->links() }}
+                            
                             
                         </div>
                         </div>

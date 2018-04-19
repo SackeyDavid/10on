@@ -14,8 +14,10 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ URL::To('img/logo-big.png') }}" type="image/jpg" rel="shortcut icon">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome-all.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/material-icons.css') }}">
     <!-- <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-4.css') }}"> -->
     <link rel="stylesheet" type="text/css" href="{{ asset('css/client-dashboard.css') }}">
+
 
 </head>
 <body>

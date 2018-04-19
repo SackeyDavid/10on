@@ -14,7 +14,7 @@ class Kilometers extends Model
      * @var array
      */
     protected $fillable = [
-        'from', 'to', 'via', 'kilometers', 'duration_via_automobile', 'from_developer' 
+        'from', 'to', 'via', 'kilometers', 'duration_via_automobile', 'from_developer', 'for_trip' 
     ];
 
     /**

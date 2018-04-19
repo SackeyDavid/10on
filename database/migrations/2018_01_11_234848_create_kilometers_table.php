@@ -18,6 +18,7 @@ class CreateKilometersTable extends Migration
             $table->string('from')->nullable();
             $table->string('to')->nullable();
             $table->string('via')->nullable();
+            $table->string('for_trip')->nullable();
             $table->string('from_developer')->nullable();
             $table->string('kilometers')->nullable();
             $table->string('duration_via_automobile')->nullable();
