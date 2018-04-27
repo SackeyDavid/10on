@@ -340,7 +340,7 @@
             $(function() {
             $('.input-daterange').datepicker({
                 format: "dd MM",
-                startDate: new Date(),
+                // startDate: new Date(),
                 maxViewMode: 2,
                 onSelect: function(dateText, inst) {
                     $('#to').focus();

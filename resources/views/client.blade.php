@@ -119,14 +119,17 @@
             <br>
             @component('components.client.addTrip')
             @endcomponent
-
-            <br>
-            @component('components.client.addStation')
-            @endcomponent
-
             <br>
             @component('components.client.addFare')
             @endcomponent
+
+            <br>
+            @component('components.client.addTax')
+            @endcomponent
+
+            <br>
+            @component('components.client.addStation')
+            @endcomponent         
             
             <br>
             @component('components.client.addBus')
@@ -136,6 +139,7 @@
             @component('components.client.addSpecialFeatures')
             @endcomponent
 
+                        
 
 
             @endif

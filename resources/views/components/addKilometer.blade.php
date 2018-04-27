@@ -100,10 +100,10 @@
                           <td class="text-warning">{{ $trip->departure_location }}</td>
                           <td class="text-success">{{ $trip->arrival_location }}</td>
                           <td class="text-danger">{{ $trip->via }}</td>
-                          <td><div class="input-group"><input type="number" min="0" name="kilometers" style="border: none; border-bottom: 1px solid #000;" class="form-control" value="0" required><div class="input-group-append"><span class="input-group-text">km</span></div></div></td>
+                          <td><div class="input-group"><input type="number" min="0" name="kilometers" style="border: none; border-bottom: 1px solid #000;" class="form-control" onchange="this.value = parseFloat(this.value).toFixed(1);" placeholder="0.0" required><div class="input-group-append"><span class="input-group-text">km</span></div></div></td>
                           <td>
-                            <div class="input-group"><input type="number" min="0" style="border: none; border-bottom: 1px solid #000;" name="duration_via_automobile_hrs"  value="0" class="form-control" required>
-                                <div class="input-group-append"><span class="input-group-text">hr(s)</span></div><input type="number" min="0" style="border: none; border-bottom: 1px solid #000;" name="duration_via_automobile_mins" value="0" class="form-control" required>
+                            <div class="input-group"><input type="number" min="0" style="border: none; border-bottom: 1px solid #000;" name="duration_via_automobile_hrs"  placeholder="0" class="form-control" required>
+                                <div class="input-group-append"><span class="input-group-text">hr(s)</span></div><input type="number" min="0" style="border: none; border-bottom: 1px solid #000;" name="duration_via_automobile_mins" placeholder="0" class="form-control" required>
                                 <div class="input-group-append"><span class="input-group-text">min(s)</span></div>
                             </div>
                           </td>

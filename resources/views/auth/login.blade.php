@@ -12,7 +12,7 @@
                         @csrf
 
                         <div class="form-group row">
-                            <label for="email" class="col-sm-4 col-form-label text-md-right">E-Mail Address</label>
+                            <label for="email" class="col-sm-4 col-form-label text-md-right">E-Mail Address/Membership number</label>
 
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
@@ -49,16 +49,21 @@
                             </div>
                         </div>
 
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                        <div class="">
+                           
+                                <a style="color: #777;" href="{{ route('password.request') }}">
+                                    <u>Forgot Your Password</u>
+                                </a>
+                                <a style="color: #777;" href="{{ route('password.request') }}">
+                                    or <u>membership number?</u>
+                                </a>
+                                <br>
+                                <br>
+                                <button type="submit" style="color: #fff;width: 100%;background-color: #ff3345;" class="btn btn-lg">
                                     Login
                                 </button>
-
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    Forgot Your Password?
-                                </a>
-                            </div>
+                                
+                           
                         </div>
                     </form>
                 </div>

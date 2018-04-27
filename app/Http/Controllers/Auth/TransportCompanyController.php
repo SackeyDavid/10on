@@ -98,15 +98,7 @@ class TransportCompanyController extends Controller
         
         $duration_via_automobile = "";
 
-            if ($request->duration_via_automobile_hrs <= 1 && $request->duration_via_automobile_mins <= 0) 
-            {
-                 $duration_via_automobile = $request->duration_via_automobile_hrs . ' hr ' . $request->duration_via_automobile_mins . ' min';
-            }
-            else 
-            {
-               
-                 $duration_via_automobile = $request->duration_via_automobile_hrs . ' hrs ' . $request->duration_via_automobile_mins . ' mins';
-            }
+            
 
             $kilometer = Kilometers::create([
             'from' => $request->from,
@@ -114,7 +106,7 @@ class TransportCompanyController extends Controller
             'to' => $request->to,
             'via' => $request->via,
             'kilometers' => $request->kilometers,
-            'duration_via_automobile' => $duration_via_automobile,
+            'duration_via_automobile' => $request->duration_via_automobile_hrs . ' hr ' . $request->duration_via_automobile_mins . ' min',
             'for_trip' => $id
 
             ]);

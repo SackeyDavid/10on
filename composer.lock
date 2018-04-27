@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "311bfadf82fdd72c0f6bc2c41435ee67",
+    "content-hash": "6bbae9e6fc9a9df114f5bbaac5dc0f32",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1506,6 +1506,111 @@
             "time": "2018-03-25T17:35:16+00:00"
         },
         {
+            "name": "ovac/hubtel-payment",
+            "version": "v2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ovac/hubtel-payment.git",
+                "reference": "293c822d09218aa0b3945258ef54696df82ac9ae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ovac/hubtel-payment/zipball/293c822d09218aa0b3945258ef54696df82ac9ae",
+                "reference": "293c822d09218aa0b3945258ef54696df82ac9ae",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0.0",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "leaphub/phpcs-symfony2-standard": "^2.0.3",
+                "mockery/mockery": "~1.0.0",
+                "phpmd/phpmd": "^2.6.0",
+                "phpunit/phpunit": "^6.3.0",
+                "satooshi/php-coveralls": "^1.0",
+                "sebastian/phpcpd": "*",
+                "squizlabs/php_codesniffer": "^2.9.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "OVAC\\HubtelPayment\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ariama Victor (A.K.A. OVAC BOYA)",
+                    "email": "iamovac@gmail.com"
+                }
+            ],
+            "description": "A comprehensive PHP Package for consuming the Hubtel Payment API",
+            "time": "2018-04-02T07:00:25+00:00"
+        },
+        {
+            "name": "ovac/laravel-hubtel-payment",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ovac/laravel-hubtel-payment.git",
+                "reference": "96019b02f4554ae38798edc0f82537dbdafe9657"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ovac/laravel-hubtel-payment/zipball/96019b02f4554ae38798edc0f82537dbdafe9657",
+                "reference": "96019b02f4554ae38798edc0f82537dbdafe9657",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "5.4.*|5.5.*|5.6.*",
+                "ovac/hubtel-payment": "~2.0.0",
+                "php": ">=5.6.4"
+            },
+            "require-dev": {
+                "leaphub/phpcs-symfony2-standard": "^2.0.3",
+                "orchestra/testbench": "~3.4|~3.5|~3.6",
+                "phpmd/phpmd": "^2.6.0",
+                "phpunit/phpunit": "~5.0|~6.0|~7.0",
+                "satooshi/php-coveralls": "^1.0",
+                "sebastian/phpcpd": "*",
+                "squizlabs/php_codesniffer": "^2.9.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OVAC\\LaravelHubtelPayment\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OVAC\\LaravelHubtelPayment\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ariama Victor (A.K.A. OVAC BOYA)",
+                    "email": "iamovac@gmail.com"
+                }
+            ],
+            "description": "A Laravel package for consuming the Hubtel Payment Api",
+            "keywords": [
+                "hubtel",
+                "laravel",
+                "payment"
+            ],
+            "time": "2018-02-19T12:02:30+00:00"
+        },
+        {
             "name": "paragonie/random_compat",
             "version": "v2.0.12",
             "source": {
@@ -1898,6 +2003,48 @@
                 "uuid"
             ],
             "time": "2018-01-20T00:28:24+00:00"
+        },
+        {
+            "name": "slydepay/slydepay-soap",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DreamOval/slydepay-php-connector.git",
+                "reference": "e58929b1b265534e6439275043c4cafccdd034ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DreamOval/slydepay-php-connector/zipball/e58929b1b265534e6439275043c4cafccdd034ff",
+                "reference": "e58929b1b265534e6439275043c4cafccdd034ff",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "kahlan/kahlan": "^3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Slydepay\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Andrew Smith",
+                    "email": "a.smith@silentworks.co.uk"
+                },
+                {
+                    "name": "Joseph Djomeda",
+                    "email": "joseph@dreamoval.com"
+                }
+            ],
+            "time": "2017-05-24T11:14:23+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",

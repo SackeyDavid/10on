@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Fare extends Model
+class Tax extends Model
 {
-    protected $table = 'fares';
+    protected $table = 'taxes';
 
     /**
      * The attributes that are mass assignable.
@@ -14,7 +14,7 @@ class Fare extends Model
      * @var array
      */
     protected $fillable = [
-        'for_trip', 'road_fare', 'carrier_imposed_charges', 'total_tax', 'total_per_passenger', 'from_client',
+        'tax_NTA', 'passenger_service_charge', 'passenger_facilities_charge', 'advance_passenger_info_fee', 'station_service_charge', 'total', 'from_client', 'for_trip'
     ];
 
     /**
@@ -32,7 +32,7 @@ class Fare extends Model
     }
 
     public function trip() {
-        return $this->belongsTo('App\Trips', 'for_trip');
+    	return $this->belongsTo('App\Trip', 'for_trip');
         
     }
 

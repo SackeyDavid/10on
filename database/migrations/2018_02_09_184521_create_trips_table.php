@@ -23,11 +23,13 @@ class CreateTripsTable extends Migration
             $table->string('arrival_date');
             $table->string('trip_duration');
             $table->string('via');
+            $table->string('trip_fare');
             $table->string('from_client');
             $table->string('fare_id');
             $table->string('remaining_seats');
             $table->string('kilometers');
             $table->string('bus_id');
+            $table->string('tax_id');
             $table->timestamps();
         });
     }

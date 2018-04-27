@@ -5,6 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Station;
 use App\Trips;
+use App\Booking;
+use App\PassengerDetails;
+use App\CardDetails;
+use App\MobileMoney;
+use Auth;
+use DB;
+use OVAC\LaravelHubtelPayment\Facades\HubtelPayment;
 
 class BookingController extends Controller
 {
@@ -24,10 +31,10 @@ class BookingController extends Controller
     public function findReturnTrips(Request $request)
     {
     	// lowest price outbounds (lpos)
-    	$lpos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date)->orderBy('trip_cost')->get();
+    	$lpos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date)->orderBy('trip_fare')->get();
 
     	// lowest price inbounds (lpis)
-    	$lpis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date)->orderBy('trip_cost')->get();
+    	$lpis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date)->orderBy('trip_fare')->get();
 
     	// earliest departure outbounds (eos)
     	$eos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date)->orderBy('departure_time')->get();
@@ -48,7 +55,7 @@ class BookingController extends Controller
     	foreach ($lpos as $key => $lpo) {
             foreach ($lpis as $key => $lpi) {
             	// string key instead of int used to later split key's values
-                 $combined_cost[$lpo->id . '-' . $lpi->id] = (float)$lpo->trip_cost + (float)$lpi->trip_cost;
+                 $combined_cost[$lpo->id . '-' . $lpi->id] = (float)$lpo->trip_fare + (float)$lpi->trip_fare;
             }
             
         }
@@ -59,20 +66,21 @@ class BookingController extends Controller
         //append combined_cost keys to a keys array
         $combined_cost_keys = array_keys($combined_cost);
 
-        //keys for earlisest departure EDK and earliest return ERK
+        //keys for lowest price departure LPDK and lowest price return LPRK
         $key_pairs = $LPDK = $LPRK = array();
-		foreach($combined_cost_keys as $keys) {
-		    $key_pairs = explode("-", $keys);
-		    // append EO id to EDK
-		    array_push($LPDK, $key_pairs[0]);
 
-		    // append EI id to ERK
-		    array_push($LPRK, $key_pairs[1]);
-		}
+    		foreach($combined_cost_keys as $keys) {
+    		    $key_pairs = explode("-", $keys);
+    		    // append EO id to EDK
+    		    array_push($LPDK, $key_pairs[0]);
 
-		// convert collections to array for interations
-		$lpos_array = $lpos->toArray();
-		$lpis_array = $lpis->toArray();
+    		    // append EI id to ERK
+    		    array_push($LPRK, $key_pairs[1]);
+    		}
+
+    		// convert collections to array for interations
+    		$lpos_array = $lpos->toArray();
+    		$lpis_array = $lpis->toArray();
 
 		// for($i=0; $i<$LPDK->count(); $i++)
   //           {
@@ -111,7 +119,141 @@ class BookingController extends Controller
 
     	
 
-    	return view('book.search-return-trips-results', compact(['lpos', 'lpis', 'combined_cost','LPDK', 'LPRK', 'lpos_array']))->with('departure_location', $request->departure_location)->with('arrival_location', $request->arrival_location)->with('departure_date', $request->departure_date)->with('passenger_num', $request->passenger_num)->with('return_date', $request->return_date)->with('departure_abbreviation', $depart_abb)->with('arrival_abbreviation', $arrive_abb);
+    	return view('book.search-return-trips-results', compact(['lpos', 'lpis', 'combined_cost','LPDK', 'LPRK', 'lpos_array', 'combined_cost_keys']))->with('departure_location', $request->departure_location)->with('arrival_location', $request->arrival_location)->with('departure_date', $request->departure_date)->with('passenger_num', $request->passenger_num)->with('return_date', $request->return_date)->with('departure_abbreviation', $depart_abb)->with('arrival_abbreviation', $arrive_abb);
     }
+
+
+    public function tripFound($lpos, $lpis, $passenger_num)
+    {
+        
+        
+        $booking = Booking::create([
+            'outbound' => $lpos,
+            'inbound' => $lpis,
+            
+          ]);
+
+        return redirect()->route('book.personal.details', ['booking_id' => $booking->id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num]);
+    }
+
+    public function personalDetails($booking_id, $lpos, $lpis, $passenger_num)
+    {
+        return view('book.provide-personal-details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num]);
+    }
+
+    public function addPassengerDetails(Request $request, $booking_id, $lpos, $lpis, $passenger_num) 
+    {
+
+        if (Auth::user()) {
+            DB::table('booking_process')->where('id', $booking_id )->update(['user_id' => Auth::user()->id]);
+
+             return redirect()->route('book.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => 'user' . ' ' . Auth::user()->id ]);
+        }
+        else
+        {
+            $passenger_details = PassengerDetails::create([
+                'title' => $request->title,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'email' => $request->email,
+                'contact_person' => $request->contact_person,
+                'country' => $request->country,
+                'mobile_number' => $request->mobile_number,
+                'remind_me' => $request->remind_me,
+                
+              ]);
+
+            DB::table('booking_process')->where('id', $booking_id )->update(['passenger_id' => $passenger_details->id]);
+
+            return redirect()->route('book.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => 'passenger' . ' ' .  $passenger_details->id]);
+        }
+
+        
+
+
+    }
+
+    public function paymentDetails($booking_id, $lpos, $lpis, $passenger_num, $traveler_id) {
+
+        $outbound = Trips::find($lpos);
+        $inbound = Trips::find($lpis);
+
+        return view('book.provide-payment-details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'outbound' => $outbound, 'inbound' => $inbound]);    
+    }
+
+    public function addPaymentDetails(Request $request, $booking_id, $lpos, $lpis, $passenger_num, $traveler_id, $option)
+    {
+        if ($option == 'card') {
+
+            if (Auth::user()) {
+
+                DB::table('booking_process')->where('id', $booking_id )->update(['card_id' => Auth::user()->card->id]);   
+
+                return redirect()->route('confirm.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . Auth::user()->card->id, 'option' => $option]);         
+            }   
+            else
+            {         
+                $payment = CardDetails::create([
+                    'card_number' => $request->card_number,
+                    'security_code' => $request->security_code,
+                    'expiry_date' => $request->expiry_date,
+                    'first_name' => $request->first_name,
+                    'last_name' => $request->last_name,
+                    'country' => $request->country,
+                    'address_line_1' => $request->address_line_1,
+                    'address_line_2' => $request->address_line_2,
+                    'address_line_3' => $request->address_line_3,
+
+                ]);
+
+                DB::table('booking_process')->where('id', $booking_id )->update(['card_id' => $payment->id ]);
+
+                return redirect()->route('confirm.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $payment->id, 'option' => $option]);
+            }
+
+        }
+        else
+        {
+            if (Auth::user()) {
+
+                DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => Auth::user()->wallet->id]); 
+                  
+
+                $payment = HubtelPayment::ReceiveMoney()
+                ->from(Auth::user()->wallet->phone_number)                //- The phone number to send the prompt to. 
+                ->amount(1.00)                    //- The exact amount value of the transaction
+                ->description('Online Booking Payment')    //- Description of the transaction.
+                ->customerName(Auth::user()->first_name . ' ' . Auth::user()->last_name)     //- Name of the person making the payment.callback after payment. 
+                ->channel('mtn-gh')                 //- The mobile network Channel.configuration
+                ->run();  
+
+                return redirect()->route('confirm.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . Auth::user()->card->id, 'option' => $option]);
+
+            }
+            else
+                {
+                    $passenger = explode(" ", $traveler_id);
+                    $bookers_id = $passenger[1];
+
+                    $wallet = MobileMoney::create([
+                    'phone_number' => $request->phone_number,
+                    'email' => $request->email,
+                    'password' => $request->password,
+                    'from_user' => null,
+                    'from_passenger' => $bookers_id
+
+                ]);
+
+                DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+
+                return redirect()->route('confirm.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $payment->id]);
+                }
+
+
+        }
+
+    }
+
+
 
 }

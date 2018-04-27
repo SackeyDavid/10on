@@ -1,0 +1,15 @@
+.logo-color {
+	color: #ff3345;
+}
+
+.passenger-details-inputs {
+	color: #000;
+	font-size: 19px;
+	font-weight: 500;
+}
+
+.title-input-bar::-webkit-input-placeholder {
+                font-size: 18px;
+                line-height: 3;
+
+            }

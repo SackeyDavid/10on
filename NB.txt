@@ -1,0 +1,32 @@
+The departure and arrival dates for search must all have an equal number. //this is quite problematic ie. koforidua to tudu works but tudu to koforidua doesn't works, because the former has an addition trip. So for return trips, its about the index, departure index keys show be always grater than or equal to arrival to departure location
+
+Problems/Bugs
+1. if the number of outbound trips was more than the inbounds, I got array offset error because I wrote the progrram to work for equal number of out- and in-bounds.
+
+soln: click on one of the error exception sources that showed the compiled code is the storage/framework folder on the left pane of the whoops window and found the error there
+
+2. Ascending order compromised after P1 fix
+
+Operartions
+	Traveler Passenger & Payment details ID assignment 
+*When traveler fills out passenger details without using registered user details, the id assigned them as saved in the passenger details table is maintained as their traveler ID which is kept parsed to necessary routes and views afterwards.
+
+*As well, when they login later during the payment details specification stage, their registered user payment details ID is assigned them as their payment ID which is parsed to necessary routes and views afterwards.
+So, once the details specifying stage for both passenger and payment is past, the id obtained in the controller is maintained throughout the booking process.
+
+Mobile Money requirements details
+-phone number or email
+-password or pin
+
+
+Problem not fixed
+1. Credit card modal does not open after it has been opened once.
+
+Hubtel Account number: HM2604180034
+Client ID: ahntkmmu
+Client Secret: anxixrrt 
+
+From mobile payment details option, we save appropriate payment_id (card or mobile) against the concerned booking process id and parse that payment_id to necessary routes and views.
+
+For mobile money database table, password is used to represent pin 
+

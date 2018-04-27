@@ -8,7 +8,7 @@
         <title>Search Results</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
 
         <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('images/apple-icon-57x57.png') }}">
         <link rel="apple-touch-icon" sizes="60x60" href="/images/apple-icon-60x60.png">
@@ -76,6 +76,10 @@
                 /*text-transform: lowercase;*/
             }
 
+            .logo-color {
+                color: #ff3345;
+            }
+
 
         </style>
     </head>
@@ -103,14 +107,20 @@
                 
                 @if (!$passenger_num)
                 @else
-                <li>Return, {{ $passenger_num }} passenger</li>
+                <li>Return, {{$passenger_num}}
+                    @if($passenger_num > 1)
+                    passengers
+                    @else
+                    passenger
+                    @endif
+                </li>
                 @endif
 
                 @if (!$departure_location || !$arrival_location || !$departure_date || !$return_date || !$departure_abbreviation || !$arrival_abbreviation)
                 @else
                 <li>{{ $departure_location }} (<span style="font-size: 14px;color: #000;"><strong>{{ $departure_abbreviation }}</strong></span>) to {{ $arrival_location }} (<span style="font-size: 14px;color: #000;"><strong>{{ $arrival_abbreviation }}</strong></span>)</li>
 
-                <li>{{ $departure_date }} to {{ $return_date }}</li>
+                <li>{{ $departure_date }} to {{ $return_date }} </li>
                 @endif
                 
             </ul>
@@ -161,15 +171,28 @@
         <div class="tab-content">
             <div class="well tab-pane active" id="lowestPriceTab">
             @if(!$LPDK || !$LPRK || !$lpos || !$lpis)
-            no keys
+            no search result, <a style="color: #ff3345;" href="javascript:history.back()">please try searching again</a>
             @else
             @for($i = 0; $i < count($LPDK); $i++)
-                @for($n = 0; $n < count($lpos); $n++)
-                @if( $LPDK[$i] == $lpos[$n]->id )
-
+            @for($n = 0; $n < count($lpos); $n++)
                 
+                @if( $lpos[$n]->id == $LPDK[$i])
+                    @for($m = 0; $m < count($lpis); $m++)
+                        @if($lpis[$m]->id  != $LPRK[$i])
+                        @continue
+                        @endif
+                @if(($lpos[$n]->remaining_seats - (int)$passenger_num) < 0 && ($lpis[$m]->remaining_seats - (int)$passenger_num) < 0 )
+                @continue
+                @else
                     
-                        
+        <form id="form_{{ $lpos[$n]->id }}_{{ $lpis[$m]->id }}" method="POST" action="{{route('trip.search.found', ['lpos' => $lpos[$n]->id, 'lpis' => $lpis[$m]->id, 'passenger_num' => $passenger_num])}}">
+                            {{ csrf_field() }} 
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            
+            <input type="hidden" name="outbound" value="{{ $lpos[$n]->id }}">
+            <input type="hidden" name="inbound" value="{{ $lpis[$m]->id }}">
+
+           
             <div class="card-body" style="border: 1px solid #ccc;">
                 <div style="width: 90%;">
 
@@ -182,14 +205,16 @@
                             <!-- display lowest price stored in combined cost using the LPDK and LPRK values -->
                             @php
                             
-                            echo number_format($combined_cost[$LPDK[$i] . '-' . $LPRK[$i]],2);
+                            echo number_format((float)$combined_cost[$LPDK[$i] . '-' . $LPRK[$i]]*(float)$passenger_num,2);
                             @endphp
                           </span> </li>
                         </ul>
                     </li>
                     <li>
                     <ul class="list-inline">
-                    <li>Return: <span class="trip_details">{{ $lpis[$n]->departure_time }} - {{ $lpis[$n]->arrival_time }}</span><br></li>
+                        
+                    <li>Return: <span class="trip_details">{{ $lpis[$m]->departure_time }} - {{ $lpis[$m]->arrival_time }}</span><br></li>
+                        
                     <li style="margin-right: -10%;" class="pull-right"><i class="fas fa-chevron-down" onclick='
 
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
@@ -197,8 +222,10 @@
                         } else {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "none";
                         }
+                        
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
                         ' 
-                        style="color: #ff3345;font-size: 28px;font-weight: 600"></i></li>
+                        style="color: #ff3345;font-size: 28px;font-weight: 600;cursor: pointer;"></i></li>
                     </ul>
                     </li>
                     <li>
@@ -206,7 +233,7 @@
                           <li><span id="trip_duration_in_hrs" class="trip_details">
                             @php 
                             $out_duration =  $lpos[$n]->trip_duration_in_hrs ;
-                            $in_duration =  $lpis[$n]->trip_duration_in_hrs ;
+                            $in_duration =  $lpis[$m]->trip_duration_in_hrs ;
                             $data_out_duration =  explode(" ", $out_duration);
                             $data_in_duration = explode(" ", $in_duration);
                             $data_out_duration_hrs_element = (float)$data_out_duration[0];
@@ -219,11 +246,17 @@
                             $trip_hrs_duration = $data_out_duration_hrs_element + $data_in_duration_hrs_element;
                             $trip_mins_duration = $data_out_duration_mins_element + $data_in_duration_mins_element;
 
-                            echo $trip_hrs_duration . ' hrs' . ' ' . $trip_mins_duration . ' mins';
+                            if (($trip_mins_duration - 60) >= 0)
+                            {
+                                $trip_mins_duration = $trip_mins_duration % 60;
+                                $trip_hrs_duration++;
+                            }
+
+                            echo $trip_hrs_duration . '<span style="color: #777;font-size: 13px;font-weight: 600;"> hr</span>' . ' ' . $trip_mins_duration . '<span style="color: #777;font-size: 13px;font-weight: 600;"> min</span>';
                             
                             @endphp
-                                </span></li>  
-                          <li class="pull-right"><strong><span class="trip_host">{{ $lpos[$n]->host->username }} &nbsp;&nbsp;{{ $lpis[$n]->host->username }}</span></strong></li>
+                             <span style="color: #777;font-size: 13px;font-weight: 600;"> via {{ $lpos[$n]->via }}</span>  </span></li>  
+                          <li class="pull-right"><strong><span class="trip_host">{{ $lpos[$n]->host->username }} &nbsp;&nbsp;{{ $lpis[$m]->host->username }}</span></strong></li>
                         </ul>
                          
                     </li>
@@ -231,7 +264,7 @@
                 </ul>
                 </div>
 
-            <div style="display: block;">
+            <div style="display: none;">
                 <p><i class="material-icons" style="font-size: 15px;color: #B0E0E6;">flight_takeoff</i> Outbound</p>
                 <div class="card card-default">
                     @if (!$departure_location || !$arrival_location || !$combined_cost)
@@ -241,7 +274,7 @@
                         <table class="table table-bordered"  style="border: 0.5px solid #ccc;margin-bottom: 0%;">
                           <thead style="background-color: #B0E0E6">
                             <tr>
-                              <td colspan="4">{{ $departure_location }} (<span style="font-size: 16px;color: #000;"><strong>{{ $departure_abbreviation }}</strong></span>) to {{ $arrival_location }} (<span style="font-size: 16px;color: #000;"><strong>{{ $arrival_abbreviation }}</strong></span>)</th>
+                              <th colspan="4">{{ $departure_location }} (<span style="font-size: 16px;color: #000;"><strong>{{ $departure_abbreviation }}</strong></span>) to {{ $arrival_location }} (<span style="font-size: 16px;color: #000;"><strong>{{ $arrival_abbreviation }}</strong></span>)</th>
                               
                             </tr>
                           </thead>
@@ -286,12 +319,12 @@
                                     @endphp
                                   </td>
                               <td rowspan="2">
-                                  <span style="color: #000;font-size: 13px;padding: 1%;">{{ $data_out_duration_hrs_element }} hrs </span> <br>
+                                  <span style="color: #000;font-size: 13px;padding: 1%;">{{ $data_out_duration_hrs_element }} hr </span> <br>
                                       
                                     @php
                                     
                                     
-                                    echo '<span style="padding: 1%;font-weight: 500;">' . $data_out_duration_mins_element . ' mins' . '</span> <br>';
+                                    echo '<span style="padding: 1%;font-weight: 500;">' . $data_out_duration_mins_element . ' min' . '</span> <br>';
                                     echo '<span style="padding: 1%;font-weight: 500;">' . 'Non-stop ' . '</span>';
                                     @endphp
                               </td>
@@ -306,6 +339,7 @@
                     @endif
                 
                 </div>
+                
                 <i class="material-icons" style="font-size: 15px;color: #66CDAA">flight_land</i> Inbound
                 <table class="table table-bordered"  style="border: 0.5px solid #ccc;margin-bottom: 0%;">
                           <thead style="background-color: #7FFFD4">
@@ -319,7 +353,7 @@
                             <tr>
                               <th rowspan="3">
                               <center>
-                                {{ $lpis[$n]->host->represents->name }}  
+                                {{ $lpis[$m]->host->represents->name }}  
                               </center></th>
                               <td>Depart</td>
                               <td>Arrive</td>
@@ -329,10 +363,10 @@
                               
                               <td rowspan="2" style="padding: 1%;">
                                   
-                                      <span style="color: #000;font-size: 13px;padding: 5%;">{{ $lpis[$n]->departure_time }} </span>
+                                      <span style="color: #000;font-size: 13px;padding: 5%;">{{ $lpis[$m]->departure_time }} </span>
                                       
                                     @php
-                                    $depart_date =   $lpis[$n]->departure_date;
+                                    $depart_date =   $lpis[$m]->departure_date;
                                     $data_depart_date = explode(" ", $depart_date);
                                     $week_day = $data_depart_date[0];
                                     $day = $data_depart_date[1];
@@ -343,10 +377,10 @@
                                   
                               </td>
                               <td rowspan="2" style="padding: 1%;">
-                                    <span style="color: #000;font-size: 13px;padding: 5%;">{{ $lpis[$n]->arrival_time }} </span>
+                                    <span style="color: #000;font-size: 13px;padding: 5%;">{{ $lpis[$m]->arrival_time }} </span>
                                       
                                     @php
-                                    $arrival_date =   $lpis[$n]->arrival_date;
+                                    $arrival_date =   $lpis[$m]->arrival_date;
                                     $data_arrive_date = explode(" ", $arrival_date);
                                     $week_day = $data_arrive_date[0];
                                     $day = $data_arrive_date[1];
@@ -356,12 +390,12 @@
                                     @endphp
                                   </td>
                               <td rowspan="2">
-                                  <span style="color: #000;font-size: 13px;padding: 1%;">{{ $data_in_duration_hrs_element }} hrs </span> <br>
+                                  <span style="color: #000;font-size: 13px;padding: 1%;">{{ $data_in_duration_hrs_element }} hr </span> <br>
                                       
                                     @php
                                     
                                     
-                                    echo '<span style="padding: 1%;font-weight: 500;">' . $data_in_duration_mins_element . ' mins' . '</span> <br>';
+                                    echo '<span style="padding: 1%;font-weight: 500;">' . $data_in_duration_mins_element . ' min' . '</span> <br>';
                                     echo '<span style="padding: 1%;font-weight: 500;">' . 'Non-stop ' . '</span>';
                                     @endphp
                               </td>
@@ -381,7 +415,15 @@
                               <th colspan="2">
                                   <ul class="list-inline">
                                       <li style="color: #000;font-size: 16px;">You will earn</li>
-                                      <li class="pull-right">Kilometer breakdown <i class="fas fa-chevron-down"></i></li>
+                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">Kilometer breakdown&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "none";
+                        }
+                        
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                                      '></i></li>
                                   </ul>
                               </th>
                               
@@ -389,14 +431,325 @@
                           </thead>
                           <tbody>
                             <tr>
-                              <td>11</td>
-                              <td>Mark</td>
-                              
+                            <div style="padding: 0%;">
+                              <td style=" ">
+                                  @php
+                                $kilometers = (float)$lpos[$n]->kilometers + (float)$lpis[$m]->kilometers;
+
+                                echo '<ul class="list-unstyled"><li><span style="color: #000;font-weight: 700">' . $kilometers . '</span></li><li>
+                                   <span style="font-weight: 500;font-size: 15px;"> Landwards kilometers <br> <span style="font-size: 12px;font-family: Segoe UI;">(plus any applicable tier bonuses)</span></span>
+                                </li></ul>';
+                                @endphp 
+                              </td>
+                              <td style="padding: 5%; ">
+                                @php
+                                $kilometers = (float)$lpos[$n]->kilometers + (float)$lpis[$m]->kilometers;
+
+                                echo '<ul class="list-unstyled"><li><span style="color: #000;font-weight: 700">' . $kilometers . '</span></li><li>
+                                   <span style="font-weight: 500;font-size: 15px;"> Tier kilometers</span>
+                                </li></ul>';
+                                @endphp 
+                              </td>
+                              </div>
                             </tr>
                            
                           </tbody>
                         </table>
-                    
+                        <hr>
+                        <p><span style="color: #000;">Total fare: GH&#8373;
+                            @php
+                            
+                            echo number_format((float)$combined_cost[$LPDK[$i] . '-' . $LPRK[$i]]*$passenger_num,2);
+                            @endphp
+                            </span>
+                            <br>
+                            <span style="color: #777;font-family: Segoe UI; font-weight: 600;font-size: 13px;">Total price in Ghana cedis including road fare, taxes, fees and carrier-imposed charges for 
+                            @if(!$passenger_num)
+                            @else
+                                @if($passenger_num > 1)
+                                {{ $passenger_num }} passengers.
+                                @else
+                                {{ $passenger_num }} passenger.
+                                @endif
+                            @endif
+                            Conditions apply.</span>
+                            
+
+                        </p>
+
+                        <div>
+                            <ul class="list-inline">
+                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Show fare breakdown (taxes and fees)</li>
+                                <li class="float-right"><i class="fas fa-chevron-down logo-color" onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                                      '></i></li>
+                            </ul>
+                            <div style="display: none;">
+                                <p><span style="font-weight: 500;font-size: 14px;font-family: Corbel;">
+                                @if(!$lpos[$n]->fare || !$lpis[$m]->fare)
+                                <span style="font-size: 11px;font-family: Corbel;color: #ff3345;">There is no available information</span>
+                                @else
+                                All prices shown in GH&#8373;
+                                @endif
+                                </span></p>
+                                <table class="table table-bordered">
+                                  <thead style="background-color: #f8f8f8;">
+                                    <tr>
+                                      <th scope="col"><span style="color: #000;font-size: 12px;">Fare breakdown</span></th>
+                                      <th scope="col"><span style="color: #000;font-size: 12px;">Adults</span></th>
+                                      
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <th scope="row">Roadfare</th>
+                                      <td>
+                                        @if(!$lpos[$n]->fare || !$lpis[$m]->fare)
+                                        -
+                                        @else
+                                        @php
+
+                                        $road_fare = (float)$lpos[$n]->fare->road_fare + (float)$lpis[$m]->fare->road_fare;
+
+                                        echo number_format($road_fare, 2);
+                                        @endphp
+                                        @endif
+                                     </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Carrier-imposed charges</th>
+                                      <td>
+                                        @if(!$lpos[$n]->fare || !$lpis[$m]->fare)
+                                        -
+                                        @else
+                                        @php
+
+                                        $carrier_imposed_charges = (float)$lpos[$n]->fare->carrier_imposed_charges + (float)$lpis[$m]->fare->carrier_imposed_charges;
+
+                                        echo number_format($carrier_imposed_charges, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Taxes, fees and charges</th>
+                                      <td>
+                                        @if(!$lpos[$n]->fare || !$lpis[$m]->fare)
+                                        -
+                                        @else
+                                        @php
+
+                                        $total_tax = (float)$lpos[$n]->fare->total_tax + (float)$lpis[$m]->fare->total_tax;
+
+                                        echo number_format($total_tax, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Total per passenger</th>
+                                      <td>
+                                        @if(!$lpos[$n]->fare || !$lpis[$m]->fare)
+                                        -
+                                        @else
+                                        @php
+
+                                        $total_per_passenger = (float)$lpos[$n]->fare->total_per_passenger + (float)$lpis[$m]->fare->total_per_passenger;
+
+                                        echo number_format($total_per_passenger, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Number of passengers</th>
+                                      <td>{{$passenger_num}}</td>
+                                      
+                                    </tr>
+                                    
+                                    <tr style="background-color: #f8f8f8;color: #000;">
+                                      <th scope="row"><span>Grand total</span></th>
+                                      <td>
+                            @php
+                            
+                            echo number_format((float)$combined_cost[$LPDK[$i] . '-' . $LPRK[$i]]*(float)$passenger_num,2);
+                            @endphp</td>
+                                      
+                                    </tr>
+                                  </tbody>
+                                </table>
+                            </div>
+                            
+                        </div>
+
+                        <div>
+                            <ul class="list-inline">
+                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Show taxes, fees and charges breakdown</li>
+                                <li class="float-right"><i class="fas fa-chevron-down logo-color" onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                                      '></i></li>
+                            </ul>
+                            <div style="display: none;">
+                                <p><span style="font-weight: 500;font-size: 14px;font-family: Corbel;">
+                                @if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                <span style="font-size: 11px;font-family: Corbel;color: #ff3345;">There is no available information</span>
+                                @else
+                                All prices shown in GH&#8373;
+                                @endif
+                                </span></p>
+                                <table class="table table-bordered">
+                                  <thead style="background-color: #f8f8f8;">
+                                    <tr>
+                                      <th scope="col"><span style="color: #000;font-size: 12px;">Taxes, fees and charges breakdown</span></th>
+                                      <th scope="col"><span style="color: #000;font-size: 12px;">Adults</span></th>
+                                      
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <th scope="row">Tax - NTA</th>
+                                      <td>
+                                        @if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                        -
+                                        @else
+                                        @php
+
+                                        $tax_NTA = (float)$lpos[$n]->tax->tax_NTA + (float)$lpis[$m]->tax->tax_NTA;
+
+                                        echo number_format($tax_NTA, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Passenger Service Charge</th>
+                                      <td>@if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                        -
+                                        @else
+                                        @php
+
+                                        $passenger_service_charge = (float)$lpos[$n]->tax->passenger_service_charge + (float)$lpis[$m]->tax->passenger_service_charge;
+
+                                        echo number_format($passenger_service_charge, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Passenger Facilities Charge</th>
+                                      <td>
+                                        @if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                        -
+                                        @else
+                                        @php
+
+                                        $passenger_facilities_charge = (float)$lpos[$n]->tax->passenger_facilities_charge + (float)$lpis[$m]->tax->passenger_facilites_charge;
+
+                                        echo number_format($passenger_facilities_charge, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Advance Passenger Information Fee</th>
+                                      <td>
+                                        @if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                        -
+                                        @else
+                                        @php
+
+                                        $advance_passenger_info_fee = (float)$lpos[$n]->tax->advance_passenger_info_fee + (float)$lpis[$m]->tax->advance_passenger_info_fee;
+
+                                        echo number_format($advance_passenger_info_fee, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Station Service Charge</th>
+                                      <td>
+                                        @if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                        -
+                                        @else
+                                        @php
+
+                                        $station_service_charge = (float)$lpos[$n]->tax->station_service_charge + (float)$lpis[$m]->tax->station_service_charge;
+
+                                        echo number_format($station_service_charge, 2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                    <tr>
+                                      <th scope="row">Number of passengers</th>
+                                      <td>
+                                          @if(!$passenger_num)
+                                          @else
+                                          {{$passenger_num}}
+                                          @endif
+                                      </td>
+                                      
+                                    </tr>
+                                    <tr style="background-color: #f8f8f8;color: #000;">
+                                      <th scope="row"><span>Grand total</span></th>
+                                      <td>
+                                        @if(!$lpos[$n]->tax || !$lpis[$m]->tax)
+                                        -
+                                        @else
+                                        @php
+                                        
+                                        echo number_format(((float)$lpos[$n]->tax->total + (float)$lpis[$m]->tax->total)*$passenger_num,2);
+                                        @endphp
+                                        @endif
+                                    </td>
+                                      
+                                    </tr>
+                                  </tbody>
+                              </table>
+                                
+                            </div>
+                            
+                        </div>
+
+                        <p>
+                            <ul class="list-inline">
+                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Fare conditions</li>
+                                <li><i class="fas fa-info-circle logo-color"></i></li>
+                            </ul>
+                            
+                        </p>
+
+                        <button class="col-md-12 btn btn-lg" type="submit" style="background-color: #ff3345;">
+                            <center style="color: #fff;font-size: 15px;font-weight: 700">GH&#8373;
+                            @php
+                            
+                            echo number_format((float)$combined_cost[$LPDK[$i] . '-' . $LPRK[$i]]*$passenger_num,2);
+                            @endphp
+                            <br>
+                            Select these drives</center>
+                        </button>
+                        <br>
                 <!-- <div class="card card-default">
                     <div class="card-header">
                         <ul class="list-inline">
@@ -404,7 +757,33 @@
                         </ul>
                     </div>
                     <div class="card-body">
-                       
+                       @if(!$LPDK || !$LPRK ||!$combined_cost ||!$combined_cost_keys || !$lpos->count() || !$lpis->count())
+                                  no lpdk
+                                  @else
+                                  @for($z= 0; $z < count($LPDK); $z++)
+                                  {{$LPDK[$z]}} 
+                                  @endfor
+                                  <br>
+                                  @for($z= 0; $z < count($LPRK); $z++)
+                                  {{$LPRK[$z]}} 
+                                  @endfor
+                                  <br>
+                                  @for($z= 0; $z < count($combined_cost_keys); $z++)
+                                  {{$combined_cost_keys[$z]}}
+                                  @endfor
+                                  <br>
+                                  @for($z= 0; $z < count($lpos); $z++)
+                                  {{$lpos[$z]}} <br>
+                                  @endfor
+                                  <br>
+                                  @for($z= 0; $z < count($lpis); $z++)
+                                  {{$lpis[$z]}} <br>
+                                  @endfor
+                                  <br>
+                                  @foreach($combined_cost as $key => $cc)
+                                  {{ $key }}: <span style="color: red">{{ $cc }}</span>
+                                  @endforeach
+                        @endif
                         @if (!$combined_cost || !$LPDK)
                         no combined cost
                         @else
@@ -419,7 +798,10 @@
              </div>
                 
             </div>
+        </form>
             <br>
+                        @endif
+                        @endfor
                     @endif
                     @endfor
                 @endfor

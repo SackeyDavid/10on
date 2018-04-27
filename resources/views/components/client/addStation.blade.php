@@ -40,8 +40,8 @@
                         <div class="input-group">
                             <input placeholder="e.g. NPL" type="text" name="abbreviation" class="form-control" maxlength="3" style="text-transform:uppercase" pattern="[A-Za-z]{3}">
                             
-                            <div class="input-group-addon">
-                                <span class="fa fa-"></span>
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
                             </div>
                         </div>
                         </div>
@@ -54,7 +54,9 @@
                         </label>
                         <div class="input-group">
                             <input type="text" placeholder="e.g. Tema" class="form-control" name="town_or_city">
-                            
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
+                            </div>
                         </div>
                         </div>
                         <br>
@@ -67,8 +69,8 @@
                             <input placeholder="eg. Greater Accra" id="section" type="text" class="form-control" name="region">
                             
                         
-                            <div class="input-group-addon">
-                                <span class="fa fa-"></span>
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
                             </div>
                         </div>
                         </div>

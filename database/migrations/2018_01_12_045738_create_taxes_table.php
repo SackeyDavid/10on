@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFaresTable extends Migration
+class CreateTaxesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,14 @@ class CreateFaresTable extends Migration
      */
     public function up()
     {
-        Schema::create('fares', function (Blueprint $table) {
+        Schema::create('taxes', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('road_fare')->nullable();
-            $table->string('carrier_imposed_charges')->nullable();
-            $table->string('total_tax')->nullable()->nullable();
-            $table->string('total_per_passenger')->nullable();
+            $table->string('tax_NTA')->nullable();
+            $table->string('passenger_service_charge')->nullable();
+            $table->string('passenger_facilities_charge')->nullable();
+            $table->string('advance_passenger_info_fee')->nullable();
+            $table->string('station_service_charge')->nullable();
+            $table->string('total')->nullable();
             $table->string('from_client')->nullable();
             $table->string('for_trip')->nullable();
             $table->timestamps();
@@ -32,6 +34,6 @@ class CreateFaresTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('fares');
+        Schema::dropIfExists('taxes');
     }
 }

@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Fare extends Model
+class Booking extends Model
 {
-    protected $table = 'fares';
+    protected $table = 'booking_process';
 
     /**
      * The attributes that are mass assignable.
@@ -14,7 +14,7 @@ class Fare extends Model
      * @var array
      */
     protected $fillable = [
-        'for_trip', 'road_fare', 'carrier_imposed_charges', 'total_tax', 'total_per_passenger', 'from_client',
+        'outbound', 'inbound', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id'
     ];
 
     /**
@@ -26,14 +26,10 @@ class Fare extends Model
 
     protected $primaryKey = 'id';
 
+    // not all passengers would be registered users so before accessing the author object check if it exists
+    
     public function author() {
-    	return $this->belongsTo('App\Client', 'from_client');
+    	return $this->belongsTo('App\User', 'passenger_id');
         
     }
-
-    public function trip() {
-        return $this->belongsTo('App\Trips', 'for_trip');
-        
-    }
-
 }

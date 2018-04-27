@@ -38,10 +38,10 @@
                             <label for="capacity">Number of passenger seats
                         </label>
                         <div class="input-group">
-                            <input placeholder="eg. 50" type="text" name="capacity" class="form-control">
+                            <input placeholder="0" type="number" min="0" name="capacity" class="form-control">
                             
-                            <div class="input-group-addon">
-                                <span class="fa fa-"></span>
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
                             </div>
                         </div>
                         </div>
@@ -50,11 +50,13 @@
                         
                         <div class="col-sm-4">
                     
-                        <label for="company"> Photo
+                        <label for="company"> Bus Photo
                         </label>
                         <div class="input-group">
                             <input type="file" class="form-control" name="photo">
-                            
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
+                            </div>
                         </div>
                         </div>
                         <br>
@@ -67,8 +69,8 @@
                             <input placeholder="eg. Yutong" id="section" type="text" class="form-control" name="brand_name">
                             
                         
-                            <div class="input-group-addon">
-                                <span class="fa fa-"></span>
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
                             </div>
                         </div>
                         </div>
@@ -79,8 +81,8 @@
                         </label>
                         <div class="input-group">
                             <input placeholder="eg. Mr. Dennis Sarpong" type="text" name="driver" class="form-control">
-                            <div class="input-group-addon">
-                                <span class="fa fa-"></span>
+                            <div class="input-group-append">
+                                <span class="input-group-text"></span>
                             </div>
                         </div>
                         </div>

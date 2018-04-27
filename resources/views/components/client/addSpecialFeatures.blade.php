@@ -1,5 +1,5 @@
 <div class="card card-default">
-                <div class="card-header">Add Special Feature</div>
+                <div class="card-header">Add Special Feature for a Bus</div>
 
                 <form class="form-horizontal"  role="form" method="POST" action="{{ route('special.add') }}">
                 

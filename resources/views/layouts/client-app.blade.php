@@ -43,6 +43,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-datepicker3.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-clockpicker.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-tagsinput.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/client-app.css') }}">
 
     
 </head>
@@ -218,15 +219,82 @@
     //   }
     // });
 
-    document.getElementById("trip_cost").onblur =function (){    
-    this.value = parseFloat(this.value.replace(/,/g, ""))
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     
-    // document.getElementById("display").value = this.value.replace(/,/g, "")
-    
-    }
+
+    $('#fare_btn_submit').click(function(){
+        // this.value = parseFloat(this.value).toFixed(2);
+        $('input[name="total_per_passenger"]').val(parseFloat($("input[name='road_fare']").val()) + parseFloat($("input[name='carrier_imposed_charges']").val()) + parseFloat($("input[name='total_tax']").val())).toFixed(2); 
+
+        if ($('input[name="total_per_passenger"]').val() == "") {
+            @guest
+            @else
+            alert('Sorry '+{{Auth::user()->username}}+ ', you provided no fare breakdown');
+            @endguest
+        
+        }
+        else {
+            @if(!Auth::user())
+            @else
+            document.forms[{{$ones_fares->count()}}+3].submit();
+            @endif
+        }
+    });
+
+    $('#tax_btn_submit').click(function(){
+        // this.value = parseFloat(this.value).toFixed(2);
+        $('input[name="total"]').val(parseFloat($("input[name='tax_NTA']").val()) + parseFloat($("input[name='passenger_service_charge']").val()) + parseFloat($("input[name='passenger_facilities_charge']").val()) + parseFloat($("input[name='advance_passenger_info_fee']").val()) + parseFloat($("input[name='station_service_charge']").val())).toFixed(2); 
+
+        if ($('input[name="total"]').val() == "") {
+            
+            
+            @guest
+            @else
+            alert('Sorry '+{{Auth::user()->username}}+ ', you provided no tax breakdown');
+            @endguest
+            
+        }
+        else {
+            @if(!Auth::user())
+            @else
+            document.forms[{{$ones_fares->count()}}+6+{{$ones_taxes->count()}}].submit();
+            @endif
+        }
+    });
+    // for taxes
+    $('#tax_trip_id').focus(function(){
+        var text = $("#tax_trip_id option:selected").text();
+        var textFormat = text.split(" ");
+        var cost = textFormat[textFormat.length - 1];
+        $('input[name="total"]').val(cost);
+
+    });
+
+    $('#tax_trip_id').change(function(){
+        var text = $("#tax_trip_id option:selected").text();
+        var textFormat = text.split(" ");
+        var cost = textFormat[textFormat.length - 1];
+        $('input[name="total"]').val(cost);
+
+    });
+
+    // for fares
+    $('#fare_trip_id').focus(function(){
+        var text = $("#fare_trip_id option:selected").text();
+        var textFormat = text.split(" ");
+        var cost = textFormat[textFormat.length - 1];
+        $('input[name="total_per_passenger"]').val(cost);
+
+    });
+
+    $('#fare_trip_id').change(function(){
+        var text = $("#fare_trip_id option:selected").text();
+        var textFormat = text.split(" ");
+        var cost = textFormat[textFormat.length - 1];
+        $('input[name="total_per_passenger"]').val(cost);
+
+    });
+
+
 
     </script>
 </body>

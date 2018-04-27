@@ -180,7 +180,7 @@
             </div>
             </div>
             <div id="resultsBtn" type="submit" class="modal-footer btn btn-lg" style="border-radius: 0;background-color: #ccc;">
-                <center><span style="font-size: 16px;height: inherit; font-weight: 500;color: #fff;"><strong>See results</strong></span></center>
+                <center><span style="font-size: 16px;height: inherit; font-weight: 500;color: #fff;"><strong>See results<br></strong></span></center>
             </div>
         </div>
     </div>

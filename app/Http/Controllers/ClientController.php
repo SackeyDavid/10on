@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Validator;
 use App\Fare;
 use App\Bus;
 use App\Trips;
+use App\Tax;
 use App\SpecialFeatures;
 use App\Station;
 use Auth;
+use DB;
 
 class ClientController extends Controller
 {
@@ -46,27 +48,46 @@ class ClientController extends Controller
             'remaining_seats' => $request->remaining_seats,
             'via' => $request->via,
             'trip_duration_in_hrs' => $request->trip_duration_in_hrs,
-            'trip_cost_id' => $request->trip_cost_id,
-            'trip_cost' => $request->trip_cost,
+            'trip_fare' => $request->trip_fare,
             'bus_id' => $request->bus_id,
         ]);
 
-        return redirect()->route('client.dashboard')->with('msg', 'Trip has been saved!');
+        return redirect()->route('client.dashboard')->with(['msg' => 'Trip has been saved!']);
+    }
+
+    
+    public function addTax(Request $request)
+    {
+        $tax = Tax::create([
+            'from_client' => Auth::user()->id,
+            'tax_NTA' => $request->tax_NTA,
+            'passenger_service_charge' => $request->passenger_service_charge,
+            'passenger_facilities_charge' => $request->passenger_facilities_charge,
+            'advance_passenger_info_fee' => $request->advance_passenger_info_fee,
+            'station_service_charge' => $request->station_service_charge,
+            'for_trip' => $request->trip_id,
+            'total' => $request->total,
+        ]);
+
+        DB::table('trips')->where('id', $request->trip_id )->update(['tax_id' => $tax->id]);
+
+        return redirect()->route('client.dashboard')->with('msg', 'Tax has been saved and Trip updated!');
     }
 
     public function addFare(Request $request)
     {
         $fare = Fare::create([
             'from_client' => Auth::user()->id,
-            'start_point' => $request->start_point,
-            'destination' => $request->destination,
+            'for_trip' => $request->trip_id,
             'road_fare' => $request->road_fare,
             'carrier_imposed_charges' => $request->carrier_imposed_charges,
             'total_tax' => $request->total_tax,
-            'total_per_passenger' => $request->total_per_passenger
+            'total_per_passenger' => number_format($request->total_per_passenger, 2)
         ]);
 
-        return redirect()->route('client.dashboard')->with('msg', 'Fare has been saved!');
+        DB::table('trips')->where('id', $request->trip_id )->update(['fare_id' => $fare->id]);
+
+        return redirect()->route('client.dashboard')->with('msg', 'Fare has been saved and Trip updated!');
     }
 
     public function addBus(Request $request)
@@ -112,6 +133,55 @@ class ClientController extends Controller
         ]);
 
         return redirect()->route('client.dashboard')->with('msg', 'Station has been saved!');
+    }
+
+    public function deleteFare($id, $for_trip) 
+    {
+            $fare = Fare::find($id);
+
+            $fare->delete();
+            
+
+            DB::table('trips')->where('id', $for_trip)->update(['fare_id' => null]);
+
+        return redirect()->route('client.dashboard')->with('msg', 'Fare has been deleted and Trip updated!');
+
+    }
+
+    public function deleteTax($id, $for_trip) 
+    {
+            $tax = Tax::find($id);
+
+            $tax->delete();
+            
+
+            DB::table('trips')->where('id', $for_trip)->update(['tax_id' => null]);
+
+        return redirect()->route('client.dashboard')->with('msg', 'Tax has been deleted and Trip updated!');
+
+    }
+
+    public function deleteTrip($id) 
+    {
+            $trip = Trips::find($id);
+            $trip->delete();
+
+            $tax = Tax::where('for_trip', $id);
+            if ($tax) {
+                $tax->delete();
+            }
+
+            $fare = Fare::where('for_trip', $id);
+            if ($fare) {
+                $fare->delete();
+            }
+            
+            
+
+            
+
+        return redirect()->route('client.dashboard')->with('msg', 'Trip has been deleted and its Tax and/or Fare breakdown deleted!');
+
     }
 
 

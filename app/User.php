@@ -18,7 +18,7 @@ class User extends Authenticatable
     protected $table = 'users';
     
     protected $fillable = [
-        'name', 'email', 'password',
+            'title','first_name', 'last_name','email', 'contact_person', 'country', 'mobile_number', 'remind_me', 'membership_number', 'agree', 'password', 'card_id', 'wallet_id'
     ];
 
     /**
@@ -35,5 +35,15 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new UserResetPasswordNotification($token));
+    }
+
+    public function card() {
+        return $this->belongsTo('App\CardDetails', 'card_id');
+        
+    }
+
+    public function wallet() {
+        return $this->belongsTo('App\MobileMoney', 'wallet_id');
+        
     }
 }
