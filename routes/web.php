@@ -25,6 +25,8 @@ Route::post('/users/logout', 'Auth\LoginController@userLogout')->name('user.logo
 Route::get('/search/from', 'BookingController@searchTrip')->name('search.trips');
 Route::get('/search/fromhome/autocomplete', 'BookingController@autocomplete')->name('search.trips.autocomplete');
 
+
+
 Route::get('/search/trips/return', 'BookingController@findReturnTrips')->name('search.trips.return.find');
 
 Route::post('/trip/from/{lpos}/{lpis}/{passenger_num}', 'BookingController@tripFound')->name('trip.search.found');
@@ -37,9 +39,11 @@ Route::get('/trip/book/payment/{booking_id}/{lpos}/{lpis}/{passenger_num}/{trave
 
 Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
 
-Route::get('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('verify.payment.details');
+Route::get('verify/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@showVerifyPaymentDetails')->name('verify.payment.details');
 
 Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('verified.payment.details.add');
+
+Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.search');
 
 
 Route::group(['middleware'=>['auth']],function(){
@@ -54,7 +58,14 @@ Route::group(['middleware'=>['auth']],function(){
 
     Route::post('/details/mobile/register/', 'HomeController@registerMobileDetails')->name('mobile.details.register');
 
+    Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
+
+    Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('verified.payment.details.add');
+
+
 });
+
+Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
 
 
 View::composer(['book.components.returnTab', 'book.components.onewayTab', 'book.components.multicityTab', 'book.search-trip'], function ($view) {

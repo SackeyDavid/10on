@@ -12,9 +12,16 @@ use App\MobileMoney;
 use Auth;
 use DB;
 use OVAC\LaravelHubtelPayment\Facades\HubtelPayment;
+use OVAC\HubtelPayment\Config;
+use Slydepay\Order\Order;
+use Slydepay\Order\OrderItem;
+use Slydepay\Order\OrderItems;
+use Slydepay;
 
 class BookingController extends Controller
 {
+    
+
     public function searchTrip()
     {
     	return view('book.search-trip');
@@ -31,22 +38,22 @@ class BookingController extends Controller
     public function findReturnTrips(Request $request)
     {
     	// lowest price outbounds (lpos)
-    	$lpos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date)->orderBy('trip_fare')->get();
+    	$lpos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date . ' 2018')->orderBy('trip_fare')->get();
 
     	// lowest price inbounds (lpis)
-    	$lpis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date)->orderBy('trip_fare')->get();
+    	$lpis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date . ' 2018')->orderBy('trip_fare')->get();
 
     	// earliest departure outbounds (eos)
-    	$eos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date)->orderBy('departure_time')->get();
+    	$eos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date . ' 2018')->orderBy('departure_time')->get();
 
     	// earlest departure inbounds (eis)
-    	$eis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date)->orderBy('departure_time')->get();
+    	$eis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date . ' 2018')->orderBy('departure_time')->get();
 
     	// shortest duration outbounds (sdos)
-    	$sdos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date)->orderBy('trip_duration_in_hrs')->get();
+    	$sdos = Trips::where('departure_location', $request->departure_location)->where('arrival_location', $request->arrival_location)->where('departure_date', $request->departure_date . ' 2018')->orderBy('trip_duration_in_hrs')->get();
 
     	// sshortest duration inbounds (sdis)
-    	$sdis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date)->orderBy('trip_duration_in_hrs')->get();
+    	$sdis = Trips::where('departure_location', $request->arrival_location)->where('arrival_location', $request->departure_location)->where('departure_date', $request->return_date . ' 2018')->orderBy('trip_duration_in_hrs')->get();
 
     	// array to store total cost for each outbound and inbound trip  
     	$combined_cost = array();
@@ -183,6 +190,7 @@ class BookingController extends Controller
 
     public function addPaymentDetails(Request $request, $booking_id, $lpos, $lpis, $passenger_num, $traveler_id, $option)
     {
+        $config = new Config('HM2604180034', 'ahntkmmu', 'anxixrrt');
         if ($option == 'card') {
 
             if (Auth::user()) {
@@ -231,23 +239,150 @@ class BookingController extends Controller
 
             }
             else
-                {
+            {
                     $passenger = explode(" ", $traveler_id);
                     $bookers_id = $passenger[1];
 
-                    $wallet = MobileMoney::create([
-                    'phone_number' => $request->phone_number,
-                    'email' => $request->email,
-                    'password' => $request->password,
-                    'from_user' => null,
-                    'from_passenger' => $bookers_id
+                    if ($passenger[0] == 'user') {
+                        $wallet = MobileMoney::create([
+                            'phone_number' => $request->phone_number,
+                            'email' => $request->email,
+                            'password' => $request->password,
+                            'from_user' => Auth::user()->id,
+                            'from_passenger' => null
+                         ]);
+                    }
+                    else
+                    {
+                        $wallet = MobileMoney::create([
+                            'phone_number' => $request->phone_number,
+                            'email' => $request->email,
+                            'password' => $request->password,
+                            'from_user' => null,
+                            'from_passenger' => $bookers_id
+                         ]);
+                    }
 
-                ]);
+//                     $payment = HubtelPayment::ReceiveMoney()
+//                             ->from()                //- The phone number to send the prompt to. 
+//                             ->amount(0.20)                    //- The exact amount value of the transaction
+//                             ->description('')    //- Description of the transaction.
+//                             ->customerName()     //- Name of the person making the payment.callback after payment. 
+//                             ->channel($request->network)                 //- The mobile network Channel.configuration
+//                             ->run();  
+//                     HUBTEL_ACCOUNT_NUMBER= 
+// HUBTEL_CLIENT_ID=     
+// HUBTEL_CLIENT_SECRET= 
+// HUBTEL_CALLBACK_URL=http://10.18.222.165/10ondrives/public
+// HUBTEL_SECONDARY_CALLBACK_URL=http://10.18.222.165/10ondrives/public/login
+ DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+                        $receive_momo_request = array(
+                              'CustomerName' => $request->name,
+                              'CustomerMsisdn'=> '0246692117',
+                              'CustomerEmail'=> 'davidkofiahensackey@gmail.com',
+                              'Channel'=> 'mtn-gh',
+                              'Amount'=> 1.00,
+                              'PrimaryCallbackUrl'=> 'http://197.255.71.75/10ondrives/public',
+                              'SecondaryCallbackUrl'=> 'http://197.255.71.75/10ondrives/public/login',
+                              'Description'=> 'Online Booking Payment',
+                              'ClientReference'=> '23213',
+                        );
 
-                DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+                        //API Keys
 
-                return redirect()->route('confirm.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $payment->id]);
-                }
+                        $clientId = 'ahntkmmu';
+                        $clientSecret = 'anxixrrt';
+                        $basic_auth_key =  'Basic ' . base64_encode($clientId . ':' . $clientSecret);
+                        $request_url = 'https://api.hubtel.com/v1/merchantaccount/merchants/HM2604180034/receive/mobilemoney';
+                        $receive_momo_request = json_encode($receive_momo_request);
+
+                        $ch =  curl_init($request_url);  
+                                curl_setopt( $ch, CURLOPT_POST, true );  
+                                curl_setopt( $ch, CURLOPT_POSTFIELDS, $receive_momo_request);  
+                                curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );  
+                                curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+                                    'Authorization: '.$basic_auth_key,
+                                    'Cache-Control: no-cache',
+                                    'Content-Type: application/json',
+                                  ));
+
+                        $result = curl_exec($ch); 
+                        $err = curl_error($ch);
+                        curl_close($ch);
+
+                        if($err){
+                            echo $err;
+                             return view('errors', ['err' => $err, 'result' => null]);
+                        }else{
+
+                            // reduce number of remaining seats
+    // $data  = array(
+    //               'CustomerName' => $request->name,
+    //               'CustomerMsisdn'=> '0246692117',
+    //               'CustomerEmail'=> 'davidkofiahensackey@gmail.com',
+    //               'Channel'=> 'mtn-gh',
+    //               'Amount'=> 1.00,
+    //               'PrimaryCallbackUrl'=> 'http://10.20.84.113/10ondrives/public',
+    //               'SecondaryCallbackUrl'=> 'http://10.20.84.113/10ondrives/public/login',
+    //               'Description'=> 'Online Booking Payment',
+    //               'ClientReference'=> '23213',
+    //                 );
+                            $out_trip = Trips::find($lpos);
+                            $out_rem_seats = $out_trip->remaining_seats;
+                            $out_rem_seats--;
+
+                            $in_trip = Trips::find($lpis);
+                            $in_rem_seats = $in_trip->remaining_seats;
+                            $in_rem_seats--;
+
+                            // update trips table
+                            DB::table('trips')->where('id', $lpos )->update(['remaining_seats' => $out_rem_seats ]);
+                            DB::table('trips')->where('id', $lpis )->update(['remaining_seats' => $in_rem_seats ]);
+
+                            $slydepay = new Slydepay\Slydepay("nafiu1994@gmail.com", "1490789001082");
+
+                            // Create a list of OrderItems with OrderItem objects
+                            $orderItems = new OrderItems([
+                            new OrderItem("1234", "Test Product", 10, 2),
+                            new OrderItem("1284", "Test Product2", 20, 2),
+                            ]);
+
+                            // Shipping and tax pulled either from ini/properties file. Hard coded here for illustration
+                            $shippingCost = 20; 
+                            $tax = 10;
+
+                            // Create the Order object for this transaction. 
+                            $order = Order::createWithId(
+                            $orderItems,
+                            "order_id_1", 
+                            $shippingCost,
+                            $tax,
+                            "description",
+                            "no comment"
+                            );
+
+                            $err = "";
+                            try {
+                            // Make request to Slydepay and get the response object for the redirect url
+                            $response = $slydepay->processPaymentOrder($order);
+                            echo $response->redirectUrl();
+                            } catch (Slydepay\Exception\ProcessPayment $e) {
+                            $err = $e->getMessage();
+                            }
+
+
+                             return view('errors', ['result' => $result ,'err' => $err]);
+                        }
+                    }
+
+               
+
+               
+
+                // return redirect()->route('confirm.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $wallet->id]);
+
+
+            
 
 
         }

@@ -16,8 +16,8 @@ class CreateBookingProcessTable extends Migration
         Schema::create('booking_process', function (Blueprint $table) {
             $table->increments('id');
             $table->string('passenger_id')->nullable();
-            $table->string('outbound');
-            $table->string('inbound');
+            $table->string('outbound')->nullable();
+            $table->string('inbound')->nullable();
             $table->string('card_id')->nullable();
             $table->string('mobile_money_id')->nullable();
             $table->string('user_id')->nullable();

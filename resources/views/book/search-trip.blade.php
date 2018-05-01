@@ -4,6 +4,10 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="description" content="Online bus booking system in Ghana">
+        <meta name="author" content="10ondrives">
+        <meta name="keyword" content="Bus, Online, Book, Ghana, 10ondrives, Transport">
 
         <title>Plan and book | 10ondrives</title>
 
@@ -34,6 +38,12 @@
         <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap-datepicker3.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/search-trips.css') }}">
+
+        <script>
+            window.Laravel = {
+                csrfToken: '{{csrf_token()}}'
+            }
+        </script>
 
         <style>
             html, body {
@@ -101,10 +111,10 @@
                     <!-- Nav tabs -->
                     <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
                       
-                      <li class="nav-item active">
+                      <li class="nav-item">
                         <a href="#returnTab" data-toggle="tab">Return</a>
                       </li>
-                      <li class="nav-item">
+                      <li class="nav-item active">
                         <a href="#onewayTab" data-toggle="tab">One Way</a>
                       </li>
                       <li class="nav-item">
@@ -161,7 +171,7 @@
                      </div>
 
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
-        
+      
         
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
@@ -169,17 +179,87 @@
         <script src="{{ asset('js/bootstrap3-typeahead.min.js') }}"></script>
         <script src="{{ asset('js/typeahead.bundle.js') }}"></script>
         <script src="{{ asset('js/handlebars.js') }}"></script>
+
+        
         
         <script>
+            $.ajaxSetup({
+                headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+              });
+            
+
+            $('body').on('keyup', '#ow_search_arrival_station', function(){
+              // alert('Hi');
+               $value = $(this).val(); // arrival station
+
+               $departure_station = $('input[name="ow_departure_station"]').val();
+               $date = $('input[name="ow_date"]').val();
+               $passenger_num = $('input[name="ow_passenger_num"]').val();
+               
+                $.ajax({
+                    type : 'GET',
+                    url  : '{{ route('trips.search') }}',
+                    data : {'ow_arrival_station': $value, 'ow_departure_station': $departure_station,'ow_date': $date, 'ow_passenger_num': $passenger_num},
+                    success:function(data){
+                        /*console.log(data);*/
+                        if($value != ""){
+                              $('.results').html(data);
+                          }
+                        else
+                        {
+                            $('.results').html('');
+                        }
+                    }
+                }); 
+
+                });
+
+            $(document).on('click', '.pagination a', function(e) {
+                e.preventDefault();
+                //console.log($(this).attr('href').split('page='));
+                var page = $(this).attr('href').split('page=')[1];
+                getTrip(page, $('#search_arrival_station').val(), $('input[name="ow_departure_station"]').val(), $('input[name="ow_date"]').val(), $('input[name="ow_passenger_num"]').val());
+            })
+            function getTrip(page, ow_arrival_station, ow_departure_station, ow_date, ow_passenger_num)
+            {
+
+                var url = "{{ route('trips.search') }}";
+
+                $.ajax({
+                    type : 'GET',
+                    url  : url + '?page=' + page,
+                    data : {'ow_arrival_station': $value, 'ow_departure_station': $departure_station,'ow_date': $date, 'ow_passenger_num': $passenger_num},
+                }).done(function(data) {
+                    $('.results').html(data);
+                })
+            }
+
+            
+
             $('#departure_station').focus(function(){
                 //open bootsrap modal
                 $('#searchstation').modal('show');
                 $('.custom-templates .typeahead').focus();
             });
 
+            $('#ow_departure_station').focus(function(){
+                //open bootsrap modal
+                $('#ow_searchstation').modal('show');
+                $('.custom-templates .typeahead').focus();
+            });
+
+
             $('#arrival_station').focus(function(){
                 //open bootsrap modal
                 $('#search-arrival-station').modal('show');
+                $('.custom-templates .typeahead').focus();
+            });
+
+            $('#ow_arrival_station').focus(function(){
+                //open bootsrap modal
+                $('#ow_search_results').modal('show');
                 $('.custom-templates .typeahead').focus();
             });
 
@@ -239,7 +319,7 @@
                     suggestion: function (data) {
 
                     
-                       return '<div class="col-md-12" style="width: 26em;background-color: #fafafa;"><ul style="" class="list-unstyled"> <li><ul class="list-inline"> <li><i class="fas fa-map-marker-alt"></i><strong> '+ data.name +',</strong> '+ data.town_or_city +'</li><li class="pull-right"><span style="padding: 1%;background-color: cyan;">'+ data.abbreviation + '</span></li></ul></li><li><span>'+ data.region +'</span></li>                             </ul></div>';
+                       return '<div id="typeahead-result" class="col-md-12" style="width: 26em;background-color: #fafafa;"><ul style="" class="list-unstyled"> <li><ul class="list-inline"> <li><i class="fas fa-map-marker-alt"></i><strong> '+ data.name +',</strong> '+ data.town_or_city +'</li><li class="pull-right"><span style="padding: 1%;background-color: cyan;">'+ data.abbreviation + '</span></li></ul></li><li><span>'+ data.region +'</span></li>                             </ul></div>';
                          
                     }
                      
@@ -264,6 +344,16 @@
                }  
            });
 
+            
+            $('#ow_search_departure_station').keyup(function() {
+              $search_value = $('#ow_search_departure_station').val();
+
+            if($search_value != "")
+               {
+                $('#ow_departure-submit').css('background-color', '#ff3345');
+               }  
+           });
+
             $('#search_arrival_station').keyup(function() {
               $search_value_2 = $('#search_arrival_station').val();
 
@@ -272,7 +362,6 @@
                 $('#arrival-submit').css('background-color', '#ff3345');
                }  
            });
-
             
 
            $('#departure-submit').on('click', function() {
@@ -281,6 +370,15 @@
             $('#departure_station').val($('#search_departure_station').val());
 
             $('#searchstation').modal('hide');
+
+           });
+
+           $('#ow_departure-submit').on('click', function() {
+                
+
+            $('#ow_departure_station').val($('#ow_search_departure_station').val());
+
+            $('#ow_searchstation').modal('hide');
 
            }); 
 
@@ -297,7 +395,10 @@
             $('#passenger_num_plus').on('click',function(){
                 var $qty= $('#passenger_num');
                 var currentVal = parseInt($qty.val());
-                if (!isNaN(currentVal)) {
+                if (currentVal > 4) {
+                  alert('maximum number of passengers reached')
+                }
+                if (!isNaN(currentVal) && currentVal <= 4) {
                     $qty.val(currentVal + 1);
                     if($qty.val() == 1){
                      $('#passenger_label').text('passenger');   
@@ -321,6 +422,39 @@
                     }
                 }
             });
+
+            $('#ow_passenger_num_plus').on('click',function(){
+                var $qty= $('#ow_passenger_num');
+                var currentVal = parseInt($qty.val());
+                if (currentVal > 4) {
+                  alert('maximum number of passengers reached')
+                }
+                if (!isNaN(currentVal) && currentVal <= 4) {
+                    $qty.val(currentVal + 1);
+                    if($qty.val() == 1){
+                     $('#ow_passenger_label').text('passenger');   
+                    }
+                    else if ($qty.val() > 1) {
+                     $('#ow_passenger_label').text('passengers');   
+                    }
+                    
+                }
+            });
+            $('#ow_passenger_num_minus').on('click',function(){
+                var $qty=$('#ow_passenger_num');
+                var currentVal = parseInt($qty.val());
+                if (!isNaN(currentVal) && currentVal > 1) {
+                    $qty.val(currentVal - 1);
+                    if($qty.val() == 1){
+                     $('#ow_passenger_label').text('passenger');   
+                    }
+                    else if ($qty.val() > 1) {
+                     $('#ow_passenger_label').text('passengers');   
+                    }
+                }
+            });
+
+
 
 
            // $('#passenger_num_plus').on('click', function() {
@@ -407,6 +541,20 @@
 
             });
 
+            $('#resultsBtn2').click(function() {
+                var getdate = $('#from2').val();
+                var thedate = $('#from2').datepicker('getDate');
+                var getdateFormat = getdate.split(" ");
+                var weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                $('#ow_day span').text(getdateFormat[0]);
+                $('#ow_mnt_year span').text(getdateFormat[1] + ' ' + thedate.getFullYear());
+                $('#week_day span').text(weekday[thedate.getDay()]);
+
+                $('input[name="ow_date"]').val(weekday[thedate.getDay()] + ' ' + getdateFormat[0] + ' ' + getdateFormat[1] + ' ' + thedate.getFullYear());
+                
+                $('#selectDates2').modal('hide');
+            });
+
             
             $('#to').focus(function(){
                 $(this).css('border-color', '#ccc');
@@ -434,6 +582,9 @@
             // $('.input-daterange input').each(function() {
             //     $(this).datepicker('clearDates');
             // });
+
+             
+            
 
             
         </script>

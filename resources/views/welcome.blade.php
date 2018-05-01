@@ -135,6 +135,9 @@
                 <h3 class="margin  m-b-md">
                     <!-- <img src="/images/IMG-20180322-WA0015.jpg" height="100px" width="250px"><br> -->
                 10ondrives</h3>
+                @php
+                echo phpinfo();
+                @endphp
                 <span class="brand-name">Book trips all over Ghana.</span>
                 <br><br>
                 <ul class="nav nav-tabs justify-content  margin" style="border-bottom: none;">

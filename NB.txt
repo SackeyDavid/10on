@@ -30,3 +30,17 @@ From mobile payment details option, we save appropriate payment_id (card or mobi
 
 For mobile money database table, password is used to represent pin 
 
+Route not defined meanwhile it's defined could be as a result of the position of the route.
+
+Non-functional requirements
+The page must load fast,
+with low-weight files
+
+Source of Errors
+*****Most errors seemed to have come from wrong identification/reference of/to DOM element, and wrong spelling
+
+*****some times check developer console network for debugging 
+
+Client will have to add the year to the dates when saving them
+
+encoded base64 hubtel client details YWhudGttbXU6YW54aXhycnQ=

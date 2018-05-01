@@ -1,4 +1,4 @@
-<div class="well tab-pane active" id="returnTab">
+<div class="well tab-pane " id="returnTab">
  
 <form method="GET"  action="{{ route('search.trips.return.find') }}" style="padding: 0%;">
 <input type="text" id="departure_station" name="departure_location"  class="form-control search-trip-bar" placeholder="Departure Station" required>

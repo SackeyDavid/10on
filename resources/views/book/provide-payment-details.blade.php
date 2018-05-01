@@ -238,7 +238,7 @@
                 
                 @if(!Auth::user())
                 <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
-                    <option></option>
+                    <option>---choose network---</option>
                     <option value="mtn-gh">Mtn</option>
                     <option value="tigo-gh">Tico</option>
                     <option value="airtel-gh">Airtel</option>
@@ -494,6 +494,45 @@
                 
             });
 
+            $('input[name="network"]').focus(function() {
+                alert('Hi');
+                var c  = document.createElement("option");
+                var channel = $('input[name="phone_number"]').val();
+                channel = channel.substring(0,3);
+                switch(channel)
+                {
+                    case 024:
+                        
+                    case 055:
+                        
+                    case 054:
+                        
+                        c.text = "Mtn" ;
+                        c.value = "mtn-gh";
+                        break;
+                    case 027:
+                        
+                    case 057:
+                        c.text = "Tigo" ;
+                        c.value = "tigo-gh";
+                        break;
+                    case 026:
+                        
+                    case 056:
+                        c.text = "Airtel" ;
+                        c.value = "airtel-gh";
+                        break;
+                    case 050:
+                        
+                    case 020:
+                        c.text = "Vodafone" ;
+                        c.value = "vodafone-gh";
+                        break;
+                }
+                 
+                this.options.add(c, 0);
+            });
+
             var counter = 2;
 
             $('#passenger_num_plus').click(function() {
@@ -531,6 +570,8 @@
                 $('.modal-backdrop').hide();
                 $("body").removeClass("modal-open");
             });
+
+
 
         </script>
     </body>

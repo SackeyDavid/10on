@@ -56,6 +56,12 @@
                 box-shadow: none;
             }
 
+            #ow_passenger_num {
+                background-color: #fff;
+                border: none;
+                box-shadow: none;
+            }
+
             
             .search-trip-bar::-webkit-input-placeholder {
                 font-size: 18px;
@@ -103,6 +109,14 @@
                 
                 z-index: 2002; 
 
+            }
+
+            #ow_searchstation {
+                z-index: 2003;
+            }
+
+            #ow_search_results {
+                z-index: 2004;
             }
 
             .modal-dialog {
