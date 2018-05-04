@@ -35,20 +35,35 @@ Route::get('/trip/book/personal/{booking_id}/{lpos}/{lpis}/{passenger_num}', 'Bo
 
 Route::post('/passenger/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}', 'BookingController@addPassengerDetails')->name('passenger.details.add');
 
+Route::post('/passenger/details/add/{booking_id}/{passenger_num}', 'SearchController@addPassengerDetails')->name('ow.passenger.details.add');
+
 Route::get('/trip/book/payment/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}', 'BookingController@paymentDetails')->name('book.payment.details');
+
+Route::get('/trip/book/payment/{booking_id}/{passenger_num}/{traveler_id}', 'SearchController@paymentDetails')->name('oneway.book.payment.details');
 
 Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
 
-Route::get('verify/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@showVerifyPaymentDetails')->name('verify.payment.details');
+Route::post('/payment/details/add/{booking_id}/{passenger_num}/{traveler_id}/{option}', 'SearchController@addPaymentDetails')->name('oneway.payment.details.add');
 
-Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('verified.payment.details.add');
+Route::get('/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.show');
+
+Route::post('/payment/success/edit/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@editPaymentSuccess')->name('payment.success.edit');
 
 Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.search');
+
+Route::post('/found/trips/oneway/{trip_id}/{passenger_num}', 'SearchController@tripFound')->name('oneway.trip.found');
+
+Route::get('/payment/success/{booking_id}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'SearchController@showPaymentSuccess')->name('one_way.payment.success.show');
 
 
 Route::group(['middleware'=>['auth']],function(){
     Route::get('/trip/book/personal/auth/{booking_id}/{lpos}/{lpis}/{passenger_num}', 'BookingController@personalDetails')->name('book.personal.details.auth');
+
+    Route::get('oneway/trip/book/personal/auth/{booking_id}/{passenger_num}', 'SearchController@onewayPersonalDetails')->name('oneway.book.personal.details.auth');
+
     Route::get('/trip/book/payment/auth/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}', 'BookingController@paymentDetails')->name('book.payment.details.auth');
+
+    Route::get('/trip/book/payment/auth/{booking_id}/{passenger_num}/{traveler_id}', 'SearchController@paymentDetails')->name('oneway.book.payment.details.auth');
 
     Route::get('/payment/details/register/', 'HomeController@showPaymentDetailsForm')->name('payment.details.register');
 
@@ -60,7 +75,7 @@ Route::group(['middleware'=>['auth']],function(){
 
     Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
 
-    Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('verified.payment.details.add');
+    
 
 
 });

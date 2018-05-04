@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Booking extends Model
+class OneWayBookingProcess extends Model
 {
-    protected $table = 'booking_process';
+    protected $table = 'one_way_booking_process';
 
     /**
      * The attributes that are mass assignable.
@@ -14,7 +14,7 @@ class Booking extends Model
      * @var array
      */
     protected $fillable = [
-        'outbound', 'inbound', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id'
+        'trip_id', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id'
     ];
 
     /**
@@ -28,7 +28,7 @@ class Booking extends Model
 
     // not all passengers would be registered users so before accessing the author object check if it exists
     
-    public function author() {
+    public function user() {
     	return $this->belongsTo('App\User', 'user_id');
         
     }
@@ -37,4 +37,6 @@ class Booking extends Model
         return $this->belongsTo('App\PassengerDetails', 'passenger_id');
         
     }
+
+    
 }

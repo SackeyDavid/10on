@@ -11,7 +11,7 @@
             </div>
             @endif
             <div class="card card-default">
-                <div class="card-header"><i class="fas fa-cedit-card"></i> Register Payment Details</div>
+                <div class="card-header"><i class="fas fa-cedit-card"></i> Provide Credit/Debit Card Details</div>
 
                 <div class="card-body">
                     <form class="form-horizontal" method="POST" action="{{ route('payment.register') }}">

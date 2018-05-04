@@ -25,7 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('contact_person');
             $table->string('remind_me');
             $table->string('card_id');
-            $table->string('wallet_id');
+            $table->string('mobile_money_id');
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

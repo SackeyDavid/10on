@@ -75,7 +75,7 @@
         </main>
 
     </div>
-     <div style="height: 40%; width: 100%; background-color: #333333;">
+     <!-- <div style="height: 40%; width: 100%; background-color: #333333;">
                     <div class="col-md-12">
                         <br>
                        <span class="footer-heads">Site tools</span> 
@@ -102,7 +102,7 @@
                        <br>
                        <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
                     </div>
-                     </div>
+                     </div> -->
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="/js/script.js"></script>

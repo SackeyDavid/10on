@@ -97,13 +97,13 @@
       <div class="modal-body" style="padding: 0%;background-color: #f8f8f8;">
         <div class="tab-heading" style="margin-top: 0%;margin-bottom: 2%; background-color: #ff3345;"> 
                     <!-- Nav tabs -->
-                    <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist">
+                    <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist" style="font-size: 12px;">
                       
                       <li class="nav-item">
                         <a href="#previousDay" data-toggle="tab">Apr 22</a>
                       </li>
                       <li class="nav-item active">
-                        <a href="#selectedDay" data-toggle="tab">Mon, Apr 23 &nbsp;&nbsp;<i class="fas fa-calendar"></i></a>
+                        <a href="#selectedDay" data-toggle="tab">Mon, Apr 23 <i class="fas fa-calendar"></i></a>
                       </li>
                       <li class="nav-item"> 
                         <a href="#nextDay" data-toggle="tab">Apr 24</a>
@@ -127,43 +127,7 @@
         <div class="well tab-pane results active" id="selectedDay" style="margin: 1%;background-color: #f8f8f8; padding: 1%;border: 1px solid #fafafa;border-radius: 3px;">
             
             
-            <div class="card-body" style="padding: 1%;background-color: #fff;border-radius: 3px;">
-            <ul class="list-inline" style="margin-bottom: 0%;">
-            <li style="width: 30%"> 
-                <ul class="list-inline">
-                    <li>
-               <ul class="list-unstyled">
-                   <li><span style="font-size: 25px;">09:00</span></li>
-                   <li>13:28</li>
-               </ul>
-                    </li>
-                    <li style="font-size: 30px;"><b style="border-right: solid 1px #ccc;height: 150px;"></b></li>
-                    
-                </ul>
-            </li>
             
-            <li style="width: 40%"> 
-               <ul class="list-unstyled">
-                   <li><span style="color: #777;">N1 <span style="font-weight: 100;">|</span> 4h28m</span></li>
-                   <li>Tudu</li>
-                   <li>
-                    <ul class="list-inline">
-                    <li> Koforidua</li>
-                    <li class="float-right">VIP</li>
-                    </ul>
-                   </li>
-               </ul>
-            </li>
-            <li class="float-right" style="width: 20%;margin-top: 6%;margin-right: -6%;color: #ff3345;"> 
-               <ul class="list-unstyled">
-                   <li></li>
-                   <li><span style="font-size: 11px;">GHS</span> <span style="font-size: 30px;">5</span></li>
-               </ul>
-            </li>
-            </ul>
-            <hr style="border-top: dotted 1px;margin-bottom: 1%;margin-top: 0%;color: #ccc;" />
-            <span style="font-weight: 400; font-family: Corbel;color: #777;">4 seats left.</span>
-            </div>
 
 
             
@@ -248,7 +212,7 @@
             </div>
             </div>
             <div id="resultsBtn2" class="modal-footer btn btn-lg" style="border-radius: 0;background-color: #ccc;">
-                <center><span style="font-size: 16px;height: inherit; font-weight: 500;color: #fff;"><strong>See results</strong></span></center>
+                <center><span style="font-size: 16px;height: inherit; font-weight: 500;color: #fff;"><strong>Continue</strong></span></center>
             </div>
         </div>
     </div>

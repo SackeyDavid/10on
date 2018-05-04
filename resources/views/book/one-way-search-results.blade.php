@@ -1,10 +1,13 @@
 @if($trips->count())
 
 @foreach($trips as $trip)
-<a href="{{route('trip.search.found', ['lpos' => $trip->id, 'lpis' => '0', 'passenger_num' => $passenger_num])}}"> 
-<div class="card-body" style="padding: 1%;background-color: #fff;border-radius: 3px;margin-bottom: 2%;">
+<form method="POST"  action="{{route('oneway.trip.found', ['trip_id' => $trip->id, 'passenger_num' => $passenger_num])}}">
+      @csrf
+  <!-- This form is expected to have a document.form index of 1 as it is the second form on the search-trips.blade.php, the first is the returnTab form. So I used an unaltered loop->iteration which value is starts at one-->
+<a href="javascript:void(0)" onclick="document.forms[{{ $loop->iteration }}].submit();"> 
+<div class="card-body" style="padding: 1%;background-color: #fff;border-radius: 3px;margin-bottom: 2%;border: 1px solid #e0e0e0;">
             <ul class="list-inline" style="margin-bottom: 0%;">
-            <li style="width: 32%"> 
+            <li style="width: 35%"> 
                 <ul class="list-inline">
                     <li>
                <ul class="list-unstyled">
@@ -17,7 +20,7 @@
                 </ul>
             </li>
             
-            <li style="width: 45%"> 
+            <li style="width: 43%"> 
                <ul class="list-unstyled">
                    <li><span style="color: #777;">{{ $trip->via }} <span style="font-weight: 100;">|</span> {{ $trip->trip_duration_in_hrs }}</span></li>
                    <li>{{ $trip->departure_location }}</li>
@@ -29,7 +32,7 @@
                    </li>
                </ul>
             </li>
-            <li class="float-right" style="width: 25%;margin-top: 6%;margin-right: -3%;color: #ff3345;"> 
+            <li class="float-right" style="width: 25%;margin-top: 6%;margin-right: -5%;color: #ff3345;"> 
                <ul class="list-unstyled">
                    <li></li>
                    <li><span style="font-size: 11px;">GHS</span> <span style="font-size: 27px;">{{ $trip->trip_fare }}</span></li>
@@ -39,7 +42,8 @@
             <hr style="border-top: dotted 1px;margin-bottom: 1%;margin-top: 0%;color: #ccc;" />
             <span style="font-weight: 400; font-family: Corbel;color: #777;">{{ $trip->remaining_seats }} seats left.</span>
             </div>
-          </a>
+            </a>
+          </form>
             
 @endforeach
 

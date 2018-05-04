@@ -98,7 +98,7 @@
             <div>
                 <ul class="list-inline" style="padding-bottom: 2%;">
                     <li><span class="top-center" style="margin-top: 0%;">Seach drives</span></li>
-                    <li><span class="top-right links"><a href="#"> Options </a></span></li>
+                    <!-- <li><span class="top-right links"><a href="#"> Options </a></span></li> -->
                     <li><span class="top-left links"><a href="javascript:history.back()"> <i class="fas fa-arrow-left" style="font-size: 15px; margin-top: 30%;"></i> </a></span></li>
                 </ul> 
             </div>
@@ -128,7 +128,12 @@
 
         </div>
         <hr>
-
+            @if(Session::has('msg'))
+            <div class="alert alert-info" >
+            <a href="#" data-dismiss="alert" class="close">&times;</a>
+            <p class=""><center> {{ Session::get('msg') }}</center></p>
+            </div>
+            @endif
                             <!-- Tab panes -->
 <div class="tab-content">
                             <!-- Return trips -->
@@ -142,7 +147,7 @@
     @endcomponent
 </div>
 
-                    <div style="height: 40%; width: 100%; background-color: #333333;">
+                    <!-- <div style="height: 40%; width: 100%; background-color: #333333;">
                     <div class="col-md-12">
                         <br>
                        <span class="footer-heads">Site tools</span> 
@@ -168,7 +173,7 @@
                        <br>
                        <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
                     </div>
-                     </div>
+                     </div> -->
 
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
       

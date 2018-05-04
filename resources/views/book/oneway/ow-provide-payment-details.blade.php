@@ -133,7 +133,7 @@
 
                 <br>
                 
-                <form id="credit-card-form" method="POST" action="{{route('payment.details.add',['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'card'])}}">
+                <form id="credit-card-form" method="POST" action="{{route('oneway.payment.details.add',['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'card'])}}">
                             @csrf
                 <div class="append">
                 <input type="text" id="card_number" name="card_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Card number" required>
@@ -220,7 +220,7 @@
 
                 <br>
                 
-                <form id="mobile-money-form" method="POST" action="{{route('payment.details.add',['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'wallet'])}}">
+                <form id="mobile-money-form" method="POST" action="{{route('oneway.payment.details.add',['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'wallet'])}}">
                             @csrf
                 @if(Auth::user())
                     @if(Auth::user()->wallet)
@@ -297,10 +297,10 @@
         </div>
         <hr>
         <div style="margin: 5%;padding: 4%;border-radius: 2px;border: 1px solid #DCDCDC;">
-            @if(!$booking_id || !$lpos || !$lpis || !$passenger_num || !$traveler_id)
+            @if(!$booking_id || !$passenger_num || !$traveler_id)
             no booking process id
             @else
-            <a href="{{ route('book.payment.details.auth', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id]) }}" style="color: #000;">
+            <a href="{{ route('oneway.book.payment.details.auth', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id]) }}" style="color: #000;">
                 <div style="">
                 <table style="margin-bottom: 0%;">
                     <tbody style="">
@@ -330,10 +330,10 @@
             </div>
             <div class="col-md-12">
                 <br>
-            @if(!$booking_id || !$lpos || !$lpis || !$passenger_num || !$traveler_id || !$outbound ||!$inbound)
+            @if(!$booking_id || !$passenger_num || !$traveler_id)
             no booking process id
             @else
-            <form method="POST" action="{{route('payment.details.add',['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'wallet'])}}">
+            <form method="POST" action="{{route('oneway.payment.details.add',['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'wallet'])}}">
                             {{ csrf_field() }} 
 
                 
@@ -343,7 +343,7 @@
                             <li style="font-weight: 300;color: #000;">Total Drive Cost</li>
                             <li><span style="font-size: 16px;font-weight: 300">GH&#8373; 
                                 @php
-                                $total = (float)$outbound->fare->total_per_passenger + (float)$inbound->fare->total_per_passenger;
+                                $total = (float)$trip->fare->total_per_passenger;
                                 echo '<span style="font-size: 24px;font-weight: 500;">' . number_format($total, 2) . '</span>';
 
                                 @endphp
@@ -394,7 +394,7 @@
             <br>
             <hr>
             <br>
-            <form method="POST" action="{{route('payment.details.add',['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'card'])}}">
+            <form method="POST" action="{{route('oneway.payment.details.add',['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'option' => 'card'])}}">
                             {{ csrf_field() }} 
 
                 
@@ -404,7 +404,7 @@
                             <li style="font-weight: 300;color: #000;">Total Drive Cost</li>
                             <li><span style="font-size: 16px;font-weight: 300">GH&#8373; 
                                 @php
-                                $total = (float)$outbound->fare->total_per_passenger + (float)$inbound->fare->total_per_passenger;
+                                $total = (float)$trip->fare->total_per_passenger;
                                 echo '<span style="font-size: 24px;font-weight: 500;">' . number_format($total, 2) . '</span>';
 
                                 @endphp
@@ -459,7 +459,7 @@
 
             </div>
             <br>
-
+            
         
             <div style="height: 40%; width: 100%; background-color: #333333;">
                     <div class="col-md-12">

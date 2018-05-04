@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Myaccount | Home</title>
+        <title>Payment Success</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -76,7 +76,7 @@
             .top-center {
                 font-size: 18px;
                 position: absolute;
-                right: 35%;
+                right: 30%;
                 font-weight: 600;
             }
 
@@ -145,7 +145,7 @@
         <div class="col-md-12">
             <div>
                 <ul class="list-inline" style="">
-                    <li><span class="top-center" style="margin-top: -2%;">My Account</span></li>
+                    <li><span class="top-center" style="margin-top: -2%;">Payment Success</span></li>
                     <!-- <li><span class="top-right links"><a href="#"> <i class="fas fa-cog"></i> </a></span></li> -->
                     <li><span class="top-left links"> <a ><span style="font-size: 15px;" onclick='
                     document.getElementById("mySidenav").style.width = "60%";
@@ -159,7 +159,7 @@
                         ' >&#9776;</span> </a></span></li>
                 </ul> 
             </div>
-            <div id="mySidenav" class="sidenav" style="background-image: url('images/3.jpg');opacity: 0.;">
+            <div id="mySidenav" class="sidenav" style="background-image: url('{{URL::to('images/3.jpg')}}');opacity: 0.;">
                 <a href="javascript:void(0)" style="font-size: 25px;font-weight: 900;color: #fff;" class="closebtn top-right" onclick="
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
@@ -189,55 +189,112 @@
             
 
         </div>
-        <hr style="margin-bottom: 0%;">
-        <div style="margin: 0%;height: 36vh;background-image: url('images/korean_city.png');font-weight: 400;">
-            <div class="col-md-12" style="color: #fff;font-weight: 600">
-                <br><br><br>
-                Access a host of exclusive benefits and privileges as a member of 10ondrives and experience the full features of the app
+        <hr style="margin-bottom: 2%;">
+        <div style="margin: 0%;height: 36vh;font-weight: 400;">
+            <div class="col-md-12" style="color: #000;font-weight: 300">
+               <center>
+                <span style="font-size: 20px;">Thank you , 
+                    @if(Auth::user())
+                    {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
+                    @else
+                    @stack('open-login-modal')
+                    @endif
+                </span> <br>
+                <span>Your booking has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
+            </center>
             </div>
-            <center>
-                <ul class="list-inline" style="border-radius: 1px;padding: 4%;">
+            
+            <br>
+            <div>
+                <ul class="list-unstyled">
                     <li>
-                        @if(Auth::user())
-                        <a href="{{route('client.dashboard') }}" class="btn" style="background-color: #777;color: #fff;">Client</a>
-                        @else
-                        <a href="/register" class="btn" style="background-color: #ff3345;color: #fff;">Join now</a>
-                        @endif
+                        <ul class="list-inline">
+                          <li>Depart: <span class="trip_details">{{ $outbound->departure_time }} - {{ $outbound->arrival_time }}</span></li>  
+                          <li class="pull-right"><span class="trip_details">GH&#8373; 
+
+                            <!-- display lowest price stored in combined cost using the LPDK and LPRK values -->
+                            @php
+                            
+                            echo number_format(((float)$outbound->trip_fare + (float)$inbound->trip_fare)*$passenger_num,2);
+                            @endphp
+                          </span> </li>
+                        </ul>
                     </li>
-                   
-                    <li><button class="btn" style="background-color: #ff3345;"><a href="{{ route('search.trips')}}" style="color: #fff;"> Book drive</a></button></li>
+                    <li>
+                    <ul class="list-inline">
+                        
+                    <li>Return: <span class="trip_details">{{ $inbound->departure_time }} - {{ $inbound->arrival_time }}</span><br></li>
+                        
+                    <li style="margin-right: -10%;" class="pull-right"><i class="fas fa-chevron-down" onclick='
+
+                        if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        ' 
+                        style="color: #ff3345;font-size: 28px;font-weight: 600;cursor: pointer;"></i></li>
+                    </ul>
+                    </li>
+                    <li>
+                        <ul class="list-inline" style="margin-bottom: -2%;">
+                          <li><span id="trip_duration_in_hrs" class="trip_details">
+                            @php 
+                            $out_duration =  $outbound->trip_duration_in_hrs ;
+                            $in_duration =  $inbound->trip_duration_in_hrs ;
+                            $data_out_duration =  explode(" ", $out_duration);
+                            $data_in_duration = explode(" ", $in_duration);
+                            $data_out_duration_hrs_element = (float)$data_out_duration[0];
+                            $data_in_duration_hrs_element = (float)$data_in_duration[0];
+
+                            $data_out_duration_mins_element = (float)$data_out_duration[3];
+                            $data_in_duration_mins_element = (float)$data_in_duration[3];
+
+
+                            $trip_hrs_duration = $data_out_duration_hrs_element + $data_in_duration_hrs_element;
+                            $trip_mins_duration = $data_out_duration_mins_element + $data_in_duration_mins_element;
+
+                            if (($trip_mins_duration - 60) >= 0)
+                            {
+                                $trip_mins_duration = $trip_mins_duration % 60;
+                                $trip_hrs_duration++;
+                            }
+
+                            echo $trip_hrs_duration . '<span style="color: #777;font-size: 13px;font-weight: 600;"> hr</span>' . ' ' . $trip_mins_duration . '<span style="color: #777;font-size: 13px;font-weight: 600;"> min</span>';
+                            
+                            @endphp
+                             <span style="color: #777;font-size: 13px;font-weight: 600;"> via {{ $outbound->via }}</span>  </span></li>  
+                          <li class="pull-right"><strong><span class="trip_host">{{ $outbound->host->username }} &nbsp;&nbsp;{{ $inbound->host->username }}</span></strong></li>
+                        </ul>
+                         
+                    </li>
                     
                 </ul>
-            </center>
-            
             </div>
-            <ul class="list-group" >
-                <li class="list-group-item" style="border-radius: 1px;font-weight: 400;">
-                    <ul class="list-inline"> 
-                        <li>About 10ndrives</li>
-                        <li class="float-right"><i class="fas fa-chevron-down"></i></li>
-                    </ul>
-                </li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;">
-                    <ul class="list-inline"> 
-                        <li>About trips</li>
-                        <li class="float-right"><i class="fas fa-chevron-down"></i></li>
-                    </ul>
-                </li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My statement</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My personal details</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My contact details</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My preferences</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My friends & Family</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;"> 
-                    <ul class="list-inline"> 
-                        <li>My app settings</li>
-                        <li class="float-right"><i class="fas fa-chevron-down"></i></li>
-                    </ul>
-                </li>
-            </ul>
             <br>
-
+           <center> <a href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}"><i class="fas fa-download"></i> Download receipt</a>
+           </center>
+            </div>
+            
+            <br>
+        <div class="modal" id="login-modal" tabindex="-1">
+            <div class="modal-content">
+                <div class="modal-dialog">
+                    <div class="modal-header">
+                        alfls;f
+                    </div>
+                    <div class="modal-body">
+                            a;lfal;f
+                    </div>
+                    <div class="modal-footer">
+                        al;;laf
+                    </div>
+                </div>
+            </div>
+            
+        </div>
 
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -253,3 +310,11 @@
         </script>
     </body>
 </html>
+@push('open-login-modal')
+<script type="text/javascript">
+    if (!Auth::user())
+    {
+        $('#login-modal').modal('show');
+    }
+</script>
+@endpush

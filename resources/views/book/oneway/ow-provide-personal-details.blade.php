@@ -127,7 +127,7 @@
             @if(!$booking_id)
             no booking process id
             @else
-            <a href="{{ route('book.personal.details.auth', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num]) }}" style="color: #000;">
+            <a href="{{ route('oneway.book.personal.details.auth', ['booking_id' => $booking_id,  'passenger_num' => $passenger_num]) }}" style="color: #000;">
                 <ul class="list-inline" style="border: 1px solid #DCDCDC;border-radius: 2px;padding: 4%;">
                     <li style="font-size: 38px;"><i class="fas fa-user-circle"></i></li>
                     <li>
@@ -151,16 +151,18 @@
             </div>
             <div class="col-md-12">
                 <br>
-            @if(!$booking_id || !$lpos || !$lpis || !$passenger_num)
+            @if(!$booking_id || !$passenger_num)
             no booking process id
             @else
-            <form method="POST" action="{{route('passenger.details.add',['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num])}}">
+
+            <!-- ow stands for oneway -->
+            <form method="POST" action="{{route('ow.passenger.details.add',['booking_id' => $booking_id, 'passenger_num' => $passenger_num])}}">
                             {{ csrf_field() }} 
 
                 
                 <span style="font-weight: 600; margin-bottom: 10%;">Personal details</span>
                 @if(Auth::user())
-                <select type="text" id="title" name="title" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
+                <select type="text" id="ow_title" name="ow_title" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
                     <option value="{{Auth::user()->title}}">{{Auth::user()->title}}</option>
                     <option value="Mr">Mr</option>
                     <option value="Mrs">Mrs</option>
@@ -168,7 +170,7 @@
                     <option value="Ms">Ms</option>
                 </select>
                 @else
-                <select type="text" id="title" name="title" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
+                <select type="text" id="ow_title" name="ow_title" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
                     <option>Title</option>
                     <option>Mr</option>
                     <option>Mrs</option>
@@ -178,33 +180,33 @@
                 @endif
                 <br>
                 @if(Auth::user())
-                <input type="text" id="first_name" name="first_name" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{ Auth::user()->first_name}}" required>
+                <input type="text" id="ow_first_name" name="ow_first_name" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{ Auth::user()->first_name}}" required>
                 @else
-                <input type="text" id="first_name" name="first_name" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="First name(As shown on an ID)" required>
+                <input type="text" id="ow_first_name" name="ow_first_name" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="First name(As shown on an ID)" required>
                 @endif
                 <br>
                 @if(Auth::user())
-                <input type="text" id="title" name="last_name" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="{{ Auth::user()->last_name}}" required>
+                <input type="text" id="ow_title" name="ow_last_name" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="{{ Auth::user()->last_name}}" required>
                 @else
-                <input type="text" id="title" name="last_name" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="Last name(As shown on an ID)" required>
+                <input type="text" id="ow_title" name="ow_last_name" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="Last name(As shown on an ID)" required>
                 @endif
                 
                 <span style="font-weight: 600; "><br>Contact details</span>
                 @if(Auth::user())
-                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->email}}" required>
+                <input type="text" id="ow_title" name="ow_email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->email}}" required>
                 @else
-                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Email address" required>
+                <input type="text" id="ow_title" name="ow_email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Email address" required>
                 @endif
                 <br>
                 @if(Auth::user())
-                <select type="text" id="contact_person" name="contact_person" style="height: 8vh;"  class="form-control passenger-details-inputs" required>
+                <select type="text" id="ow_contact_person" name="ow_contact_person" style="height: 8vh;"  class="form-control passenger-details-inputs" required>
                     <option value="{{Auth::user()->contact_person}}">{{Auth::user()->contact_person}}</option>
                     <option>Contact person</option>
                     <option>Travel arranger</option>
                     
                 </select>
                 @else
-                <select type="text" id="contact_person" name="contact_person" style="height: 8vh;"  class="form-control passenger-details-inputs" required>
+                <select type="text" id="ow_contact_person" name="ow_contact_person" style="height: 8vh;"  class="form-control passenger-details-inputs" required>
                     <option>Contact person</option>
                     <option>Travel arranger</option>
                     
@@ -214,17 +216,17 @@
                 <ul class="list-inline" style="margin-right: -1%;">
                     <li style="width: 45%;">
                 @if(Auth::user())
-                <input type="text" id="country" name="country" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->country}}" required>
+                <input type="text" id="ow_country" name="ow_country" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->country}}" required>
                 @else
-                <input type="text" id="country" name="country" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="Ghana(+233)" required>
+                <input type="text" id="ow_country" name="ow_country" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="Ghana(+233)" required>
                 @endif   
                     </li>
                     
                     <li class="float-right" style="width: 50%;">
                 @if(Auth::user())
-                <input type="text" id="mobile_number" name="mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->mobile_number}}" required>
+                <input type="text" id="ow_mobile_number" name="ow_mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->mobile_number}}" required>
                 @else
-                <input type="text" id="mobile_number" name="mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="Mobile number" required>
+                <input type="text" id="ow_mobile_number" name="ow_mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="Mobile number" required>
                 @endif
                     </li>
                 </ul>
@@ -232,12 +234,12 @@
                  <div class="input-group">
                 @if(Auth::user())
                     @if(Auth::user()->remind_me == "yes")
-                <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" checked required>
+                <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" checked required>
                     @else
-                <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" required> 
+                <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" required> 
                     @endif
                 @else 
-                 <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs">
+                 <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs">
                  @endif
                     <span style="font-size: 11px;color: #000;font-weight: 500;"> Would you like to receive an sms reminder when check-in opens?</span>
                     
@@ -251,7 +253,7 @@
             <br>
 
 
-            <div style="height: 40%; width: 100%; background-color: #333333;">
+            <!-- <div style="height: 40%; width: 100%; background-color: #333333;">
                     <div class="col-md-12">
                         <br>
                        <span class="footer-heads">Site tools</span> 
@@ -278,16 +280,16 @@
                        <br>
                        <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
                     </div>
-                     </div>
+                     </div> -->
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
         <script type="text/javascript">
-            $('#contact_person').focus(function(){
+            $('#ow_contact_person').focus(function(){
                 var c  = document.createElement("option");
-                c.text = $('#title').val() + ' ' + $('input[name="first_name"]').val() + ' ' + $('input[name="last_name"]').val(); 
+                c.text = $('#ow_title').val() + ' ' + $('input[name="ow_first_name"]').val() + ' ' + $('input[name="ow_last_name"]').val(); 
                 this.options.add(c, 2);
             });
         </script>
