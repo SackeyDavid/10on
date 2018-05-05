@@ -188,7 +188,7 @@
             <div class="col-md-12" style="color: #000;font-weight: 300">
                <center>
                 <span style="font-size: 20px;">Thank you , {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}</span> <br>
-                <span>Your booking has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
+                <span>Your booking with ID <span style="font-weight: 800">{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
             </center>
             </div>
         </div>
@@ -371,7 +371,7 @@
                                       @else
                                         Passenger
                                       @endif</li>
-                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">Edit&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
+                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
                         } else {
@@ -930,6 +930,36 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
              <center> <a style="color: #fff;font-weight: 300;background-color: #ff3345;" class="btn btn-sm" href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}"><i class="fas fa-download"></i> Download receipt</a>
             </center>
             <br><br>
+    <div class="modal fade" id="session-expired-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+        <div class="modal-dialog" role="document">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h4 class="modal-title">Session Expired</h4>
+
+                </div>
+
+                <div class="modal-body">
+
+                    Your session is expired.
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button id="btnExpiredOk" onclick="sessionExpiredRedirect()" type="button" class="btn btn-primary" data-dismiss="modal" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px; background-color: #428bca; color: #FFF;">Ok</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
@@ -941,6 +971,17 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
                 c.text = $('#ow_title').val() + ' ' + $('input[name="ow_first_name"]').val() + ' ' + $('input[name="ow_last_name"]').val(); 
                 this.options.add(c, 2);
             });
+
+            $(document).ready(function(){
+                if ((time() - Session::activity()) > (Config::get('session.lifetime') * 60))
+                {
+                    $('#session-expired-modal').modal('show');
+                }
+            });
         </script>
+        
+        
+           
+
     </body>
 </html>

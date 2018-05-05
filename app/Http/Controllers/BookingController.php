@@ -266,7 +266,9 @@ class BookingController extends Controller
                     // ->channel('mtn-gh')                 //- The mobile network Channel.configuration
                     // ->run();  
 
-                    return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . Auth::user()->card->id, 'option' => $option]);
+                    
+
+                    return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . Auth::user()->wallet->id, 'option' => $option]);
 
                 }
                 elseif (Auth::user() && !Auth::user()->wallet)
@@ -404,9 +406,23 @@ class BookingController extends Controller
             $payment_details = MobileMoney::find($payment[1]);
         }
 
+        $depart_abb = Station::where('name', $outbound->departure_location)->first();
+
+        $arrive_abb = Station::where('name', $outbound->arrival_location)->first();
+
+        $departure_abbreviation = ""; 
+        $arrival_abbreviation = ""; 
+
+        
+
+        if ($depart_abb != null || $arrive_abb != null ) {
+            $departure_abbreviation = $depart_abb->abbreviation;
+
+            $arrival_abbreviation = $arrive_abb->abbreviation;
+        }
 
 
-        return view('book.return-payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'outbound' => $outbound, 'inbound' => $inbound, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details]);
+        return view('book.return-payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'outbound' => $outbound, 'inbound' => $inbound, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details])->with('departure_abbreviation', $departure_abbreviation)->with('arrival_abbreviation', $arrival_abbreviation);
     }
 
     

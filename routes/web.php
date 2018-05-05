@@ -45,7 +45,7 @@ Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{tr
 
 Route::post('/payment/details/add/{booking_id}/{passenger_num}/{traveler_id}/{option}', 'SearchController@addPaymentDetails')->name('oneway.payment.details.add');
 
-Route::get('/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.show');
+Route::get('/return/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.show');
 
 Route::post('/payment/success/edit/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@editPaymentSuccess')->name('payment.success.edit');
 
@@ -53,7 +53,7 @@ Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.searc
 
 Route::post('/found/trips/oneway/{trip_id}/{passenger_num}', 'SearchController@tripFound')->name('oneway.trip.found');
 
-Route::get('/payment/success/{booking_id}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'SearchController@showPaymentSuccess')->name('one_way.payment.success.show');
+Route::get('/oneway/payment/success/{booking_id}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'SearchController@showPaymentSuccess')->name('one_way.payment.success.show');
 
 
 Route::group(['middleware'=>['auth']],function(){
