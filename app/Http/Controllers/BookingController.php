@@ -17,6 +17,9 @@ use Slydepay\Order\Order;
 use Slydepay\Order\OrderItem;
 use Slydepay\Order\OrderItems;
 use Slydepay;
+use App\User;
+use Illuminate\Support\Facades\Input;
+use \Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -389,12 +392,18 @@ class BookingController extends Controller
         $payment = explode(" ", $payment_id);
 
         if ($passenger[0] == 'user') 
-        {
-            $passenger_details = Auth::user();
+        { 
+            if (!Auth::user()) {
+                $passenger_details = "session expired";
+            }
+            else
+            {
+                $passenger_details = User::where('id', Auth::user()->id)->first();
+            }
         }
         elseif ($passenger[0] == 'passenger') 
         {
-            $passenger_details == PassengerDetails::find($passenger[1]);
+            $passenger_details = PassengerDetails::find($passenger[1]);
         }
 
         if ($option == 'card') 
@@ -425,6 +434,50 @@ class BookingController extends Controller
         return view('book.return-payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'outbound' => $outbound, 'inbound' => $inbound, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details])->with('departure_abbreviation', $departure_abbreviation)->with('arrival_abbreviation', $arrival_abbreviation);
     }
 
+    public function driveStatusShow($booking_id)
+    {
+        $booking = Booking::find($booking_id);
+        $outbound = Trips::find($booking->outbound);
+
+        $inbound = Trips::find($booking->inbound);
+
+        $date_booked = Carbon::parse($booking->created_at);
+
+        $departing_date = Carbon::parse($outbound->departure_date);
+
+        $arriving_date = Carbon::parse($inbound->departure_date);
+
+        $date = explode(" ", $booking->created_at);
+
+        $days_left_to_departure = $departing_date->diffInDays($date_booked) . ' days';
+
+        $days_left_to_arrival = $arriving_date->diffInDays($date_booked) . ' days';
+
+        if (explode(" ",$days_left_to_departure)[0] <= 1) {
+            $days_left_to_departure = $departing_date->diffInHours($date_booked) . ' hours';
+            if (explode(" ", $days_left_to_departure)[0] <= 1 ) {
+                $days_left_to_departure = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                if (explode(" ", $days_left_to_departure)[0] <= 1 ) {
+                $days_left_to_departure = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+            
+                }
+            }
+        }
+
+        if (explode(" ",$days_left_to_arrival)[0] <= 1) {
+            $days_left_to_arrival = $arriving_date->diffInHours($date_booked) . ' hours';
+            if (explode(" ", $days_left_to_arrival)[0] <= 1 ) {
+                $days_left_to_arrival = $arriving_date->diffInMinutes($date_booked) . ' mins';    
+                if (explode(" ", $days_left_to_arrival)[0] <= 1 ) {
+                $days_left_to_arrival = $arriving_date->diffInSeconds($date_booked) . ' seconds';    
+            
+                }
+            }
+        }
+
+        return view('book.return-drive-status', ['booking' => $booking, 'outbound' => $outbound, 'inbound' => $inbound, 'date' => $date, 'days_left_to_departure' => $days_left_to_departure, 'days_left_to_arrival' => $days_left_to_arrival]);
+
+    }
     
 
 

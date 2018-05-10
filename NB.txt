@@ -18,9 +18,15 @@ Mobile Money requirements details
 -phone number or email
 -password or pin
 
+3. Route not defined error message when clearly defined 
+Soln: -Place route at the bottom of routes list, that is beneath the auth middleware.
+	  -Avoid using similar url words for different but related routes (very important to even prevent unintended redirects)
+
 
 Problem not fixed
 1. Credit card modal does not open after it has been opened once.
+2. Open of modal when session expires
+3. Session expiration login modal for views after the search results 
 
 Hubtel Account number: HM2604180034
 Client ID: ahntkmmu
@@ -46,3 +52,7 @@ Client will have to add the year to the dates when saving them
 encoded base64 hubtel client details YWhudGttbXU6YW54aXhycnQ=
 
 For page expired due to inactivity errors, check that the concerned form has a csrf token like '@csrf'
+
+
+Lessons
+* if a database table(say trips) column(say departure station) belongs to a larger set (say station database table), then instead of assigning just a part of the larger set, other than the id, to the trips table's departure station column , assign the id of the row of which the part is a column.    

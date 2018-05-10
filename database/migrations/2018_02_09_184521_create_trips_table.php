@@ -29,6 +29,8 @@ class CreateTripsTable extends Migration
             $table->string('remaining_seats');
             $table->string('kilometers');
             $table->string('bus_id');
+            $table->string('departure_station_id');
+            $table->string('arrival_station_id');
             $table->string('tax_id');
             $table->timestamps();
         });

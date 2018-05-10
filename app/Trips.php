@@ -18,7 +18,7 @@ class Trips extends Model
      */
 
     protected $fillable = [
-        'departure_location', 'arrival_location', 'departure_time', 'arrival_time', 'departure_date', 'arrival_date', 'trip_duration_in_hrs', 'trip_fare', 'fare_id', 'bus_id', 'remaining_seats', 'via', 'published', 'from_client', 'kilometers', 'tax_id' 
+        'departure_location', 'arrival_location', 'departure_time', 'arrival_time', 'departure_date', 'arrival_date', 'trip_duration_in_hrs', 'trip_fare', 'fare_id', 'bus_id', 'remaining_seats', 'via', 'published', 'from_client', 'kilometers', 'tax_id', 'departure_station_id', 'arrival_station_id' 
     ];
 
     
@@ -41,6 +41,16 @@ class Trips extends Model
 
     public function bus() {
         return $this->belongsTo('App\Bus', 'bus_id');
+        
+    }
+
+    public function departure() {
+        return $this->belongsTo('App\Station', 'departure_station_id');
+        
+    }
+
+    public function arrival() {
+        return $this->belongsTo('App\Station', 'arrival_station_id');
         
     }
 

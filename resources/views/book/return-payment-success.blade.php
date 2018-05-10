@@ -128,6 +128,19 @@
             .fa-chevron-down {
                 color: #ff3345;
             }
+            @media (max-width: 600px) {
+                #login-modal .modal-dialog {
+                /*overflow-y: hidden !important;
+                overflow-x: hidden !important;
+                overflow: hidden;*/
+                height: 20%;
+                width: 60%;
+                margin: 20%;
+                margin-top: 16%;
+                
+                }
+
+            }
 
             @media screen and (max-height: 450px) {
                 .sidenav {padding-top: 15px;}
@@ -168,7 +181,8 @@
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    Drive Status <br>
+                    <a href="{{ route('return.drive.status', ['booking_id' => $booking->id]) }}" style="color: #fff;cursor: pointer;">
+                    Drive Status </a><br>
                     <hr>
                     My Account <br>
                     <hr>
@@ -197,10 +211,10 @@
                     @if(Auth::user())
                     {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
                     @else
-                    @stack('open-login-modal')
+                    
                     @endif
                 </span> <br>
-                <span>Your booking has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
+                <span>Your booking with ID <span style="font-weight: 800">RT-{{$booking->id}}</span> has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
             </center>
             </div>
             
@@ -474,8 +488,11 @@
                                     <li>{{ Auth::user()->title}} {{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</li>
                                                                     
                                     @else
+                                     @if($passenger_details == 'session expired')
+                                     
+                                     @else
                                     <li>{{$passenger_details->title}} {{$passenger_details->first_name}} {{$passenger_details->last_name}}</li>
-                                    
+                                     @endif
                                     @endif
                                 
                                 
@@ -614,7 +631,11 @@
                                     <li>{{ Auth::user()->title}} {{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</li>
                                                                     
                                     @else
+                                        @if($passenger_details == 'session expired')
+                                        
+                                        @else
                                     <li>{{$passenger_details->title}} {{$passenger_details->first_name}} {{$passenger_details->last_name}}</li>
+                                        @endif
                                     
                                     @endif
                                 
@@ -1135,22 +1156,36 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
             </div>
             
             <br>
-        <div class="modal" id="login-modal" tabindex="-1">
+         <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+        <div class="modal-dialog" role="document">
+
             <div class="modal-content">
-                <div class="modal-dialog">
-                    <div class="modal-header">
-                        alfls;f
-                    </div>
-                    <div class="modal-body">
-                            a;lfal;f
-                    </div>
-                    <div class="modal-footer">
-                        al;;laf
-                    </div>
+
+                <div class="modal-header">
+
+                    <h4 class="modal-title">Session Expired</h4>
+
                 </div>
+
+                <div class="modal-body">
+
+                    <span style="font-weight: 300;">Your session has expired.</span>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button id="btnExpiredOk" onclick="sessionExpiredRedirect()" type="button" class="btn btn-primary" data-dismiss="modal" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px; background-color: #428bca; color: #FFF;">Ok</button>
+                    <a href="{{route('return.payment.success.auth', ['booking_id' => $booking_id, 'lpos' => $outbound, 'lpis' => $inbound, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option])}}"  style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px;color: #FFF;"><div type="button" class="btn btn-success">Login</div></a>
+
+                </div>
+
             </div>
-            
+
         </div>
+
+    </div>
 
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -1158,6 +1193,15 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
         <script type="text/javascript">
+            $(document).ready(function() {
+                var session_status = '{{$passenger_details}}';
+                if (session_status == 'session expired')
+                {
+                    $('#login-modal').modal({backdrop: 'static', keyboard: false});
+                    $('#login-modal').modal('show');
+
+                }
+            });
             $('#ow_contact_person').focus(function(){
                 var c  = document.createElement("option");
                 c.text = $('#ow_title').val() + ' ' + $('input[name="ow_first_name"]').val() + ' ' + $('input[name="ow_last_name"]').val(); 
@@ -1166,11 +1210,4 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
         </script>
     </body>
 </html>
-@push('open-login-modal')
-<script type="text/javascript">
-    if (!Auth::user())
-    {
-        $('#login-modal').modal('show');
-    }
-</script>
-@endpush
+

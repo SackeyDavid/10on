@@ -128,6 +128,18 @@
             .fa-chevron-down {
                 color: #ff3345;
             }
+            @media (max-width: 600px) {
+                #login-modal .modal-dialog {
+                /*overflow-y: hidden !important;
+                overflow-x: hidden !important;
+                overflow: hidden;*/
+                height: 20%;
+                width: 60%;
+                margin: 20%;
+                margin-top: 16%;
+                
+                }
+            }
 
             @media screen and (max-height: 450px) {
                 .sidenav {padding-top: 15px;}
@@ -154,7 +166,7 @@
                 </ul> 
             </div>
             
-            <div id="mySidenav" class="sidenav" style="background-image: url({{URL::to('images/3.jpg')}});opacity: 0.9;">
+            <div id="mySidenav" class="sidenav" style="background-image: url({{URL::to('images/3.jpg')}});opacity: 0.;">
                 <a href="javascript:void(0)" style="font-size: 25px;font-weight: 900;color: #fff;" class="closebtn top-right" onclick="
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
@@ -163,7 +175,12 @@
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    Drive Status <br>
+                    @php 
+                    $pretext = sprintf('%06d', mt_rand(100000,999999));
+                    $posttext = sprintf('%06d', mt_rand(100000,999999));
+                    @endphp
+                    <a href="{{ route('oneway.drive.status', ['pretext' => $pretext,'booking_id' => $booking->id, 'posttext' => $posttext]) }}" style="color: #fff;cursor: pointer;">
+                    Drive Status</a> <br>
                     <hr>
                     My Account <br>
                     <hr>
@@ -187,8 +204,13 @@
         <div style="margin: 0%;font-weight: 400;">
             <div class="col-md-12" style="color: #000;font-weight: 300">
                <center>
-                <span style="font-size: 20px;">Thank you , {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}</span> <br>
-                <span>Your booking with ID <span style="font-weight: 800">{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
+                <span style="font-size: 20px;">Thank you , 
+                    @if(Auth::user())
+                    {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
+                    @else
+                    
+                    @endif</span> <br>
+                <span>Your booking on {{$booking->created_at}} with ID <span style="font-weight: 800">OW-{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens in {{$days_left}}.</span>
             </center>
             </div>
         </div>
@@ -395,7 +417,12 @@
                                     <li>{{ Auth::user()->title}} {{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</li>
                                                                     
                                     @else
-                                    <li>{{$passenger_details->title}} {{$passenger_details->first_name}} {{$passenger_details->last_name}}</li>
+                                    <li>
+                                        @if(Auth::user())
+                                        {{ $passenger_details->title}} {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
+                                        @else
+                                        
+                                        @endif</li>
                                     
                                     @endif
                                 
@@ -530,13 +557,7 @@
                              
                               <td style="padding: 5%; ">
                                 <ul class="list-unstyled" style="font-weight: 400;">
-                                    @if(Auth::user())
-                                    <li>{{ Auth::user()->title}} {{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</li>
-                                                                    
-                                    @else
-                                    <li>{{$passenger_details->title}} {{$passenger_details->first_name}} {{$passenger_details->last_name}}</li>
                                     
-                                    @endif
                                 
                                 
                                 </ul>
@@ -930,7 +951,7 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
              <center> <a style="color: #fff;font-weight: 300;background-color: #ff3345;" class="btn btn-sm" href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}"><i class="fas fa-download"></i> Download receipt</a>
             </center>
             <br><br>
-    <div class="modal fade" id="session-expired-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 
         <div class="modal-dialog" role="document">
 
@@ -944,13 +965,14 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
 
                 <div class="modal-body">
 
-                    Your session is expired.
+                    <span style="font-weight: 300;">Your session has expired.</span>
 
                 </div>
 
                 <div class="modal-footer">
 
                     <button id="btnExpiredOk" onclick="sessionExpiredRedirect()" type="button" class="btn btn-primary" data-dismiss="modal" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px; background-color: #428bca; color: #FFF;">Ok</button>
+                    <a href="{{route('one_way.payment.success.show.auth', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option])}}" onclick="sessionExpiredRedirect()" type="button" class="btn btn-success" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px; background-color: #428bca; color: #FFF;">Login</a>
 
                 </div>
 
@@ -959,25 +981,29 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
         </div>
 
     </div>
-
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
         <script type="text/javascript">
+            $(document).ready(function() {
+                var session_status = '{{$passenger_details}}';
+                if (session_status == 'session expired')
+                {
+                    $('#login-modal').modal({backdrop: 'static', keyboard: false});
+                    $('#login-modal').modal('show');
+
+                }
+            });
+
             $('#ow_contact_person').focus(function(){
                 var c  = document.createElement("option");
                 c.text = $('#ow_title').val() + ' ' + $('input[name="ow_first_name"]').val() + ' ' + $('input[name="ow_last_name"]').val(); 
                 this.options.add(c, 2);
             });
 
-            $(document).ready(function(){
-                if ((time() - Session::activity()) > (Config::get('session.lifetime') * 60))
-                {
-                    $('#session-expired-modal').modal('show');
-                }
-            });
+           
         </script>
         
         

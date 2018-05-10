@@ -189,10 +189,10 @@
                         <span style="color: #ff3345;">no stations saved</span>
                         @else
 
-                            <select type="text" class="form-control" name="departure_location"  required>
-                            <option>---add new bus station below---</option>
+                            <select type="text" class="form-control" name="departure_station_id"  required>
+                            <option>-can add new bus station below-</option>
                             @foreach($stations as $station)
-                            <option value="{{ $station->name }}">{{ $station->name }}</option>
+                            <option value="{{ $station->id }}">{{ $station->name }}</option>
                             @endforeach
                             </select>
                         @endif
@@ -215,10 +215,10 @@
                         <span style="color: #ff3345;">no stations saved</span>
                         @else
 
-                            <select type="text" class="form-control" name="arrival_location"  required>
-                            <option>---add new bus station below---</option>
+                            <select type="text" class="form-control" name="arrival_station_id"  required>
+                            <option>-can add new bus station below-</option>
                             @foreach($stations as $station)
-                            <option value="{{ $station->name }}">{{ $station->name }}</option>
+                            <option value="{{ $station->id }}">{{ $station->name }}</option>
                             @endforeach
                             </select>
                         @endif
@@ -361,7 +361,7 @@
                         <label for="company"> Trip Fare (<span style="font-size: 11px;">amount must equal total fare to be computed below</span>)
                         </label>
                         <div  class="input-group">
-                                <input type="number" min="0" name="trip_fare" class="form-control" onchange="this.value = parseFloat(this.value).toFixed(2);" placeholder="0.00" style="color: #000;">
+                                <input type="number" min="0" step=".01" name="trip_fare" class="form-control" onchange="this.value = parseFloat(this.value).toFixed(2);" placeholder="0.00" style="color: #000;">
                                 <div class="input-group-append">
                                 <span class="input-group-text">GH&#8373;</span>
                                 </div>

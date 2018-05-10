@@ -37,10 +37,15 @@ class ClientController extends Controller
 
     public function addTrip(Request $request)
     {
+        $departure_location = Station::find($request->departure_station_id);
+        $arrival_location = Station::find($request->arrival_station_id);
+
         $fare = Trips::create([
             'from_client' => Auth::user()->id,
-            'departure_location' => $request->departure_location,
-            'arrival_location' => $request->arrival_location,
+            'departure_station_id' => $request->departure_station_id,
+            'arrival_station_id' => $request->arrival_station_id,
+            'departure_location' => $departure_location->name,
+            'arrival_location' => $arrival_location->name,
             'departure_time' => $request->departure_time,
             'arrival_time' => $request->arrival_time,
             'departure_date' => $request->departure_date,
@@ -52,7 +57,7 @@ class ClientController extends Controller
             'bus_id' => $request->bus_id,
         ]);
 
-        return redirect()->route('client.dashboard')->with(['msg' => 'Trip has been saved!']);
+        return redirect()->route('client.dashboard')->with(['msg' => 'Trip has been saved! Add fare breakdown']);
     }
 
     
@@ -71,7 +76,7 @@ class ClientController extends Controller
 
         DB::table('trips')->where('id', $request->trip_id )->update(['tax_id' => $tax->id]);
 
-        return redirect()->route('client.dashboard')->with('msg', 'Tax has been saved and Trip updated!');
+        return redirect()->route('client.dashboard')->with('msg', 'Tax has been saved to the specifed trip!');
     }
 
     public function addFare(Request $request)
@@ -87,7 +92,7 @@ class ClientController extends Controller
 
         DB::table('trips')->where('id', $request->trip_id )->update(['fare_id' => $fare->id]);
 
-        return redirect()->route('client.dashboard')->with('msg', 'Fare has been saved and Trip updated!');
+        return redirect()->route('client.dashboard')->with('msg', 'Fare has been saved to the specifed trip! Add Tax breakdown');
     }
 
     public function addBus(Request $request)

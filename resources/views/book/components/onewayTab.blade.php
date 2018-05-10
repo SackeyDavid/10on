@@ -62,16 +62,50 @@
 <input type="hidden" id="ow_date" name="ow_date" value="">
 
 <br>
-<a href="#selectDates2" class="btn btn-lg" data-toggle="modal" style="width: 100%;font-weight: 600; height: 8vh; background-color: #D3D3D3;"><div class="clearfix">
+<span id="select-oneway-date" class="btn btn-lg" style="width: 100%;font-weight: 600; height: 9vh; background-color: #D3D3D3;"><div class="clearfix">
     @php
     echo '<span style="font-size: 14px;" class="float-left">DEPARTURE</span><br>';
-    echo  '<ul class="list-inline" style="font-size: 12px;margin-top: -9%;"><li id="ow_day"><span style="font-size: 38px;">' . date('d') . '</span></li><li><ul class="list-unstyled"><li id="ow_mnt_year"><span>' . date('M Y') . '</span></li><li style="margin-left: -65%;" id="week_day"><span>' . date('D') . '</span></li></ul></li></ul>';
+    echo  '<ul class="list-inline" style="font-size: 12px;margin-top: -9%;"><li id="ow_day"><span style="font-size: 38px;">' . date('d') . '</span></li><li><ul class="list-unstyled"><li id="ow_mnt_year"><span>' . date('M Y') . '</span></li><li style="margin-left: -65%;" id="week_day"><span>&nbsp;&nbsp;' . date('D') . '</span></li></ul></li></ul>';
     @endphp
-    <br>
-</div></a>
+    
+</div></span>
 <br>
 <br>
 <input type="text" id="ow_arrival_station" name="ow_arrival_location"  class="form-control search-trip-bar" placeholder="To" required>
+
+<style type="text/css">
+   #arrival-tabs .nav-tabs{
+  background-color:#fff;
+}
+   #arrival-tabs  .tab-content{
+    background-color:#B22222;
+    color:#fff;
+    padding:5px
+}
+    #arrival-tabs .nav-item {
+        margin-top: 1%;
+    }
+   #arrival-tabs .nav-tabs > li > a{
+  border: medium none;
+}
+   #arrival-tabs .nav-tabs > li > a:hover{
+  background-color: #E61F1F !important;
+    border: medium none;
+    border-radius: 5px;
+    color:#fff;
+}
+    #arrival-tabs .nav-tabs .active a {
+    background-color: #fff;
+
+    }
+
+    .top-right-search {
+        position: absolute;
+        right: 20%;
+        top: 20%;
+    }
+
+</style>
 
 <div class="modal" id="ow_search_results" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
@@ -81,11 +115,14 @@
                 <div>
                     <ul class="list-inline" style="padding-bottom: 0%;">
                         <li><span class="title-center" style="margin-top: -3%;left: 0%;font-weight: 900;">
-            <input style="border: none; box-shadow: none; font-size: 20px; min-width: 17em;" type="text" id="ow_search_arrival_station" name="ow_arrival_station" class="form-control" height="50px" width="90%" placeholder="Arrival Station" autofocus>
+            <div class="custom-templates">
+            <input style="border: none; box-shadow: none; font-size: 20px; min-width: 17em;" type="text" id="ow_search_arrival_station" name="ow_arrival_station" class="typeahead form-control" height="50px" width="90%" placeholder="Arrival Station" autofocus>
+            </div>
 
             <!-- <input  type="text" id="search_arrival_station" name="ow_arrival_station"  autocomplete="off" class="form-control" placeholder="" > -->
         
                         </span></li>
+                        <li><span id="oneway-search" class="top-right-search btn btn-sm" style="background-color: #fff;color: #fff;"><i class="fas fa-search"></i> search</span></li>
                         <li><span class="top-left1 links"><a href="#" data-dismiss="modal"> <i class="fas fa-times" style="font-size: 15px;"></i> </a></span></li>
                     </ul> 
                 </div>
@@ -94,26 +131,28 @@
         
         
       </div>
-      <div class="modal-body" style="padding: 0%;background-color: #f8f8f8;">
-        <div class="tab-heading" style="margin-top: 0%;margin-bottom: 2%; background-color: #ff3345;"> 
+      <div class="modal-body" id="oneway-results-modal-body" style="padding: 0%;background-color: #fff;">
+        <div id="arrival-tabs" class="tab-heading" style="margin-top: 0%;margin-bottom: 0%;height: 6vh; background-color: #ff3333;"> 
                     <!-- Nav tabs -->
+
                     <ul class="nav nav-tabs nav-justified" id="myTab" role="tablist" style="font-size: 12px;">
                       
                       <li class="nav-item">
-                        <a href="#previousDay" data-toggle="tab">Apr 22</a>
+                        <a href="#previousDay" id="previous_day_tab" data-toggle="tab"><span style="color: #fff;"></span></a>
                       </li>
-                      <li class="nav-item active">
-                        <a href="#selectedDay" data-toggle="tab">Mon, Apr 23 <i class="fas fa-calendar"></i></a>
+                      <li class="nav-item active" style="margin-bottom: 0%;">
+                        <a href="#selectedDay" id="selected_day_tab" data-toggle="tab" style="border-color: #ff3333;padding-left: 0%; padding-right: 0%;"><span style="color: #fff;"></span> &nbsp;&nbsp;<i class="fas fa-calendar" style="color: #fff;"></i></a>
                       </li>
                       <li class="nav-item"> 
-                        <a href="#nextDay" data-toggle="tab">Apr 24</a>
+                        <a href="#nextDay" id="next_day_tab" data-toggle="tab"><span style="color: #fff;"></span></a>
                       </li>
                     </ul>
-
+                    
                     
 
             </div>
-<div class="tab-content">
+<div class="tab-content" style="padding-top: 2%;">
+
         <div class="card-body tab-pane" id="previousDay" style="background-color: #fff;margin: 1%;">
             <div class="col-sm-4">
                 asdlkf
@@ -124,7 +163,7 @@
 
         </div>
 
-        <div class="well tab-pane results active" id="selectedDay" style="margin: 1%;background-color: #f8f8f8; padding: 1%;border: 1px solid #fafafa;border-radius: 3px;">
+        <div class="well tab-pane results active" id="selectedDay" style="margin: 1%;background-color: #fff; padding: 1%;border: 1px solid #fafafa;border-radius: 3px;font-family: Arial">
             
             
             

@@ -195,9 +195,9 @@
               });
             
 
-            $('body').on('keyup', '#ow_search_arrival_station', function(){
+            $('body').on('click', '#oneway-search', function(){
               // alert('Hi');
-               $value = $(this).val(); // arrival station
+               $value = $('#ow_search_arrival_station').val(); // arrival station
 
                $departure_station = $('input[name="ow_departure_station"]').val();
                $date = $('input[name="ow_date"]').val();
@@ -241,7 +241,21 @@
                 })
             }
 
-            
+            // (function() {
+            //   var foo = document.getElementById("foo");
+            //   foo.addEventListener("click", function() {
+            //     display("Clicked");
+            //   }, false);
+            //   setTimeout(function() {
+            //     display("Artificial click:");
+            //     foo.click(); // <==================== The artificial click
+            //   }, 500);
+            //   function display(msg) {
+            //     var p = document.createElement('p');
+            //     p.innerHTML = String(msg);
+            //     document.body.appendChild(p);
+            //   }
+            // })();
 
             $('#departure_station').focus(function(){
                 //open bootsrap modal
@@ -266,6 +280,12 @@
                 //open bootsrap modal
                 $('#ow_search_results').modal('show');
                 $('.custom-templates .typeahead').focus();
+            });
+
+            $('#select-oneway-date').click(function(){
+                //open bootsrap modal
+                $('#selectDates2').modal('show');
+                $('input-daterange #from2').focus();
             });
 
 
@@ -303,7 +323,7 @@
             $('.custom-templates .typeahead').typeahead( {
                 // hint: true,
                 // highlight: true,
-                // minLength: 1
+                 minLength: 0
 
                 // source: function (query, process) {
                 //     return $.get(path, { query: query }, function (data) {
@@ -339,6 +359,45 @@
 
             
             });
+
+            
+
+            $('.custom-templates .typeahead').on('typeahead:selected', function(evt, item) {
+                if ($('#searchstation').is(':visible')) {
+                   $('#departure_station').val($('#search_departure_station').val());
+
+                   $('#searchstation').modal('hide'); 
+
+                   
+                }
+                else if ($('#search-arrival-station').is(':visible')) 
+                {
+                   $('#arrival_station').val($('#search_arrival_station').val());
+
+                   $('#search-arrival-station').modal('hide');
+                   
+                }
+                else if ($('#ow_searchstation').is(':visible')) 
+                {
+                   $('#ow_departure_station').val($('#ow_search_departure_station').val());
+
+                   $('#ow_searchstation').modal('hide');
+                }
+                
+                else if ($('#ow_search_results').is(':visible')) {
+                   $('#oneway-results-modal-body').css('background-color', '#f8f8f8');
+                   $('.well .tab-pane').css('background-color', '#f8f8f8');
+                   $('#arrival-tabs .nav-tabs .active a').css('background-color', '#E61F1F');
+                   $('#arrival-tabs .nav-tabs').css('background-color', '#ff3333');
+                   document.getElementById("oneway-search").click();
+                }
+
+                
+
+                 
+            });
+
+            
 
             $('#search_departure_station').keyup(function() {
               $search_value = $('#search_departure_station').val();
@@ -481,6 +540,7 @@
                 format: "dd MM",
                 // startDate: new Date(),
                 maxViewMode: 2,
+                autoclose: true,
                 onSelect: function(dateText, inst) {
                     $('#to').focus();
                 }
@@ -528,37 +588,64 @@
                 else{
                    $('#trip-duration span').text(diff+ ' Days'); 
                 }
+
+
                      // doesn't seem to have any effect
                     $value = $('#to').val();
-                    $value2 = $('#from2').val();
+                    // $value2 = $('#from2').val();
+
                if($value != "")
                {
                 
                 $('#resultsBtn').css('background-color', '#ff3345');
 
                }
-                   if($value2 != "")
-                   {
-                    $('#resultsBtn2').css('background-color', '#ff3345');
+                   // if($value2 != "")
+                   // {
+                   //  $('#resultsBtn2').css('background-color', '#ff3345');
 
-                   }
+                   // }
+
+                if ($('#selectDates2').is(':visible')) 
+                {
+                    var getdate = $('#from2').val();
+                    var thedate = $('#from2').datepicker('getDate');
+                    var getdateFormat = getdate.split(" ");
+                    var weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                    $('#ow_day span').text(getdateFormat[0]);
+                    $('#ow_mnt_year span').text(getdateFormat[1] + ' ' + thedate.getFullYear());
+                    $('#week_day span').text(weekday[thedate.getDay()]);
+
+                    $('input[name="ow_date"]').val(weekday[thedate.getDay()] + ' ' + getdateFormat[0] + ' ' + getdateFormat[1] + ' ' + thedate.getFullYear());
+
+                    // for the arrival input modal
+                    var toSplite = thedate.toDateString();
+                    var splitedFormat = toSplite.split(" ");
+
+                    $('#selected_day_tab span').text(splitedFormat[0] + ',' + splitedFormat[1] + ' ' +splitedFormat[2]);
+                    var previous = new Date(thedate);
+
+                    previous.setDate(thedate.getDate() - 1);
+                    toSplite = previous.toDateString();
+                    splitedFormat = toSplite.split(" ");
+                    $('#previous_day_tab span').text(splitedFormat[1] + ' ' + splitedFormat[2]);
+
+                    var next = new Date(thedate);
+                    next.setDate(thedate.getDate() + 1);
+                    toSplite = next.toDateString();
+                    splitedFormat = toSplite.split(" ");
+                    $('#next_day_tab span').text(splitedFormat[1] + ' ' + splitedFormat[2] );
+                    
+                    $('#selectDates2').modal('hide');
+
+                }
             });
 
             });
 
-            $('#resultsBtn2').click(function() {
-                var getdate = $('#from2').val();
-                var thedate = $('#from2').datepicker('getDate');
-                var getdateFormat = getdate.split(" ");
-                var weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-                $('#ow_day span').text(getdateFormat[0]);
-                $('#ow_mnt_year span').text(getdateFormat[1] + ' ' + thedate.getFullYear());
-                $('#week_day span').text(weekday[thedate.getDay()]);
+            // ow stands for oneway and from2 is the name of the date input for the oneway tab
 
-                $('input[name="ow_date"]').val(weekday[thedate.getDay()] + ' ' + getdateFormat[0] + ' ' + getdateFormat[1] + ' ' + thedate.getFullYear());
-                
-                $('#selectDates2').modal('hide');
-            });
+            
 
             
             $('#to').focus(function(){

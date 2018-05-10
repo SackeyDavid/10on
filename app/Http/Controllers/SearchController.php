@@ -10,6 +10,9 @@ use App\OneWayBookingProcess;
 use Auth;
 use App\MobileMoney;
 use OVAC\LaravelHubtelPayment\Facades\HubtelPayment;
+use App\User;
+use \Carbon\Carbon;
+use App\PassengerDetails;
 
 class SearchController extends Controller
 {
@@ -375,11 +378,17 @@ class SearchController extends Controller
 
         if ($passenger[0] == 'user') 
         {
-            $passenger_details = Auth::user();
+            if (!Auth::user()) {
+                $passenger_details = "session expired";
+            }
+            else
+            {
+                $passenger_details = User::where('id', Auth::user()->id)->first();
+            }
         }
         elseif ($passenger[0] == 'passenger') 
         {
-            $passenger_details == PassengerDetails::find($passenger[1]);
+            $passenger_details = PassengerDetails::find($passenger[1])->first();
         }
 
         if ($option == 'card') 
@@ -391,9 +400,51 @@ class SearchController extends Controller
             $payment_details = MobileMoney::find($payment[1]);
         }
 
+        $date_booked = Carbon::parse($booking->created_at);
+        $departing_date = Carbon::parse($trip->departure_date);
+
+        $days_left = $departing_date->diffInDays($date_booked) . ' days';
+        if (explode(" ",$days_left)[0] <= 1) {
+            $days_left = $departing_date->diffInHours($date_booked) . ' hours';
+            if (explode(" ", $days_left)[0] <= 1 ) {
+                $days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                if (explode(" ", $days_left)[0] <= 1 ) {
+                $days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+            
+                }
+            }
+        }
 
 
-        return view('book.oneway.payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'trip' => $trip, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details]);
+
+
+        return view('book.oneway.payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'trip' => $trip, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details, 'days_left' => $days_left]);
+    }
+
+    public function driveStatusShow($pretext, $booking_id, $posttext)
+    {
+        $booking = OneWayBookingProcess::find($booking_id);
+        $trip = Trips::find($booking->trip_id);
+
+        $date_booked = Carbon::parse($booking->created_at);
+        $departing_date = Carbon::parse($trip->departure_date);
+
+        $date = explode(" ", $booking->created_at);
+
+        $days_left = $departing_date->diffInDays($date_booked) . ' days';
+        if (explode(" ",$days_left)[0] <= 1) {
+            $days_left = $departing_date->diffInHours($date_booked) . ' hours';
+            if (explode(" ", $days_left)[0] <= 1 ) {
+                $days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                if (explode(" ", $days_left)[0] <= 1 ) {
+                $days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+            
+                }
+            }
+        }
+
+        return view('book.oneway.drive-status', ['booking' => $booking, 'trip' => $trip, 'date' => $date, 'days_left' => $days_left]);
+
     }
 
 

@@ -246,7 +246,7 @@
                 <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
                     <option>---choose network---</option>
                     <option value="mtn-gh">Mtn</option>
-                    <option value="tigo-gh">Tico</option>
+                    <option value="tigo-gh">Tigo</option>
                     <option value="airtel-gh">Airtel</option>
                     <option value="vodafone-gh">Vodafone</option>
                 </select>

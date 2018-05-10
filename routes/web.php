@@ -45,11 +45,15 @@ Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{tr
 
 Route::post('/payment/details/add/{booking_id}/{passenger_num}/{traveler_id}/{option}', 'SearchController@addPaymentDetails')->name('oneway.payment.details.add');
 
-Route::get('/return/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.show');
+
 
 Route::post('/payment/success/edit/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@editPaymentSuccess')->name('payment.success.edit');
 
 Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.search');
+
+Route::get('/oneway/drive/status/{pretext}/{booking_id}/{posttext}', 'SearchController@driveStatusShow')->name('oneway.drive.status');
+
+Route::get('/return/drive/status/10120{booking_id}120020010', 'BookingController@driveStatusShow')->name('return.drive.status');
 
 Route::post('/found/trips/oneway/{trip_id}/{passenger_num}', 'SearchController@tripFound')->name('oneway.trip.found');
 
@@ -77,10 +81,19 @@ Route::group(['middleware'=>['auth']],function(){
 
     
 
+    Route::get('/auth/oneway/payment/success/{booking_id}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'SearchController@showPaymentSuccess')->name('one_way.payment.success.show.auth');
+
+    Route::get('/auth/return/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.auth');
+
+    Route::get('/auth/return/drive/status/10120{booking_id}120020010', 'BookingController@driveStatusShow')->name('auth.return.drive.status');
+
 
 });
 
 Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
+
+Route::get('/return/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.show');
+
 
 
 View::composer(['book.components.returnTab', 'book.components.onewayTab', 'book.components.multicityTab', 'book.search-trip'], function ($view) {
@@ -92,6 +105,9 @@ View::composer(['book.components.returnTab', 'book.components.onewayTab', 'book.
 
              $view->with('fares', $fares)->with('buses', $buses)->with('trips', $trips)->with('special_features', $special_features)->with('stations', $stations);
   });
+
+
+
 
 Route::prefix('admin')->group(function(){
 
@@ -173,3 +189,6 @@ Route::prefix('client')->group(function(){
 	Route::post('/password/reset', 'Auth\ClientResetPasswordController@reset');
 	Route::get('/password/reset/{token}', 'Auth\ClientResetPasswordController@showResetForm')->name('client.password.reset');
 });
+
+
+
