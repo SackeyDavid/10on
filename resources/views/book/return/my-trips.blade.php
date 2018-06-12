@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Drive Status | One Way Trip</title>
+        <title>My Trips | Return Trip</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -160,8 +160,7 @@
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
                     <hr>
-                    <a href="{{ route('my.trips.oneway', ['$booking_id' =>$booking->id]) }}" style="color: #fff;cursor: pointer;">
-                    My Trips </a> <br>
+                    My Trips <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>

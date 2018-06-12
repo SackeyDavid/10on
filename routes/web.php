@@ -53,6 +53,8 @@ Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.searc
 
 Route::get('/oneway/drive/status/{pretext}/{booking_id}/{posttext}', 'SearchController@driveStatusShow')->name('oneway.drive.status');
 
+Route::get('/oneway/trips/my/{booking_id}', 'SearchController@showMyTrips')->name('my.trips.oneway');
+
 Route::get('/return/drive/status/10120{booking_id}120020010', 'BookingController@driveStatusShow')->name('return.drive.status');
 
 Route::post('/found/trips/oneway/{trip_id}/{passenger_num}', 'SearchController@tripFound')->name('oneway.trip.found');

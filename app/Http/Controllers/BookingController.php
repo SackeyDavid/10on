@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Station;
 use App\Trips;
-use App\Booking;
+use App\ReturnBooking;
 use App\PassengerDetails;
 use App\CardDetails;
 use App\MobileMoney;
@@ -81,10 +81,10 @@ class BookingController extends Controller
 
     		foreach($combined_cost_keys as $keys) {
     		    $key_pairs = explode("-", $keys);
-    		    // append EO id to EDK
+    		    // append Lowest Price Outbound id to LPDK
     		    array_push($LPDK, $key_pairs[0]);
 
-    		    // append EI id to ERK
+    		    // append Lowest Price Inbound id to LPRK
     		    array_push($LPRK, $key_pairs[1]);
     		}
 
@@ -112,7 +112,8 @@ class BookingController extends Controller
     	}
 
 
-    	
+    	// lpis - lowest price inbounds, lpos -lowest price outbounds
+        // other values are obtained from http request and/or a combination with corresponding database values such as the abbreviations for station names (e.g. depart_abb)
 
     	return view('book.search-return-trips-results', compact(['lpos', 'lpis', 'combined_cost','LPDK', 'LPRK', 'lpos_array', 'combined_cost_keys']))->with('departure_location', $request->departure_location)->with('arrival_location', $request->arrival_location)->with('departure_date', $request->departure_date)->with('passenger_num', $request->passenger_num)->with('return_date', $request->return_date)->with('departure_abbreviation', $depart_abb)->with('arrival_abbreviation', $arrive_abb);
     }
@@ -122,7 +123,7 @@ class BookingController extends Controller
     {
         
         
-        $booking = Booking::create([
+        $booking = ReturnBooking::create([
             'outbound' => $lpos,
             'inbound' => $lpis,
             
@@ -140,7 +141,7 @@ class BookingController extends Controller
     {
 
         if (Auth::user()) {
-            DB::table('booking_process')->where('id', $booking_id )->update(['user_id' => Auth::user()->id]);
+            DB::table('return_booking_process')->where('id', $booking_id )->update(['user_id' => Auth::user()->id]);
 
              return redirect()->route('book.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => 'user' . ' ' . Auth::user()->id ]);
         }
@@ -158,7 +159,7 @@ class BookingController extends Controller
                 
               ]);
 
-            DB::table('booking_process')->where('id', $booking_id )->update(['passenger_id' => $passenger_details->id]);
+            DB::table('return_booking_process')->where('id', $booking_id )->update(['passenger_id' => $passenger_details->id]);
 
             return redirect()->route('book.payment.details', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => 'passenger' . ' ' .  $passenger_details->id]);
         }
@@ -179,7 +180,7 @@ class BookingController extends Controller
 
     public function addPaymentDetails(Request $request, $booking_id, $lpos, $lpis, $passenger_num, $traveler_id, $option)
     {
-        $booking = Booking::find($booking_id);
+        $booking = ReturnBooking::find($booking_id);
 
         $out_trip = Trips::find($lpos);
 
@@ -201,7 +202,7 @@ class BookingController extends Controller
 
                 if (Auth::user() && Auth::user()->card) {
 
-                    DB::table('booking_process')->where('id', $booking_id )->update(['card_id' => Auth::user()->card->id]);   
+                    DB::table('return_booking_process')->where('id', $booking_id )->update(['card_id' => Auth::user()->card->id]);   
 
                     return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . Auth::user()->card->id, 'option' => $option]);         
                 }   
@@ -222,7 +223,7 @@ class BookingController extends Controller
 
                     // card payment codes here
 
-                    DB::table('booking_process')->where('id', $booking_id )->update(['card_id' => $payment->id ]);
+                    DB::table('return_booking_process')->where('id', $booking_id )->update(['card_id' => $payment->id ]);
 
                     DB::table('users')->where('id', Auth::user()->id )->update(['card_id' => $payment->id ]);
 
@@ -245,7 +246,7 @@ class BookingController extends Controller
 
                     // card payment method here
 
-                    DB::table('booking_process')->where('id', $booking_id )->update(['card_id' => $payment->id ]);
+                    DB::table('return_booking_process')->where('id', $booking_id )->update(['card_id' => $payment->id ]);
 
 
                     return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $payment->id, 'option' => $option]);
@@ -258,7 +259,7 @@ class BookingController extends Controller
             {
                 if (Auth::user() && Auth::user()->wallet) {
 
-                    DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => Auth::user()->wallet->id]); 
+                    DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => Auth::user()->wallet->id]); 
                       
 
                     // $payment = HubtelPayment::ReceiveMoney()
@@ -301,7 +302,7 @@ class BookingController extends Controller
                 //         ->channel($request->network)    //- The mobile network Channel.configuration
                 //         ->run();  
                         
-                        DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+                        DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
 
                         DB::table('users')->where('id', Auth::user()->id )->update(['mobile_money_id' => $wallet->id ]);
                             
@@ -348,7 +349,7 @@ class BookingController extends Controller
                 //         ->channel($request->network)    //- The mobile network Channel.configuration
                 //         ->run();  
                         
-                        DB::table('booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+                        DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
 
                         
                             
@@ -376,7 +377,7 @@ class BookingController extends Controller
 
     public function showPaymentSuccess($booking_id, $lpos, $lpis, $passenger_num, $traveler_id, $payment_id, $option)
     {
-        $booking = Booking::find($booking_id);
+        $booking = ReturnBooking::find($booking_id);
 
         $outbound = Trips::find($lpos);
 
@@ -436,7 +437,7 @@ class BookingController extends Controller
 
     public function driveStatusShow($booking_id)
     {
-        $booking = Booking::find($booking_id);
+        $booking = ReturnBooking::find($booking_id);
         $outbound = Trips::find($booking->outbound);
 
         $inbound = Trips::find($booking->inbound);

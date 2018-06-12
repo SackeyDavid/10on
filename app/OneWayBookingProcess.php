@@ -38,5 +38,10 @@ class OneWayBookingProcess extends Model
         
     }
 
+    public function trip() {
+        return $this->belongsTo('App\Trips', 'trip_id');
+        
+    }
+
     
 }

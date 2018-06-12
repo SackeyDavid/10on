@@ -7,12 +7,14 @@ use App\Trips;
 use DB;
 use Pagination;
 use App\OneWayBookingProcess;
+use App\ReturnBooking;
 use Auth;
 use App\MobileMoney;
 use OVAC\LaravelHubtelPayment\Facades\HubtelPayment;
 use App\User;
 use \Carbon\Carbon;
 use App\PassengerDetails;
+use Input;
 
 class SearchController extends Controller
 {
@@ -445,6 +447,99 @@ class SearchController extends Controller
 
         return view('book.oneway.drive-status', ['booking' => $booking, 'trip' => $trip, 'date' => $date, 'days_left' => $days_left]);
 
+    }
+
+    public function showMyTrips($booking_id) {
+
+        $booking = OneWayBookingProcess::find($booking_id);
+
+        $owbookings = '';
+        $rtbookings = '';
+        $traveler_user = '';
+        $traveler_passenger = '';
+
+        if ($booking->user) {
+
+            $traveler_user_email = $booking->user_email;
+            $traveler_user_mobile_number = $booking->user->mobile_number;
+
+            // oneway-bookings
+            $onewaybookings = OneWayBookingProcess::get();
+
+            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $owbookings = $owbookings_for_email->merge($owbookings_for_mobile_number);
+
+            $owbookings->all();
+
+            $uniqueOWs = $owbookings->unique();
+            
+
+            // Return-bookings
+           $returnbookings = ReturnBooking::get();
+            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry, $traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry, $traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $rtbookings = $rtbookings_for_email->merge($rtbookings_for_mobile_number);
+
+            $rtbookings->all();
+
+            $uniqueRTs = $rtbookings->unique();
+
+            return view('book.oneway.my-trips', ['booking' => $booking, 'uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs]);  
+
+        }
+        else {
+
+            $traveler_passenger_email = $booking->passenger->email;
+            $traveler_passenger_mobile_number = $booking->passenger->mobile_number;
+
+            // Oneway-bookings
+            $onewaybookings = OneWayBookingProcess::get();
+            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_passenger_email){
+                                return $entry->passenger['email'] == $traveler_passenger_email;
+            });
+
+            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_passenger_mobile_number){
+                                return $entry->passenger['mobile_number'] == $traveler_passenger_mobile_number;
+            });
+
+            // merge collections
+            $owbookings = $owbookings_for_email->merge($owbookings_for_mobile_number);
+
+            $owbookings->all();
+
+            // remove duplicates
+            $uniqueOWs = $owbookings->unique();
+            
+
+            // Return-bookings
+            $returnbookings = ReturnBooking::get();
+            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry, $traveler_passenger_email){
+                                return $entry->passenger['email'] == $traveler_passenger_email && $entry->passenger['mobile_number'] == $traveler_passenger_mobile_number;
+            });
+
+            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry, $traveler_passenger_mobile_number){
+                                return $entry->passenger['email'] == $traveler_passenger_email && $entry->passenger['mobile_number'] == $traveler_passenger_mobile_number;
+            });
+
+            return view('book.oneway.my-trips', ['booking' => $booking, 'owbookings' => $owbookings, 'rtbookings' => $rtbookings]);
+
+        }
+
+        
+        
     }
 
 

@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Drive Status | One Way Trip</title>
+        <title>My Trips @guest @else | {{Auth::user()->first_name}} @endguest</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -133,6 +133,29 @@
                 .sidenav {padding-top: 15px;}
                 .sidenav a {font-size: 18px;}
             }
+
+            /* enable absolute positioning */
+            .inner-addon { 
+                position: relative; 
+            }
+
+            /* style icon */
+            .inner-addon .fa-search {
+              position: absolute;
+              padding: 10px;
+              pointer-events: none;
+              color: #ddd;
+            }
+
+            /* align icon */
+            .left-addon .fa-search  { left:  0px;}
+            .right-addon .fa-search { right: 0px;}
+
+            /* add padding  */
+            .left-addon input  { padding-left:  30px; }
+            .right-addon input { padding-right: 30px; }
+
+            
         </style>
     </head>
     <body>
@@ -145,7 +168,7 @@
         <div class="col-md-12">
             <div>
                 <ul class="list-inline" style="">
-                    <li><span class="top-center" style="margin-top: -2%;">Drive status</span></li>
+                    <li><span class="top-center" style="margin-top: -2%;">Travel History</span></li>
                     <!-- <li><span class="top-right links"><a href="#"> <i class="fas fa-cog"></i> </a></span></li> -->
                     <li><span class="top-left links"> <a ><span style="font-size: 15px;" onclick='
                     document.getElementById("mySidenav").style.width = "60%";
@@ -160,8 +183,7 @@
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
                     <hr>
-                    <a href="{{ route('my.trips.oneway', ['$booking_id' =>$booking->id]) }}" style="color: #fff;cursor: pointer;">
-                    My Trips </a> <br>
+                    My Trips <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
@@ -188,44 +210,177 @@
                     </div>
                 </div>
             </div>
-           <br><br> 
-           <div class="col-md-12">
-            <div class="card card-default" style="font-weight: 400;">
-                <div class="card-header">
-                    <ul class="list-inline">
-                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(RT-{{$booking->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
-                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;" class="fas fa-chevron-down" onclick='
-                        if (this.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
-                            this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "block";
+            <div class="inner-addon left-addon">
+                <i class="fas fa-search"></i>
+            <input style="border: none; box-shadow: none; font-size: 20px; min-width: 17em;" type="text" id="ow_search_arrival_station" name="ow_arrival_station" class="typeahead form-control" height="50px" width="90%" placeholder="Search history" autofocus>
+            </div>
+           <br>
+           <div style="background-color: #f8f8f8;padding: 2%;border: 1px solid #E8E8E8;">
+                &nbsp;&nbsp;<span style="font-weight: 300;" class="text-success">Current <span class="float-right"><i class="fas fa-chevron-down text-success" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.children[6].children[0].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.children[6].children[0].style.display = "block";
                         } else {
-                            this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                            this.parentNode.parentNode.parentNode.parentNode.children[6].children[0].style.display = "none";
                         }
                         $(this).toggleClass("fa-chevron-up fa-chevron-down");
-                        '></i></li>
-                    </ul> 
+                        '></i></span> </span>
+            </div>
+           
+           <div class="col-md-12" style="padding: 1%;margin-top: 1%;">
+            <div class="card card-default" style="font-weight: 400;">
+                <div class="card-header">
+                    Today - Friday, June 08, 2018
                 </div>
-                <div class="card-body" style="padding: 0%;">
-                    <div class="card-header" style="background-color: #B0E0E6;">
-                        Outbound  <span>({{$trip->departure_location}} - {{$trip->arrival_location}})</span>
-                    </div>
-                    <div class="card-body" style="padding: 0%;">
                 
-                <table class="table table-bordered" style="margin: 0%;">
+                   
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;">
+               
+                <table class="table" style="margin-bottom: 1%;">
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-success">12:09 - 12:57</th>
+                      <td style="border-top-style: none;">Neoplan(NPL) to Asafo(ASF) <br>via N2</td>
+                      <td style="border-top-style: none;">GHS 32.00</td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Remove from history</a>
+                        </div>
+                      </div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-success">12:09 - 12:57</th>
+                      <td style="border-top-style: none;">Neoplan(NPL) to Asafo(ASF) <br>via N2</td>
+                      <td style="border-top-style: none;">GHS 32.00</td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Remove from history</a>
+                        </div>
+                      </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                      <th scope="row" class="text-success">12:09 - 12:57</th>
+                      <td>Neoplan(NPL) to Asafo(ASF) <br>via N2</td>
+                      <td>GHS 32.00</td>
+                      <td>
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Remove from history</a>
+                        </div>
+                      </div>
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+                </div>
+                <br>
+            </div>
+
+        </div>
+
+        
+           <div style="background-color: #f8f8f8;padding: 2%;border: 1px solid #E8E8E8;">
+                &nbsp;&nbsp;<span style="font-weight: 300;">Past <span class="float-right"><i class="fas fa-chevron-down" style="color: inherit;" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.children[8].children[0].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.children[8].children[0].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.parentNode.children[8].children[0].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></span> </span>
+            </div>
+           
+           <div class="col-md-12" style="padding: 1%;margin-top: 1%;">
+            <div class="card card-default" style="font-weight: 400;">
+                <div class="card-header">
+                    Today - Friday, June 08, 2018
+                </div>
                 
-                <thead>
-                    <tr style="font-size: 11px;">
-                        <th>Booked </th>
-                        <th>Check-in</th>
+                   
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;">
+               
+                <table class="table" style="margin-bottom: 1%;">
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-success">12:09 - 12:57</th>
+                      <td style="border-top-style: none;">Neoplan(NPL) to Asafo(ASF) <br>via N2</td>
+                      <td style="border-top-style: none;">GHS 32.00</td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Remove from history</a>
+                        </div>
+                      </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <tr style="font-weight: 300;background-color: #fff;">
-                        <td>{{$booking->created_at->diffForHumans()}}</td>
-                        <td>{{$days_left}} left</td>
+                    
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-success">12:09 - 12:57</th>
+                      <td style="border-top-style: none;">Neoplan(NPL) to Asafo(ASF) <br>via N2</td>
+                      <td style="border-top-style: none;">GHS 32.00</td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Remove from history</a>
+                        </div>
+                      </div>
+                        </td>
                     </tr>
-                </tbody>
-            </table>
-                    </div>
+
+                    <tr>
+                      <th scope="row" class="text-success">12:09 - 12:57</th>
+                      <td>Neoplan(NPL) to Asafo(ASF) <br>via N2</td>
+                      <td>GHS 32.00</td>
+                      <td>
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#">Remove from history</a>
+                        </div>
+                      </div>
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+                
                     
                 </div>
             </div>
@@ -263,6 +418,7 @@
         </div>
 
     </div>
+        <script src="{{ asset('js/app.js') }}"></script>
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>

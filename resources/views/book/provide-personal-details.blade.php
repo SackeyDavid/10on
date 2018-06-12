@@ -191,9 +191,9 @@
                 
                 <span style="font-weight: 600; "><br>Contact details</span>
                 @if(Auth::user())
-                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->email}}" required>
+                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->email}}">
                 @else
-                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Email address" required>
+                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Email address">
                 @endif
                 <br>
                 @if(Auth::user())

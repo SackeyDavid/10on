@@ -27,6 +27,8 @@ Problem not fixed
 1. Credit card modal does not open after it has been opened once.
 2. Open of modal when session expires
 3. Session expiration login modal for views after the search results 
+4. Route digit parameter randomization to prevent manipulation
+5. Lowering down the number of collections to loop through when all database collections are passed to view.
 
 Hubtel Account number: HM2604180034
 Client ID: ahntkmmu
@@ -56,3 +58,7 @@ For page expired due to inactivity errors, check that the concerned form has a c
 
 Lessons
 * if a database table(say trips) column(say departure station) belongs to a larger set (say station database table), then instead of assigning just a part of the larger set, other than the id, to the trips table's departure station column , assign the id of the row of which the part is a column.    
+
+
+Appreciation
+A big thanks to stackoverflow

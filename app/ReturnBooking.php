@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Booking extends Model
+class ReturnBooking extends Model
 {
-    protected $table = 'booking_process';
+    protected $table = 'return_booking_process';
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +35,16 @@ class Booking extends Model
 
     public function passenger() {
         return $this->belongsTo('App\PassengerDetails', 'passenger_id');
+        
+    }
+
+    public function outbound() {
+        return $this->belongsTo('App\Trips', 'outbound');
+        
+    }
+
+    public function inbound() {
+        return $this->belongsTo('App\Trips', 'inbound');
         
     }
 }
