@@ -27,9 +27,9 @@
                         
                         
                             
-                            <select type="text" name="bus_number" class="form-control">
+                            <select type="text" name="bus_id" class="form-control">
                                 @foreach($buses as $bus)
-                                <option value="{{ $bus->bus_number }}">{{ $bus->bus_number }}</option>
+                                <option value="{{ $bus->id }}">{{ $bus->bus_number }}</option>
                                 @endforeach
                             </select>
                             
@@ -103,7 +103,7 @@
                         <label for="company"> Television
                         </label>
                         <div class="input-group">
-                            <input type="checkbox" class="form-control" name="television" value="yes">
+                            <input type="checkbox" class="form-control" name="television" value="yes" checked>
                             <!-- <div class="input-group-addon">
                                 <span class="fa fa-" id="add-more-program"></span>
                             </div> -->
@@ -129,7 +129,7 @@
                         <label for="company"> Air Condition
                         </label>
                         <div class="input-group">
-                            <input type="checkbox" class="form-control" name="ac" id="" value="yes">
+                            <input type="checkbox" class="form-control" name="ac" id="" value="yes" checked="">
                             <!-- <div class="input-group-addon">
                                 <span class="fa fa-" id="add-more-program"></span>
                             </div> -->

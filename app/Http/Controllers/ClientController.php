@@ -103,7 +103,7 @@ class ClientController extends Controller
             'capacity' => $request->capacity,
             'photo' => $request->photo,
             'brand_name' => $request->brand_name,
-            'driver' => $request->driver
+            'driver' => $request->driver,
         ]);
 
         return redirect()->route('client.dashboard')->with('msg', 'Bus has been saved!');
@@ -111,9 +111,9 @@ class ClientController extends Controller
 
     public function addSpecialFeatures(Request $request)
     {
-        $fare = SpecialFeatures::create([
+        $spFeature = SpecialFeatures::create([
             'from_client' => Auth::user()->id,
-            'bus_number' => $request->bus_number,
+            'bus_id' => $request->bus_id,
             'fuel' => $request->fuel,
             'television' => $request->television,
             'wifi' => $request->wifi,
@@ -122,6 +122,8 @@ class ClientController extends Controller
             'articulation' => $request->articulation,
             'decker' => $request->decker
         ]);
+
+         DB::table('buses')->where('id', $request->bus_id)->update(['special_feature_id' => $spFeature->id]);
 
         return redirect()->route('client.dashboard')->with('msg', 'Special Feature has been saved!');
     }

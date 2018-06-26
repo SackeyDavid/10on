@@ -43,5 +43,10 @@ class OneWayBookingProcess extends Model
         
     }
 
+    public function mobileMoney() {
+        return $this->belongsTo('App\MobileMoney', 'mobile_money_id');
+        
+    }
+
     
 }

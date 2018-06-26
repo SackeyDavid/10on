@@ -14,7 +14,7 @@ class SpecialFeatures extends Model
      * @var array
      */
     protected $fillable = [
-        'bus_number', 'fuel', 'television', 'wifi', 'ac', 'wheel_lift', 'articulation', 'decker', 'from_client'
+        'bus_id', 'fuel', 'television', 'wifi', 'ac', 'wheel_lift', 'articulation', 'decker', 'from_client'
     ];
 
     /**

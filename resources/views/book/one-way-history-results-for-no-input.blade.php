@@ -166,30 +166,20 @@
             <p class=""><center> {{ Session::get('msg') }}. Kindly <a href="{{route('login')}}">log in</a></center></p>
             </div>
             @endif
-        <div class="col-md-12">
-            <div>
-                <ul class="list-inline" style="">
-                    <li><span class="top-center" style="margin-top: -2%;">Travel Timeline</span></li>
-                    <!-- <li><span class="top-right links"><a href="#"> <i class="fas fa-cog"></i> </a></span></li> -->
-                    <li><span class="top-left links"> <a ><span style="font-size: 15px;" onclick='
-                    document.getElementById("mySidenav").style.width = "60%";
-                    
-                        ' >&#9776;</span> </a></span></li>
-                </ul> 
-            </div>
-        </div> 
-        <hr style="margin-bottom: 2%;">
             <div id="mySidenav" class="sidenav" style="background-image: url({{URL::to('images/3.jpg')}});opacity: 0.;">
                 <a href="javascript:void(0)" style="font-size: 25px;font-weight: 900;color: #fff;" class="closebtn top-right" onclick="
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
-                    <hr> <a href="{{ route('my.trips.oneway') }}" style="color: #fff;cursor: pointer;">
-                    My Trips</a> <br>
+                    <hr>
+                    My Trips <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    
-                    <a href="{{ route('oneway.drive.status') }}" style="color: #fff;cursor: pointer;">
+                    @php 
+                    $pretext = sprintf('%06d', mt_rand(100000,999999));
+                    $posttext = sprintf('%06d', mt_rand(100000,999999));
+                    @endphp
+                    <a href="{{ route('oneway.drive.status', ['pretext' => $pretext,'booking_id' => 190313, 'posttext' => $posttext]) }}" style="color: #fff;cursor: pointer;">
                     Drive Status</a> <br>
                     <hr>
                     <a href="{{ URL::to('/home') }}" style="color: #fff;cursor: pointer;">
@@ -205,19 +195,11 @@
                     <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
-                    <a href="/" style="text-decoration: none;color: #fff;"> Home <i class="fa fa-home"></i></a>
                     </div>
                 </div>
             </div>
-            @if (!$uniqueOWs)
-            no booking
-            @else
-            <div class="inner-addon left-addon">
-                <i class="fas fa-search"></i>
-            <input style="border: none; box-shadow: none; font-size: 20px; min-width: 17em;" type="text" id="search_history" name="search_history" class="form-control" height="50px" width="90%" placeholder="Search history" autofocus>
-            </div>
-            @endif
-           <br>
+            
+           
            <div class="main">
 
                 @if(!$uniqueOWs->count())
@@ -476,7 +458,7 @@
             $('body').on('keyup', '#search_history', function(){
               // alert('Hi');
                $value = $('#search_history').val(); // arrival station
-            
+               let pointid = $('#search_history').attr("data-pointid");
                // $departure_station = $('input[name="ow_departure_station"]').val();
                // $date = $('input[name="ow_date"]').val();
                // $passenger_num = $('input[name="ow_passenger_num"]').val();
@@ -484,7 +466,7 @@
                 $.ajax({
                     type : 'GET',
                     url  : '{{ route('search.history') }}',
-                    data : {'search_history': $value},
+                    data : {'search_history': $value, 'booking_id': pointid},
                     success:function(data){
                         /*console.log(data);*/
                         

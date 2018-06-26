@@ -54,6 +54,11 @@ class Trips extends Model
         
     }
 
+    public function owbookings() {
+        return $this->hasMany('App\OneWayBookingProcess', 'trip_id');
+        
+    }
+
 
 
 }

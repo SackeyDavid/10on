@@ -133,15 +133,25 @@
                 .sidenav {padding-top: 15px;}
                 .sidenav a {font-size: 18px;}
             }
+
+            .active {
+                background-color: #fff;
+                opacity: 0.4;
+                padding: 2%;
+                color: #fff;
+                border-radius: 10%;
+            }
         </style>
     </head>
     <body>
             @if(Session::has('msg'))
             <div class="alert alert-info" >
             <a href="#" data-dismiss="alert" class="close">&times;</a>
-            <p class=""><center> {{ Session::get('msg') }}</center></p>
+            <p class=""><center> {{ Session::get('msg') }}. Kindly <a href="{{route('user.trips.oneway')}}"><u>log in.</u></a></center></p>
             </div>
             @endif
+
+            
         <div class="col-md-12">
             <div>
                 <ul class="list-inline" style="">
@@ -160,17 +170,14 @@
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
                     <hr>
-                    <a href="{{ route('my.trips.oneway', ['$booking_id' =>$booking->id]) }}" style="color: #fff;cursor: pointer;">
+                    <a href="{{ route('my.trips.oneway') }}" style="color: #fff;cursor: pointer;">
                     My Trips </a> <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    @php 
-                    $pretext = sprintf('%06d', mt_rand(100000,999999));
-                    $posttext = sprintf('%06d', mt_rand(100000,999999));
-                    @endphp
-                    <a href="{{ route('oneway.drive.status', ['pretext' => $pretext,'booking_id' => $booking->id, 'posttext' => $posttext]) }}" style="color: #fff;cursor: pointer;">
-                    Drive Status</a> <br>
+                   
+                    <a href="{{ route('oneway.drive.status') }}" style="color: #fff;cursor: pointer;">
+                    <u>Drive Status</u></a> <br>
                     <hr>
                     <a href="{{ URL::to('/home') }}" style="color: #fff;cursor: pointer;">
                     My Account</a> <br>
@@ -185,16 +192,44 @@
                     <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+                     <a href="/" style="text-decoration: none;color: #fff;"> Home <i class="fa fa-home"></i></a>
                     </div>
                 </div>
             </div>
-           <br><br> 
+            
            <div class="col-md-12">
-            <div class="card card-default" style="font-weight: 400;">
+            @if(!$bookings)
+            no bookings
+            @else
+                @foreach($bookings as $booking)
+                    @php
+
+                    $trip = $booking->trip;
+
+                    $date_booked = \Carbon\Carbon::parse($booking->created_at);
+                    $departing_date = \Carbon\Carbon::parse($trip->departure_date);
+
+                    $date = explode(" ", $booking->created_at);
+
+                    $days_left = $departing_date->diffInDays($date_booked) . ' days';
+
+                    if (explode(" ", $days_left)[0] <= 1) {
+                        $days_left = $departing_date->diffInHours($date_booked) . ' hours';
+                        if (explode(" ", $days_left)[0] <= 1 ) {
+                            $days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                            if (explode(" ", $days_left)[0] <= 1 ) {
+                            $days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+                        
+                            }
+                        }
+                    }
+
+                    @endphp
+            <div class="card card-default" style="font-weight: 400;margin-bottom: 2%;">
                 <div class="card-header">
                     <ul class="list-inline">
-                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(RT-{{$booking->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
-                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;" class="fas fa-chevron-down" onclick='
+                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(OW-{{$booking->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
+                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;color: inherit;" class="fas fa-chevron-down" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "block";
                         } else {
@@ -209,26 +244,26 @@
                         Outbound  <span>({{$trip->departure_location}} - {{$trip->arrival_location}})</span>
                     </div>
                     <div class="card-body" style="padding: 0%;">
-                
-                <table class="table table-bordered" style="margin: 0%;">
-                
-                <thead>
-                    <tr style="font-size: 11px;">
-                        <th>Booked </th>
-                        <th>Check-in</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="font-weight: 300;background-color: #fff;">
-                        <td>{{$booking->created_at->diffForHumans()}}</td>
-                        <td>{{$days_left}} left</td>
-                    </tr>
-                </tbody>
-            </table>
+                        <table class="table table-bordered" style="margin: 0%;">
+                        
+                            <thead>
+                                <tr style="font-size: 11px;">
+                                    <th>Booked </th>
+                                    <th>Check-in</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="font-weight: 300;background-color: #fff;">
+                                    <td>{{$booking->created_at->diffForHumans()}}</td>
+                                    <td>{{$days_left}} left</td>
+                                </tr>
+                            </tbody>
+                         </table>
                     </div>
-                    
                 </div>
             </div>
+                @endforeach
+            @endif
         </div>
         
         
@@ -274,7 +309,9 @@
                 c.text = $('#ow_title').val() + ' ' + $('input[name="ow_first_name"]').val() + ' ' + $('input[name="ow_last_name"]').val(); 
                 this.options.add(c, 2);
             });
-
+            $('.alert-info').fadeTo(15000, 500).slideUp(500, function() {
+                $('.alert-info').slideUp(500);
+            });
             
         </script>
         

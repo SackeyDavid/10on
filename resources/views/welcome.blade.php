@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>10ondrives</title>
+        <title>10ondrives | Book trips across Ghana</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -119,6 +119,20 @@
         </style>
     </head>
     <body>
+         @if(Session::has('msg'))
+            <div class="alert alert-info" role="alert">
+            <button type="button" data-dismiss="alert" class="close" onclick="$('.alert').alert('close');"><span aria-hidden="true">&times;</span></button>
+            <p class=""><center> {{ Session::get('msg') }}. Kindly <a href="{{route('manage.auth.booking')}}">log in.</a></center></p>
+            </div>
+        @endif
+
+        <!-- @if($msg && !Auth::user())
+            <div class="alert alert-info" role="alert">
+            <button type="button" data-dismiss="alert" class="close" onclick="$('.alert').alert('close');"><span aria-hidden="true">&times;</span></button>
+            <p class=""><center> {{ $msg }} Kindly <a href="{{route('login')}}"><u>log in.</u></a></center></p>
+            </div>
+        @endif
+ -->
         <div class="flex-center position-ref full-height">
             @if (Route::has('login'))
                 <div class="top-right links">
@@ -141,10 +155,10 @@
                 <span class="brand-name">Book trips all over Ghana.</span>
                 <br><br>
                 <ul class="nav nav-tabs justify-content  margin" style="border-bottom: none;">
-                    <li><a href="{{ route('search.trips') }}" style="font-weight: 600;color: #484848;"><i class="fa fa-bus"></i><strong> Book a drive</strong></a></li>
-                    <li><a href="#manage-bookingTab" style="color: #484848;"><i class="fa fa-tag"></i><strong>  Booking </strong></a></li>
-                    <li><a href="#whats-on-busTab" style="color: #484848;"><i class="fas fa-wifi"></i> <strong> Your bus</strong></a></li>
-                    <li><a href="#flight-status" style="color: #484848;"><i class="fa fa-clock"></i><strong> Drive status </strong></a></li>
+                    <li><a href="{{ route('search.trips') }}" style="font-weight: 600;color: #484848;"><i class="fa fa-edit"></i><strong> Book a drive</strong></a></li>
+                    <li><a href="{{ route('manage.booking') }}" style="color: #484848;"><i class="fa fa-tag"></i><strong>  Booking </strong></a></li>
+                    <li><a href="{{route('bus.info')}}" style="color: #484848;"><i class="fas fa-bus"></i> <strong> Your bus</strong></a></li>
+                    <li><a href="{{route('oneway.drive.status')}}" style="color: #484848;"><i class="fa fa-clock"></i><strong> Drive status </strong></a></li>
                 </ul>
                 <br>
                 <div class="tab-content margin">
@@ -347,6 +361,16 @@
                     <li><i class="fab fa-instagram"></i></li>
                 </ul>
         </div>
-        <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
+        
+        <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+
+        <script type="text/javascript">
+            $('.alert-info').fadeTo(5000, 500).slideUp(500, function() {
+                $('.alert-info').slideUp(500);
+            });
+        </script>
+        
     </body>
 </html>

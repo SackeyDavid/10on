@@ -14,7 +14,7 @@ class Bus extends Model
      * @var array
      */
     protected $fillable = [
-        'from_client', 'bus_number', 'capacity', 'photo', 'brand_name', 'driver'
+        'from_client', 'bus_number', 'capacity', 'photo', 'brand_name', 'driver', 'special_features_id'
     ];
 
     /**
@@ -29,5 +29,9 @@ class Bus extends Model
     public function author() {
     	return $this->belongsTo('App\Client', 'from_client');
         
+    }
+
+    public function specialfeatures() {
+        return $this->belongsTo('App\SpecialFeatures', 'special_features_id');
     }
 }

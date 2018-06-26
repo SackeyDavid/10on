@@ -423,54 +423,43 @@ class SearchController extends Controller
         return view('book.oneway.payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'trip' => $trip, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details, 'days_left' => $days_left]);
     }
 
-    public function driveStatusShow($pretext, $booking_id, $posttext)
+    public function driveStatusShow()
     {
-        $booking = OneWayBookingProcess::find($booking_id);
-        $trip = Trips::find($booking->trip_id);
+        if (Auth::user()) {
 
-        $date_booked = Carbon::parse($booking->created_at);
-        $departing_date = Carbon::parse($trip->departure_date);
+            $bookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
 
-        $date = explode(" ", $booking->created_at);
-
-        $days_left = $departing_date->diffInDays($date_booked) . ' days';
-        if (explode(" ",$days_left)[0] <= 1) {
-            $days_left = $departing_date->diffInHours($date_booked) . ' hours';
-            if (explode(" ", $days_left)[0] <= 1 ) {
-                $days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
-                if (explode(" ", $days_left)[0] <= 1 ) {
-                $days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
             
-                }
-            }
+            return view('book.oneway.drive-status', compact('bookings'));
+ 
         }
-
-        return view('book.oneway.drive-status', ['booking' => $booking, 'trip' => $trip, 'date' => $date, 'days_left' => $days_left]);
-
+        else {
+            return redirect()->back()->with('msg', "Sorry, you're not logged in");
+        }
+        
     }
 
-    public function showMyTrips($booking_id) {
+    public function showMyTrips() {
 
-        $booking = OneWayBookingProcess::find($booking_id);
-
+        
         $owbookings = '';
         $rtbookings = '';
         $traveler_user = '';
         $traveler_passenger = '';
 
-        if ($booking->user) {
+        if (Auth::user()) {
 
-            $traveler_user_email = $booking->user_email;
-            $traveler_user_mobile_number = $booking->user->mobile_number;
+            $traveler_user_email = Auth::user()->email;
+            $traveler_user_mobile_number = Auth::user()->mobile_number;
 
             // oneway-bookings
-            $onewaybookings = OneWayBookingProcess::get();
+            $onewaybookings = OneWayBookingProcess::orderBy('created_at', 'DESC')->get();
 
-            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_user_email){
+            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_email){
                                 return $entry->user['email'] == $traveler_user_email;
             });
 
-            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_user_mobile_number){
+            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_mobile_number){
                                 return $entry->user['mobile_number'] == $traveler_user_mobile_number;
             });
 
@@ -478,16 +467,39 @@ class SearchController extends Controller
 
             $owbookings->all();
 
-            $uniqueOWs = $owbookings->unique();
-            
+            $uniqueOWs = $owbookings;
+
+            $ow_dates_array = array();
+
+            $ow_trip_dates = array();
+
+            foreach ($uniqueOWs as $value) {
+                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_ow_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_ow_date;
+                if ($diffDays < 1) {
+                   array_push($ow_trip_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            $ow_dates_array = array_unique($ow_dates_array);
+
 
             // Return-bookings
-           $returnbookings = ReturnBooking::get();
-            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry, $traveler_user_email){
+            $returnbookings = ReturnBooking::orderBy('created_at', 'DESC')->get();
+            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_email){
                                 return $entry->user['email'] == $traveler_user_email;
             });
 
-            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry, $traveler_user_mobile_number){
+            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_mobile_number){
                                 return $entry->user['mobile_number'] == $traveler_user_mobile_number;
             });
 
@@ -497,50 +509,286 @@ class SearchController extends Controller
 
             $uniqueRTs = $rtbookings->unique();
 
-            return view('book.oneway.my-trips', ['booking' => $booking, 'uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs]);  
+            return view('book.oneway.my-trips', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);  
 
         }
         else {
 
-            $traveler_passenger_email = $booking->passenger->email;
-            $traveler_passenger_mobile_number = $booking->passenger->mobile_number;
-
-            // Oneway-bookings
-            $onewaybookings = OneWayBookingProcess::get();
-            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_passenger_email){
-                                return $entry->passenger['email'] == $traveler_passenger_email;
-            });
-
-            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry, $traveler_passenger_mobile_number){
-                                return $entry->passenger['mobile_number'] == $traveler_passenger_mobile_number;
-            });
-
-            // merge collections
-            $owbookings = $owbookings_for_email->merge($owbookings_for_mobile_number);
-
-            $owbookings->all();
-
-            // remove duplicates
-            $uniqueOWs = $owbookings->unique();
-            
-
-            // Return-bookings
-            $returnbookings = ReturnBooking::get();
-            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry, $traveler_passenger_email){
-                                return $entry->passenger['email'] == $traveler_passenger_email && $entry->passenger['mobile_number'] == $traveler_passenger_mobile_number;
-            });
-
-            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry, $traveler_passenger_mobile_number){
-                                return $entry->passenger['email'] == $traveler_passenger_email && $entry->passenger['mobile_number'] == $traveler_passenger_mobile_number;
-            });
-
-            return view('book.oneway.my-trips', ['booking' => $booking, 'owbookings' => $owbookings, 'rtbookings' => $rtbookings]);
+        return view('book.oneway.drive-status', ['booking' => $booking, 'trip' => $trip, 'date' => $date, 'days_left' => $days_left, 'msg' => "Oops, You're currently logged out."]);
 
         }
 
         
         
     }
+
+
+    public function deleteHistory(Request $request) {
+        $toDelete = OneWayBookingProcess::find($request->booking_id);
+        $toDelete->delete();
+        return 'success';
+    }
+
+    public function manageBooking() {
+
+
+        if (Auth::user()) {
+
+            $traveler_user_email = Auth::user()->email;
+            $traveler_user_mobile_number = Auth::user()->mobile_number;
+
+            // oneway-bookings
+            $onewaybookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
+
+            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $owbookings = $owbookings_for_email->merge($owbookings_for_mobile_number);
+
+            $owbookings->all();
+
+            $uniqueOWs = $owbookings;
+
+            $ow_dates_array = array();
+
+
+            $ow_trip_dates = array(); // represents one way booked trip dates whose departure date is either today or in the future
+
+            foreach ($uniqueOWs as $value) {
+                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_ow_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_ow_date;
+                if ($diffDays < 1) {
+                   array_push($ow_trip_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            $ow_dates_array = array_unique($ow_dates_array);
+
+            return view('book.manage-booking', ['uniqueOWs' => $uniqueOWs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);
+
+        }
+        else
+        {
+            return redirect()->back()->with('msg', "Oops, You're currently logged out.");
+        }
+
+        
+    }
+
+    public function searchHistory(Request $request) {
+
+        $search_history = $request->search_history;
+        
+        // $departure = $request->ow_departure_station;
+
+        // $passenger_num = $request->ow_passenger_num;
+
+        if ($search_history == "") {
+
+            $traveler_user_email = Auth::user()->email;
+            $traveler_user_mobile_number = Auth::user()->mobile_number;
+
+            // oneway-bookings
+            $onewaybookings = OneWayBookingProcess::orderBy('created_at', 'DESC')->get();
+
+            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $owbookings = $owbookings_for_email->merge($owbookings_for_mobile_number);
+
+            $owbookings->all();
+
+            $uniqueOWs = $owbookings;
+
+            $ow_dates_array = array();
+
+            $ow_trip_dates = array();
+
+            foreach ($uniqueOWs as $value) {
+                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_ow_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_ow_date;
+                if ($diffDays < 1) {
+                   array_push($ow_trip_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            $ow_dates_array = array_unique($ow_dates_array);
+
+
+            // Return-bookings
+            $returnbookings = ReturnBooking::orderBy('created_at', 'DESC')->get();
+            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $rtbookings = $rtbookings_for_email->merge($rtbookings_for_mobile_number);
+
+            $rtbookings->all();
+
+            $uniqueRTs = $rtbookings->unique();
+
+            return view('book.one-way-history-results-for-no-input', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);  
+
+        }
+
+        if($request->ajax())
+        {
+            
+            
+            
+            $owbookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->whereHas('trip', function ($query) use ($search_history){
+                    $query->where('departure_location', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_location', 'LIKE', '%'. $search_history . '%')->orWhere('departure_date', $search_history . '%')->orWhere('departure_time', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_time', 'LIKE', '%'. $search_history . '%')->orWhere('kilometers', 'LIKE', '%'.  $search_history . '%')->orWhere('trip_duration_in_hrs', 'LIKE', '%'. $search_history . '%')->orWhere('trip_fare', 'LIKE', '%'. $search_history . '%')->orderBy('trip_fare');
+                })->get(); 
+
+           
+
+            // $owbookings = $trips->filter(function(Trips $entry) {
+            //                     return $entry['user_id'] == Auth::user()->id;
+            // });
+
+            $owbookings = $owbookings->unique();
+
+            // $owbookings->paginate(12);
+
+            // foreach ($trips as $trip) {
+            //     foreach ($trip->owbookings as $owbooking) {
+            //         if ($owbooking->user_id == Auth::user()->id) {
+                        
+            //         }
+            //     }
+                
+            // }
+
+            return view('book.one-way-history-results', compact('owbookings','search_history'))->render();
+            }
+
+
+                
+        
+    }
+
+    public function editBooking(Request $request) {
+
+        $input['title'] = $request->title;
+        $input['first_name'] = $request->first_name;
+        $input['last_name'] = $request->last_name;
+        $input['email'] = $request->email;
+        $input['country'] = $request->country;
+        $input['mobile_number'] = $request->mobile_number;
+        $input['contact_person'] = $request->contact_person;
+        $input['remind_me'] = $request->remind_me;
+
+        // update personal info
+        DB::table('users')->where('id', Auth::user()->id)->update($input);
+
+
+        $input1['phone_number'] = $request->mobile_number;
+        $input1['network'] = $request->network;
+
+
+        // update payment info
+        DB::table('mobile_money_details')->where('from_user', Auth::user()->id)->update($input1);
+
+        //set flash data with success message
+        // Session::flash('success', 'Your booking info has been successfully edited');
+
+
+
+        // redirect with flash data to showProfile
+        return redirect()->back()->with('msg', 'Booking Info has been edited');
+        
+    }
+
+    public function showBus() {
+
+        if (Auth::user()) {
+
+            $traveler_user_email = Auth::user()->email;
+            $traveler_user_mobile_number = Auth::user()->mobile_number;
+
+            // oneway-bookings
+            $onewaybookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
+
+            $owbookings_for_email = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $owbookings_for_mobile_number = $onewaybookings->filter(function(OneWayBookingProcess $entry) use ($traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $owbookings = $owbookings_for_email->merge($owbookings_for_mobile_number);
+
+            $owbookings->all();
+
+            $uniqueOWs = $owbookings;
+
+            $ow_dates_array = array();
+
+
+            $ow_trip_dates = array(); // represents one way booked trip dates whose departure date is either today or in the future
+
+            foreach ($uniqueOWs as $value) {
+                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_ow_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_ow_date;
+                if ($diffDays < 1) {
+                   array_push($ow_trip_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            $ow_dates_array = array_unique($ow_dates_array);
+
+            return view('bus', ['uniqueOWs' => $uniqueOWs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);
+
+        }
+        else
+        {
+            return redirect()->back()->with('msg', "Oops, You're currently logged out.");
+        }
+        
+    }
+
 
 
 }

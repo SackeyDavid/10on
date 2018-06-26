@@ -16,6 +16,7 @@ class CreateSpecialFeaturesTable extends Migration
         Schema::create('special_features', function (Blueprint $table) {
             $table->increments('id');
             $table->string('from_client');
+            $table->string('bus_id');
             $table->string('fuel')->default('no');
             $table->string('television')->default('no');
             $table->string('wifi')->default('no');

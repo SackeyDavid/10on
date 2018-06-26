@@ -19,7 +19,7 @@ class CreateBusesTable extends Migration
             $table->string('bus_number')->nullable()->unique();
             $table->string('capacity')->nullable();
             $table->string('photo')->nullable();
-            $table->string('special_feature')->nullable();
+            $table->string('special_feature_id')->nullable();
             $table->string('brand_name')->nullable();
             $table->string('driver')->nullable();
             $table->timestamps();

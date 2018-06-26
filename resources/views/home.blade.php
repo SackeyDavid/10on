@@ -163,14 +163,16 @@
                 <a href="javascript:void(0)" style="font-size: 25px;font-weight: 900;color: #fff;" class="closebtn top-right" onclick="
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
-                    <hr>
+                    <hr> <a href="{{ route('my.trips.oneway') }}" style="color: #fff;cursor: pointer;">
                     My Trips <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    Drive Status <br>
+                     <a href="{{ route('oneway.drive.status') }}" style="color: #fff;cursor: pointer;">
+                    Drive Status </a> <br>
                     <hr>
-                    My Account <br>
+                    <a href="{{ URL::to('/home') }}" style="color: #fff;cursor: pointer;">
+                    My Account</a> <br>
                     <hr>
                     Notifications <br>
                     <hr>
@@ -182,6 +184,7 @@
                     <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+                    <a href="/" style="text-decoration: none;color: #fff;"> Home <i class="fa fa-home"></i></a>
                     </div>
                 </div>
             </div>

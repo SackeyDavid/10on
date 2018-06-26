@@ -12,7 +12,7 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('welcome', ['msg' => "Hello, you're welcome!"]);
 });
 
 Auth::routes();
@@ -47,19 +47,23 @@ Route::post('/payment/details/add/{booking_id}/{passenger_num}/{traveler_id}/{op
 
 
 
+
 Route::post('/payment/success/edit/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@editPaymentSuccess')->name('payment.success.edit');
 
 Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.search');
 
-Route::get('/oneway/drive/status/{pretext}/{booking_id}/{posttext}', 'SearchController@driveStatusShow')->name('oneway.drive.status');
+Route::get('/history/trips/search', 'SearchController@searchHistory')->name('search.history');
 
-Route::get('/oneway/trips/my/{booking_id}', 'SearchController@showMyTrips')->name('my.trips.oneway');
+Route::get('/oneway/drive/status/', 'SearchController@driveStatusShow')->name('oneway.drive.status');
 
-Route::get('/return/drive/status/10120{booking_id}120020010', 'BookingController@driveStatusShow')->name('return.drive.status');
+Route::get('/oneway/trips/my/', 'SearchController@showMyTrips')->name('my.trips.oneway');
+
+Route::get('/return/drive/status/10120120020010', 'BookingController@driveStatusShow')->name('return.drive.status');
 
 Route::post('/found/trips/oneway/{trip_id}/{passenger_num}', 'SearchController@tripFound')->name('oneway.trip.found');
 
 Route::get('/oneway/payment/success/{booking_id}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'SearchController@showPaymentSuccess')->name('one_way.payment.success.show');
+
 
 
 Route::group(['middleware'=>['auth']],function(){
@@ -89,12 +93,23 @@ Route::group(['middleware'=>['auth']],function(){
 
     Route::get('/auth/return/drive/status/10120{booking_id}120020010', 'BookingController@driveStatusShow')->name('auth.return.drive.status');
 
+    Route::get('/auth/oneway/trips/my/{booking_id}', 'SearchController@showMyTrips')->name('user.trips.oneway');
+
+    Route::get('/auth/manage/booking', 'SearchController@manageBooking')->name('manage.auth.booking');
+
+    Route::post('/edit/booking/{booking_id}', 'SearchController@editBooking')->name('edit.booking');
+
+    Route::get('/traveler/bus/', 'SearchController@showBus')->name('bus.info');
 
 });
 
 Route::post('/payment/details/add/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{option}', 'BookingController@addPaymentDetails')->name('payment.details.add');
 
 Route::get('/return/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{traveler_id}/{payment_id}/{option}', 'BookingController@showPaymentSuccess')->name('return.payment.success.show');
+
+Route::delete('/history/delete', 'SearchController@deleteHistory')->name('history.delete');
+
+Route::get('/manage/booking', 'SearchController@manageBooking')->name('manage.booking');
 
 
 
@@ -162,16 +177,25 @@ Route::prefix('client')->group(function(){
 
   Route::post('/tax/add', 'ClientController@addTax')->name('tax.add');
 
-  View::composer(['client', 'components.client.addBus', 'components.client.addFare', 'components.client.addStation', 'components.client.addTax','components.client.addTrip', 'components.client.addSpecialFeatures'], function ($view) {
+  View::composer(['client', 'components.client.addBus', 'components.client.addFare', 'components.client.addStation', 'components.client.addTax','components.client.addTrip', 'components.client.addSpecialFeatures', 'layouts.client-app'], function ($view) {
              $fares = App\Fare::orderBy('created_at', 'DESC')->paginate(10);
+             $ones_fares = '';
+             $buses = '';
+             $ones_taxes = '';
+             $trips = '';
+             $ones_trips = '';
+             $special_features = '';
+             $ones_special_features = '';
+             $stations = '';
+             $ones_stations = '';
+
              if (!Auth::user()) {
                $ones_fares = App\Fare::all();
-             }
-             
-             
 
-             $ones_fares = App\Fare::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
-             $buses = App\Bus::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
+             }else
+             {
+              $ones_fares = App\Fare::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
+              $buses = App\Bus::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
              $ones_taxes = App\Tax::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
              $trips = App\Trips::orderBy('created_at', 'DESC')->paginate(10);
              $ones_trips = App\Trips::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
@@ -179,6 +203,12 @@ Route::prefix('client')->group(function(){
              $ones_special_features = App\SpecialFeatures::where('from_client', Auth::user()->id)->orderBy('created_at', 'DESC')->paginate(10);
              $stations = App\Station::orderBy('name')->get();
              $ones_stations = App\Station::where('from_client', Auth::user()->id)->orderBy('name')->paginate(10);
+             }
+             
+             
+
+             
+             
 
              $view->with('fares', $fares)->with('ones_fares', $ones_fares)->with('buses', $buses)->with('trips', $trips)->with('ones_trips', $ones_trips)->with('special_features', $special_features)->with('ones_special_features', $ones_special_features)->with('stations', $stations)->with('ones_stations', $ones_stations)->with('ones_taxes', $ones_taxes);
   });
