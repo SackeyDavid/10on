@@ -14,6 +14,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ URL::To('images/logo-big.jpg') }}" type="image/jpg" rel="shortcut icon">
     <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome-all.css') }}">
+    <link rel="stylesheet" href="{{ URL::To('css/intlTelInput.min.css') }}">
     <!-- <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}"> -->
    
     <link rel="stylesheet" type="text/css" href="{{ asset('css/search-trips.css') }}">
@@ -104,11 +105,14 @@
                     </div>
                      </div> -->
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
+    <!-- <script src="{{ asset('js/app.js') }}"></script> -->
     <script src="/js/script.js"></script>
     <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> -->
+    <script src="{{ asset('js/intlTelInput.min.js') }}"></script>
+    <script src="{{ asset('js/utils.js') }}"></script>
     
 
     <script type="text/javascript">
@@ -117,6 +121,21 @@
                 c.text = $('#title').val() + ' ' + $('input[name="first_name"]').val() + ' ' + $('input[name="last_name"]').val(); 
                 this.options.add(c, 2);
             });
+
+            $("#mobile_number").intlTelInput({
+              preferredCountries: ["gh", "ke", "ng", "tg", "ci", "bf", "us", "gb"],
+              nationalMode: true,
+              utilsScript: "js/utils.js"
+            });
+
+            
+
+            $("#register-submit").click(function(){
+              $("#mobile_number").val($("#mobile_number").intlTelInput("getNumber"));
+              document.forms[0].submit();
+            });
+
+            
     </script>
 
 </body>

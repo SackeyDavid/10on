@@ -365,72 +365,141 @@ class SearchController extends Controller
 
     public function showPaymentSuccess($booking_id, $passenger_num, $traveler_id, $payment_id, $option)
     {
-        $booking = OneWayBookingProcess::find($booking_id);
+                $booking = OneWayBookingProcess::find($booking_id);
 
-        $trip = Trips::find($booking->trip_id);
+                $trip = Trips::find($booking->trip_id);
 
-        $passenger_details = "";
+                $passenger_details = "";
 
-        $payment_details = "";
+                $payment_details = "";
 
-        $passenger = explode(" ", $traveler_id);
-        $bookers_id = $passenger[1];
+                $passenger = explode(" ", $traveler_id);
+                $bookers_id = $passenger[1];
 
-        $payment = explode(" ", $payment_id);
+                $payment = explode(" ", $payment_id);
 
-        if ($passenger[0] == 'user') 
-        {
-            if (!Auth::user()) {
-                $passenger_details = "session expired";
-            }
-            else
-            {
-                $passenger_details = User::where('id', Auth::user()->id)->first();
-            }
-        }
-        elseif ($passenger[0] == 'passenger') 
-        {
-            $passenger_details = PassengerDetails::find($passenger[1])->first();
-        }
-
-        if ($option == 'card') 
-        {
-            $payment_details = CardDetails::find($payment[1]);
-        }
-        elseif ($option == 'wallet') 
-        {
-            $payment_details = MobileMoney::find($payment[1]);
-        }
-
-        $date_booked = Carbon::parse($booking->created_at);
-        $departing_date = Carbon::parse($trip->departure_date);
-
-        $days_left = $departing_date->diffInDays($date_booked) . ' days';
-        if (explode(" ",$days_left)[0] <= 1) {
-            $days_left = $departing_date->diffInHours($date_booked) . ' hours';
-            if (explode(" ", $days_left)[0] <= 1 ) {
-                $days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
-                if (explode(" ", $days_left)[0] <= 1 ) {
-                $days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
-            
+                if ($passenger[0] == 'user') 
+                {
+                    if (!Auth::user()) {
+                        $passenger_details = "session expired";
+                    }
+                    else
+                    {
+                        $passenger_details = User::where('id', Auth::user()->id)->first();
+                    }
                 }
-            }
-        }
+                elseif ($passenger[0] == 'passenger') 
+                {
+                    $passenger_details = PassengerDetails::find($passenger[1])->first();
+                }
+
+                if ($option == 'card') 
+                {
+                    $payment_details = CardDetails::find($payment[1]);
+                }
+                elseif ($option == 'wallet') 
+                {
+                    $payment_details = MobileMoney::find($payment[1]);
+                }
+
+                $date_booked = Carbon::parse($booking->created_at);
+                $departing_date = Carbon::parse($trip->departure_date);
+
+                $days_left = $departing_date->diffInDays($date_booked) . ' days';
+                if (explode(" ",$days_left)[0] <= 1) {
+                    $days_left = $departing_date->diffInHours($date_booked) . ' hours';
+                    if (explode(" ", $days_left)[0] <= 1 ) {
+                        $days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                        if (explode(" ", $days_left)[0] <= 1 ) {
+                        $days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+                    
+                        }
+                    }
+                }
 
 
 
 
-        return view('book.oneway.payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'trip' => $trip, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details, 'days_left' => $days_left]);
+                return view('book.oneway.payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'trip' => $trip, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details, 'days_left' => $days_left]);
     }
 
     public function driveStatusShow()
     {
         if (Auth::user()) {
 
-            $bookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
+            $ow_bookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
+
+            $rt_bookings = ReturnBooking::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
+
+            $ow_trip_dates = array();
+
+            foreach ($ow_bookings as $value) {
+                // array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_ow_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_ow_date;
+                if ($diffDays < 1) {
+                   array_push($ow_trip_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            $rt_outbound_dates = array();
+
+            $rt_inbound_dates = array();
+
+            foreach ($rt_bookings as $value) {
+                // array_push($rt_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->departing->departure_date)[3] . "-" . explode(" ", $value->departing->departure_date)[2] . "-" . explode(" ", $value->departing->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_outbound_dates, date('Ymd', $trip_date)); 
+                }
+
+                $trip_date = explode(" ", $value->returning->departure_date)[3] . "-" . explode(" ", $value->returning->departure_date)[2] . "-" . explode(" ", $value->returning->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_inbound_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
 
             
-            return view('book.oneway.drive-status', compact('bookings'));
+            // merge both rt future trip dates
+            $combined_return_trip_dates = array_merge($rt_outbound_dates, $rt_inbound_dates);
+
+            // merge both ow and rt futures trip dates
+            $combined_trip_dates = array_merge($ow_trip_dates, $combined_return_trip_dates); 
+
+            $combined_trip_dates = array_unique($combined_trip_dates);
+
+            // sort both ow and rt future trip dates in descencing(ie most recent) order
+            usort($combined_trip_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+
+            
+            return view('book.oneway.drive-status', compact('ow_bookings', 'rt_bookings', 'combined_trip_dates'));
  
         }
         else {
@@ -474,7 +543,7 @@ class SearchController extends Controller
             $ow_trip_dates = array();
 
             foreach ($uniqueOWs as $value) {
-                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+                //array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
 
                 $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
                 $trip_date = strtotime($trip_date);
@@ -487,6 +556,9 @@ class SearchController extends Controller
                 if ($diffDays < 1) {
                    array_push($ow_trip_dates, date('Ymd', $trip_date)); 
                 }
+                if ($diffDays >= 1) {
+                   array_push($ow_dates_array, date('Ymd', $trip_date));
+                }
                 
             }
 
@@ -494,7 +566,7 @@ class SearchController extends Controller
 
 
             // Return-bookings
-            $returnbookings = ReturnBooking::orderBy('created_at', 'DESC')->get();
+            $returnbookings = ReturnBooking::where('user_id', Auth::user()->id)->orderBy('created_at', 'DESC')->get();
             $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_email){
                                 return $entry->user['email'] == $traveler_user_email;
             });
@@ -507,14 +579,85 @@ class SearchController extends Controller
 
             $rtbookings->all();
 
-            $uniqueRTs = $rtbookings->unique();
+            $uniqueRTs = $returnbookings;
 
-            return view('book.oneway.my-trips', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);  
+            $rt_dates_array = array();
+
+            $rt_outbound_dates = array();
+
+            $rt_inbound_dates = array();
+            $test = '';
+
+            foreach ($uniqueRTs as $value) {
+                
+
+                $trip_date = explode(" ", $value->departing->departure_date)[1] . "-" . explode(" ", $value->departing->departure_date)[2] . "-" . explode(" ", $value->departing->departure_date)[3];
+                
+                $trip_date = strtotime($trip_date);
+
+                // $trip_date+= 1209600; // add two weeks to get actual date
+                $test = date('Ymd', $trip_date);
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_outbound_dates, date('Ymd', $trip_date)); 
+                }
+                if ($diffDays >= 1) {
+                   array_push($rt_dates_array, date('Ymd', $trip_date));
+                }
+
+                $trip_date = explode(" ", $value->returning->departure_date)[1] . "-" . explode(" ", $value->returning->departure_date)[2] . "-" . explode(" ", $value->returning->departure_date)[3];
+                $trip_date = strtotime($trip_date);
+                // $trip_date+= 1209600; // add two weeks to get actual date
+
+                
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_inbound_dates, date('Ymd', $trip_date)); 
+                }
+                if ($diffDays >= 1) {
+                   array_push($rt_dates_array, date('Ymd', $trip_date));
+                }
+                
+            }
+
+            $rt_dates_array = array_unique($rt_dates_array);
+
+            $combined_past_trips = array_merge($rt_dates_array, $ow_dates_array);
+
+            // avoid duplicates
+            $combined_past_trips = array_unique($combined_past_trips);
+
+            // sort both dates in ascending order
+            usort($combined_past_trips, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+            // merge both rt future trip dates
+            $combined_return_trip_dates = array_merge($rt_outbound_dates, $rt_inbound_dates);
+
+            // merge both ow and rt futures trip dates
+            $combined_trip_dates = array_merge($combined_return_trip_dates, $ow_trip_dates); 
+
+            // avoid duplicates in future dates
+            $combined_trip_dates = array_unique($combined_trip_dates);
+
+            // sort both ow and rt future trip dates in descencing(ie most recent) order
+            usort($combined_trip_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+            return view('book.oneway.my-trips', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'combined_trip_dates' => $combined_trip_dates, 'combined_past_trips' => $combined_past_trips, 'rt_inbound_dates' => $rt_inbound_dates, 'test' => $test]);  
 
         }
         else {
 
-        return view('book.oneway.drive-status', ['booking' => $booking, 'trip' => $trip, 'date' => $date, 'days_left' => $days_left, 'msg' => "Oops, You're currently logged out."]);
+        return redirect()->back()->with('msg', "Oops, you're logged out.");
 
         }
 
@@ -522,12 +665,24 @@ class SearchController extends Controller
         
     }
 
-
+    // delete history function also works for deleting oneway bookings from manage-booking view
     public function deleteHistory(Request $request) {
         $toDelete = OneWayBookingProcess::find($request->booking_id);
         $toDelete->delete();
         return 'success';
     }
+
+    public function deleteReturnBooking(Request $request) {
+        $toDelete = ReturnBooking::find($request->booking_id);
+        $toDelete->delete();
+        return 'success';
+    }
+
+    // public function deleteReturnTrip(Request $request) {
+    //     $toDelete = ReturnBooking::find($request->booking_id);
+    //     $toDelete->delete();
+    //     return 'success';
+    // }
 
     public function manageBooking() {
 
@@ -557,14 +712,15 @@ class SearchController extends Controller
             $ow_dates_array = array();
 
 
-            $ow_trip_dates = array(); // represents one way booked trip dates whose departure date is either today or in the future
+            $ow_trip_dates = array(); 
+            // represents one way booked trip dates whose departure date is either today or in the future
 
             foreach ($uniqueOWs as $value) {
-                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+                // array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
 
-                $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
+                $trip_date = explode(" ", $value->trip->departure_date)[1] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[3];
                 $trip_date = strtotime($trip_date);
-                $trip_date+= 1209600; // add two weeks to get actual date
+                // $trip_date+= 1209600; // add two weeks to get actual date
 
                 $now = date('Ymd'); 
                 
@@ -576,9 +732,88 @@ class SearchController extends Controller
                 
             }
 
-            $ow_dates_array = array_unique($ow_dates_array);
+            // $ow_dates_array = array_unique($ow_dates_array);
 
-            return view('book.manage-booking', ['uniqueOWs' => $uniqueOWs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);
+            // rt bookings
+                // Return-bookings
+            $returnbookings = ReturnBooking::orderBy('created_at', 'DESC')->get();
+            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $rtbookings = $rtbookings_for_email->merge($rtbookings_for_mobile_number);
+
+            $rtbookings->all();
+
+            $uniqueRTs = $rtbookings;
+
+            // $rt_dates_array = array();
+
+            $rt_outbound_dates = array();
+
+            $rt_inbound_dates = array();
+
+            foreach ($uniqueRTs as $value) {
+                // array_push($rt_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->departing->departure_date)[1] . "-" . explode(" ", $value->departing->departure_date)[2] . "-" . explode(" ", $value->departing->departure_date)[3];
+                $trip_date = strtotime($trip_date);
+                // $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_outbound_dates, date('Ymd', $trip_date)); 
+                }
+
+                $trip_date = explode(" ", $value->returning->departure_date)[1] . "-" . explode(" ", $value->returning->departure_date)[2] . "-" . explode(" ", $value->returning->departure_date)[3];
+                $trip_date = strtotime($trip_date);
+                // $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_inbound_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            // $rt_dates_array = array_unique($rt_dates_array);
+
+            // $combined_booking_dates = array_merge($rt_dates_array, $ow_dates_array);
+
+            // // avoid duplicates
+            // $combined_booking_dates = array_unique($combined_booking_dates);
+
+            // // sort both dates in ascending order
+            // usort($combined_booking_dates, function($a, $b) {
+            //     return strtotime($b) - strtotime($a);
+            // });
+
+            // merge both rt future trip dates
+            $combined_return_trip_dates = array_merge($rt_outbound_dates, $rt_inbound_dates);
+
+            // merge both ow and rt futures trip dates
+            $combined_trip_dates = array_merge($combined_return_trip_dates, $ow_trip_dates); 
+
+            $combined_trip_dates = array_unique($combined_trip_dates);
+
+            // sort both ow and rt future trip dates in descencing(ie most recent) order
+            usort($combined_trip_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+            // rt bookings
+
+            return view('book.manage-booking', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'combined_trip_dates' => $combined_trip_dates]);
 
         }
         else
@@ -640,7 +875,7 @@ class SearchController extends Controller
                 
             }
 
-            $ow_dates_array = array_unique($ow_dates_array);
+           $ow_dates_array = array_unique($ow_dates_array);
 
 
             // Return-bookings
@@ -657,9 +892,68 @@ class SearchController extends Controller
 
             $rtbookings->all();
 
-            $uniqueRTs = $rtbookings->unique();
+            $uniqueRTs = $rtbookings;
 
-            return view('book.one-way-history-results-for-no-input', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);  
+            $rt_dates_array = array();
+
+            $rt_outbound_dates = array();
+
+            $rt_inbound_dates = array();
+
+            foreach ($uniqueRTs as $value) {
+                array_push($rt_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+
+                $trip_date = explode(" ", $value->departing->departure_date)[3] . "-" . explode(" ", $value->departing->departure_date)[2] . "-" . explode(" ", $value->departing->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_outbound_dates, date('Ymd', $trip_date)); 
+                }
+
+                $trip_date = explode(" ", $value->returning->departure_date)[3] . "-" . explode(" ", $value->returning->departure_date)[2] . "-" . explode(" ", $value->returning->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_inbound_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+            $rt_dates_array = array_unique($rt_dates_array);
+
+            $combined_booking_dates = array_merge($rt_dates_array, $ow_dates_array);
+
+            // avoid duplicates
+            $combined_booking_dates = array_unique($combined_booking_dates);
+
+            // sort both dates in ascending order
+            usort($combined_booking_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+            // merge both rt future trip dates
+            $combined_return_trip_dates = array_merge($rt_outbound_dates, $rt_inbound_dates);
+
+            // merge both ow and rt futures trip dates
+            $combined_trip_dates = array_merge($ow_trip_dates, $combined_return_trip_dates); 
+
+            // sort both ow and rt future trip dates in descencing(ie most recent) order
+            usort($combined_trip_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+
+            return view('book.one-way-history-results-for-no-input', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'combined_trip_dates' => $combined_trip_dates, 'combined_booking_dates' => $combined_booking_dates]);  
 
         }
 
@@ -667,12 +961,49 @@ class SearchController extends Controller
         {
             
             
-            
+            // ow bookings
             $owbookings = OneWayBookingProcess::where('user_id', Auth::user()->id)->whereHas('trip', function ($query) use ($search_history){
-                    $query->where('departure_location', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_location', 'LIKE', '%'. $search_history . '%')->orWhere('departure_date', $search_history . '%')->orWhere('departure_time', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_time', 'LIKE', '%'. $search_history . '%')->orWhere('kilometers', 'LIKE', '%'.  $search_history . '%')->orWhere('trip_duration_in_hrs', 'LIKE', '%'. $search_history . '%')->orWhere('trip_fare', 'LIKE', '%'. $search_history . '%')->orderBy('trip_fare');
+                    $query->where('departure_location', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_location', 'LIKE', '%'. $search_history . '%')->orWhere('departure_date', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_date', 'LIKE', '%'. $search_history . '%')->orWhere('departure_time', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_time', 'LIKE', '%'. $search_history . '%')->orWhere('kilometers', 'LIKE', '%'.  $search_history . '%')->orWhere('trip_duration_in_hrs', 'LIKE', '%'. $search_history . '%')->orWhere('trip_fare', 'LIKE', '%'. $search_history . '%')->orderBy('trip_fare');
                 })->get(); 
 
-           
+            // return bookings
+            $rtbookings_departing = ReturnBooking::where('user_id', Auth::user()->id)->whereHas('departing', function ($query) use ($search_history){
+                    $query->where('departure_location', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_location', 'LIKE', '%'. $search_history . '%')->orWhere('departure_date', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_date', 'LIKE', '%'. $search_history . '%')->orWhere('departure_time', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_time', 'LIKE', '%'. $search_history . '%')->orWhere('kilometers', 'LIKE', '%'.  $search_history . '%')->orWhere('trip_duration_in_hrs', 'LIKE', '%'. $search_history . '%')->orWhere('trip_fare', 'LIKE', '%'. $search_history . '%')->orderBy('trip_fare');
+                })->get();
+
+            $rtbookings_returning = ReturnBooking::where('user_id', Auth::user()->id)->whereHas('returning', function ($query) use ($search_history){
+                    $query->where('departure_location', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_location', 'LIKE', '%'. $search_history . '%')->orWhere('departure_date', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_date', 'LIKE', '%'. $search_history . '%')->orWhere('departure_time', 'LIKE', '%'. $search_history . '%')->orWhere('arrival_time', 'LIKE', '%'. $search_history . '%')->orWhere('kilometers', 'LIKE', '%'.  $search_history . '%')->orWhere('trip_duration_in_hrs', 'LIKE', '%'. $search_history . '%')->orWhere('trip_fare', 'LIKE', '%'. $search_history . '%')->orderBy('trip_fare');
+                })->get(); 
+
+           $rtbookings = $rtbookings_departing->merge($rtbookings_returning);
+
+            // get owbookings dates
+            $ow_dates_array = array();
+
+            foreach ($owbookings as $value) {
+                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+                
+            }
+
+            // get rtbookings dates
+            $rt_dates_array = array();
+
+            foreach ($owbookings as $value) {
+                array_push($rt_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+                
+            }
+
+            $rt_dates_array = array_unique($rt_dates_array);
+
+            $combined_booking_dates = array_merge($rt_dates_array, $ow_dates_array);
+
+            // avoid duplicates
+            $combined_booking_dates = array_unique($combined_booking_dates);
+
+            // sort both dates in ascending order
+            usort($combined_booking_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
 
             // $owbookings = $trips->filter(function(Trips $entry) {
             //                     return $entry['user_id'] == Auth::user()->id;
@@ -691,7 +1022,7 @@ class SearchController extends Controller
                 
             // }
 
-            return view('book.one-way-history-results', compact('owbookings','search_history'))->render();
+            return view('book.one-way-history-results', compact('owbookings', 'rtbookings', 'search_history', 'combined_booking_dates'))->render();
             }
 
 
@@ -731,6 +1062,7 @@ class SearchController extends Controller
         
     }
 
+    // this function shows the bus travelers will used for the active trips
     public function showBus() {
 
         if (Auth::user()) {
@@ -755,13 +1087,13 @@ class SearchController extends Controller
 
             $uniqueOWs = $owbookings;
 
-            $ow_dates_array = array();
+            //$ow_dates_array = array();
 
 
             $ow_trip_dates = array(); // represents one way booked trip dates whose departure date is either today or in the future
 
             foreach ($uniqueOWs as $value) {
-                array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
+                // array_push($ow_dates_array, date('Ymd', strtotime(explode(" ", $value->created_at)[0])));
 
                 $trip_date = explode(" ", $value->trip->departure_date)[3] . "-" . explode(" ", $value->trip->departure_date)[2] . "-" . explode(" ", $value->trip->departure_date)[1];
                 $trip_date = strtotime($trip_date);
@@ -777,9 +1109,73 @@ class SearchController extends Controller
                 
             }
 
-            $ow_dates_array = array_unique($ow_dates_array);
+            // $ow_dates_array = array_unique($ow_dates_array);    
 
-            return view('bus', ['uniqueOWs' => $uniqueOWs, 'ow_dates_array' => $ow_dates_array, 'ow_trip_dates' => $ow_trip_dates]);
+            // Return-bookings
+            $returnbookings = ReturnBooking::orderBy('created_at', 'DESC')->get();
+            $rtbookings_for_email = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_email){
+                                return $entry->user['email'] == $traveler_user_email;
+            });
+
+            $rtbookings_for_mobile_number = $returnbookings->filter(function(ReturnBooking $entry) use ($traveler_user_mobile_number){
+                                return $entry->user['mobile_number'] == $traveler_user_mobile_number;
+            });
+
+            $rtbookings = $rtbookings_for_email->merge($rtbookings_for_mobile_number);
+
+            $rtbookings->all();
+
+            $uniqueRTs = $rtbookings;
+
+    
+
+            $rt_outbound_dates = array();
+
+            $rt_inbound_dates = array();
+
+            foreach ($uniqueRTs as $value) {
+                
+                $trip_date = explode(" ", $value->departing->departure_date)[3] . "-" . explode(" ", $value->departing->departure_date)[2] . "-" . explode(" ", $value->departing->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_outbound_dates, date('Ymd', $trip_date)); 
+                }
+
+                $trip_date = explode(" ", $value->returning->departure_date)[3] . "-" . explode(" ", $value->returning->departure_date)[2] . "-" . explode(" ", $value->returning->departure_date)[1];
+                $trip_date = strtotime($trip_date);
+                $trip_date+= 1209600; // add two weeks to get actual date
+
+                $now = date('Ymd'); 
+                
+                $current_rt_date = date('Ymd', $trip_date);
+                $diffDays = $now - $current_rt_date;
+                if ($diffDays < 1) {
+                   array_push($rt_inbound_dates, date('Ymd', $trip_date)); 
+                }
+                
+            }
+
+
+            // merge both rt future trip dates
+            $combined_return_trip_dates = array_merge($rt_outbound_dates, $rt_inbound_dates);
+
+            // merge both ow and rt futures trip dates
+            $combined_trip_dates = array_merge($combined_return_trip_dates, $ow_trip_dates); 
+
+            // sort both ow and rt future trip dates in descencing(ie most recent) order
+            usort($combined_trip_dates, function($a, $b) {
+                return strtotime($b) - strtotime($a);
+            });
+
+
+
+            return view('bus', ['uniqueOWs' => $uniqueOWs, 'uniqueRTs' => $uniqueRTs, 'combined_trip_dates' => $combined_trip_dates]);
 
         }
         else

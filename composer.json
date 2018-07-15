@@ -11,7 +11,10 @@
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.*",
         "laravel/tinker": "~1.0",
+        "nexmo/client": "dev-master as 1.0",
+        "nexmo/laravel": "^1.1",
         "nicolaslopezj/searchable": "1.*",
+        "norris1z/hubtel-laravel-sms-channel": "^1.2",
         "ovac/laravel-hubtel-payment": "^1.0",
         "slydepay/slydepay-soap": "^1.1"
     },

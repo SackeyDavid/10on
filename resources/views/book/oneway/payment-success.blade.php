@@ -170,19 +170,17 @@
                 <a href="javascript:void(0)" style="font-size: 25px;font-weight: 900;color: #fff;" class="closebtn top-right" onclick="
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
-                    <hr>
-                    My Trips <br>
+                    <hr>  <a href="{{ route('my.trips.oneway') }}" style="color: #fff;cursor: pointer;">
+                    My Trips </a> <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    @php 
-                    $pretext = sprintf('%06d', mt_rand(100000,999999));
-                    $posttext = sprintf('%06d', mt_rand(100000,999999));
-                    @endphp
-                    <a href="{{ route('oneway.drive.status', ['pretext' => $pretext,'booking_id' => $booking->id, 'posttext' => $posttext]) }}" style="color: #fff;cursor: pointer;">
+                   
+                    <a href="{{ route('oneway.drive.status') }}" style="color: #fff;cursor: pointer;">
                     Drive Status</a> <br>
                     <hr>
-                    My Account <br>
+                    <a href="{{ URL::to('/home') }}" style="color: #fff;cursor: pointer;">
+                    My Account </a> <br>
                     <hr>
                     Notifications <br>
                     <hr>
@@ -194,6 +192,7 @@
                     <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+                    <a href="/" style="text-decoration: none;color: #fff;"> Home <i class="fa fa-home"></i></a>
                     </div>
                 </div>
             </div>
@@ -210,8 +209,9 @@
                     @else
                     
                     @endif</span> <br>
-                <span>Your booking on {{$booking->created_at}} with ID <span style="font-weight: 800">OW-{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens in {{$days_left}}.</span>
+               
             </center>
+             <span>Your booking on {{$booking->created_at}} with ID <span style="font-weight: 800">OW-{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification before check-in opens in {{$days_left}}.</span>
             </div>
         </div>
         <br>
@@ -222,7 +222,7 @@
                               <th colspan="2">
                                   <ul class="list-inline">
                                       <li style="color: #000;font-size: 16px;">
-                                      Your Trip</li>
+                                      Your Trip (One Way)</li>
                                       <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";

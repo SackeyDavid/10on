@@ -18,7 +18,7 @@ class User extends Authenticatable
     protected $table = 'users';
     
     protected $fillable = [
-            'title','first_name', 'last_name','email', 'contact_person', 'country', 'mobile_number', 'remind_me', 'membership_number', 'agree', 'password', 'card_id', 'mobile_money_id'
+            'title','first_name', 'last_name','email', 'contact_person', 'country', 'mobile_number', 'remind_me', 'membership_number', 'agree', 'password', 'card_id', 'mobile_money_id', 'kilometers',
     ];
 
     /**
@@ -46,4 +46,10 @@ class User extends Authenticatable
         return $this->belongsTo('App\MobileMoney', 'mobile_money_id');
         
     }
+
+    public function routeNotificationForSMS()
+    {
+        return $this->mobile_number; 
+    }
+    
 }

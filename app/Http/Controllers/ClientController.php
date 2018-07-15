@@ -130,14 +130,25 @@ class ClientController extends Controller
 
     public function addStation(Request $request)
     {
+        DB::beginTransaction();
 
-        $fare = Station::create([
-            'from_client' => Auth::user()->id,
-            'name' => $request->name,
-            'abbreviation' => $request->abbreviation,
-            'town_or_city' => $request->town_or_city,
-            'region' => $request->region
-        ]);
+        try {
+             $fare = Station::create([
+                    'from_client' => Auth::user()->id,
+                    'name' => $request->name,
+                    'abbreviation' => $request->abbreviation,
+                    'town_or_city' => $request->town_or_city,
+                    'region' => $request->region
+                ]);
+
+            DB::commit();
+            // all good
+        } catch (\Exception $e) {
+            DB::rollback();
+            // something went wrong
+            return redirect()->back()->with('msg-error', 'Oops, something went wrong. Either the station or abbreviation specified is already chosen or something else went wrong.');
+        }
+        
 
         return redirect()->route('client.dashboard')->with('msg', 'Station has been saved!');
     }

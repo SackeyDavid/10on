@@ -114,13 +114,13 @@
 
     <script type="text/javascript">
     
-        $depart_day = "";
+        let depart_day = "";
 
-        $depart_date = "";
+        let depart_date = "";
 
-        $return_day = "";
+        let return_day = "";
 
-        $return_date = "";
+        let return_date = "";
 
         
      
@@ -131,34 +131,34 @@
     });
 
     function calculateTime() {
-            //get values
-            var valuestart = $("input[name='departure_time']").val();
-            var valuestop = $("input[name='arrival_time']").val();
-              
-             //create date format          
-             var timeStart = new Date("01/01/2007 " + valuestart).getHours();
-             var timeEnd = new Date("01/01/2007 " + valuestop).getHours();
-             
-             var hourDiff = timeEnd - timeStart; 
+        //get values
+        var valuestart = $("input[name='departure_time']").val();
+        var valuestop = $("input[name='arrival_time']").val();
+          
+         //create date format          
+         var timeStart = new Date("01/01/2007 " + valuestart).getHours();
+         var timeEnd = new Date("01/01/2007 " + valuestop).getHours();
+         
+         var hourDiff = timeEnd - timeStart; 
 
-            var startTime=moment(valuestart, "HH:mm a");
-            var endTime=moment(valuestop, "HH:mm a");
-            var duration = moment.duration(endTime.diff(startTime));
-            //var hours = parseInt(duration.asHours());
-            //var minutes = parseInt(duration.asMinutes())-hours*60;
-            // alert (hours + ' hour and '+ minutes+' minutes.');  
-            var minutes = moment.utc(moment(endTime, "HH:mm").diff(moment(startTime, "HH:mm"))).format("mm")
+        var startTime=moment(valuestart, "HH:mm a");
+        var endTime=moment(valuestop, "HH:mm a");
+        var duration = moment.duration(endTime.diff(startTime));
+        //var hours = parseInt(duration.asHours());
+        //var minutes = parseInt(duration.asMinutes())-hours*60;
+        // alert (hours + ' hour and '+ minutes+' minutes.');  
+        var minutes = moment.utc(moment(endTime, "HH:mm").diff(moment(startTime, "HH:mm"))).format("mm");
 
-            var hours = endTime.diff(startTime, 'hours') + " hrs and " + minutes + " mins";
+        var hours = endTime.diff(startTime, 'hours') + " hrs and " + minutes + " mins";
 
 
-             // $("p").html("<b>Hour Difference:</b> " + hourDiff ) 
-             if(valuestop != "")
-             { 
-                $("input[name='trip_duration_in_hrs']").val(hours);//does not calculate correctly with an end time at 12 pm
+         // $("p").html("<b>Hour Difference:</b> " + hourDiff ) 
+         if(valuestop != "")
+         { 
+            $("input[name='trip_duration_in_hrs']").val(hours);//does not calculate correctly with an end time at 12 pm
 
-             }           
-             
+         }           
+         
     }
     $(".clockpicker").change(calculateTime);
     calculateTime();
@@ -194,8 +194,10 @@
 
      
       $('input[name ="departure_time"]').focus(function() {
-        $('input[name ="departure_date"]').val( depart_day+ ' ' + depart_date);
-        $('input[name ="arrival_date"]').val( return_day+ ' ' + return_date);
+        let year = (new Date()).getFullYear();
+
+        $('input[name ="departure_date"]').val( depart_day+ ' ' + depart_date +' ' + year);
+        $('input[name ="arrival_date"]').val( return_day+ ' ' + return_date +' ' +year );
       }); 
      
      
@@ -225,10 +227,12 @@
         // this.value = parseFloat(this.value).toFixed(2);
         $('input[name="total_per_passenger"]').val(parseFloat($("input[name='road_fare']").val()) + parseFloat($("input[name='carrier_imposed_charges']").val()) + parseFloat($("input[name='total_tax']").val())).toFixed(2); 
 
+        
+
         if ($('input[name="total_per_passenger"]').val() == "") {
             @guest
             @else
-            alert('Sorry '+{{Auth::user()->username}}+ ', you provided no fare breakdown');
+            alert('Sorry, you provided no fare breakdown');
             @endguest
         
         }
@@ -249,7 +253,7 @@
             
             @guest
             @else
-            alert('Sorry '+{{Auth::user()->username}}+ ', you provided no tax breakdown');
+            alert('Sorry, you provided no tax breakdown');
             @endguest
             
         }

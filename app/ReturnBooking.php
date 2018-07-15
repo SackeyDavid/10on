@@ -28,7 +28,7 @@ class ReturnBooking extends Model
 
     // not all passengers would be registered users so before accessing the author object check if it exists
     
-    public function author() {
+    public function user() {
     	return $this->belongsTo('App\User', 'user_id');
         
     }
@@ -38,13 +38,19 @@ class ReturnBooking extends Model
         
     }
 
-    public function outbound() {
+    public function departing() {
         return $this->belongsTo('App\Trips', 'outbound');
         
     }
 
-    public function inbound() {
+    public function returning() {
         return $this->belongsTo('App\Trips', 'inbound');
         
     }
+
+    public function mobileMoney() {
+        return $this->belongsTo('App\MobileMoney', 'mobile_money_id');
+        
+    }
+    
 }

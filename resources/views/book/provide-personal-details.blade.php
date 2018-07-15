@@ -35,6 +35,7 @@
         <link rel="stylesheet" type="text/css" href="{{ asset('css/search-trips.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/material-icons.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/provide-personal-details.css') }}">
+        <link rel="stylesheet" href="{{ URL::To('css/intlTelInput.min.css') }}">
         
 
         <!-- Styles -->
@@ -212,21 +213,23 @@
                 </select>
                 @endif
                 <br>
-                <ul class="list-inline" style="margin-right: -1%;">
-                    <li style="width: 45%;">
+
                 @if(Auth::user())
-                <input type="text" id="country" name="country" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->country}}" required>
+                <input type="tel" id="mobile_number" name="mobile_number" style="height: 8vh;width: 100%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->mobile_number}}" required>
                 @else
-                <input type="text" id="country" name="country" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="Ghana(+233)" required>
+                <input type="tel" id="mobile_number" name="mobile_number" style="height: 8vh;width: 100%;"  class="form-control passenger-details-inputs" placeholder="Mobile number" required>
+                @endif
+                <ul class="list-inline" style="margin-right: -1%;">
+                    <li style="width: 0%;">
+                @if(Auth::user())
+                <input type="hidden" id="country" name="country" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->country}}" required>
+                @else
+                <input type="hidden" id="country" name="country" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="Ghana(+233)" required>
                 @endif   
                     </li>
                     
-                    <li class="float-right" style="width: 50%;">
-                @if(Auth::user())
-                <input type="text" id="mobile_number" name="mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->mobile_number}}" required>
-                @else
-                <input type="text" id="mobile_number" name="mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="Mobile number" required>
-                @endif
+                    <li class="float-right" style="width: 100%;">
+                
                     </li>
                 </ul>
                  
@@ -240,11 +243,11 @@
                 @else 
                  <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs">
                  @endif
-                    <span style="font-size: 11px;color: #000;font-weight: 500;"> Would you like to receive an sms reminder when check-in opens?</span>
+                    <span style="font-size: 11px;color: #000;font-weight: 500;"> I'd like to receive an sms reminder when check-in opens?</span>
                     
                 </div>
                 <br>
-                <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Continue</button>
+                <button id="personal-submit" type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Continue</button>
             </form>
             @endif
                 <br>
@@ -283,13 +286,33 @@
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="{{ asset('js/intlTelInput.min.js') }}"></script>
+        <script src="{{ asset('js/utils.js') }}"></script>
+
         <script type="text/javascript">
             $('#contact_person').focus(function(){
                 var c  = document.createElement("option");
                 c.text = $('#title').val() + ' ' + $('input[name="first_name"]').val() + ' ' + $('input[name="last_name"]').val(); 
                 this.options.add(c, 2);
+            });
+
+            
+
+            $("#mobile_number").intlTelInput({
+              preferredCountries: ["gh", "ke", "ng", "tg", "ci", "bf", "us", "gb"],
+              nationalMode: true,
+              utilsScript: "js/utils.js"
+            });
+
+            $("#personal-submit").click(function(){
+               
+              let country = $('#mobile_number').intlTelInput('getSelectedCountryData');
+
+               $('#country').val(country['name']);
+            
+              $("#mobile_number").val($("#mobile_number").intlTelInput("getNumber"));
+              document.forms[0].submit();
             });
         </script>
     </body>

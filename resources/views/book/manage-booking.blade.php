@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>Manage Booking @guest @else | {{Auth::user()->first_name}} {{Auth::user()->last_name}} @endguest</title>
+        <title>Manage Your Booking @guest @else | {{Auth::user()->first_name}} {{Auth::user()->last_name}} @endguest</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -168,6 +168,12 @@
             <p class=""><center> {{ Session::get('msg') }}.</a></center></p>
             </div>
             @endif
+
+            <div id="delete-info" class="alert alert-info" role="alert" style="margin-bottom: 0%;">
+            <button type="button" data-dismiss="alert" class="close" onclick="$('.alert').alert('close');"><span aria-hidden="true">&times;</span></button>
+            <p class=""><center style="color: #000;font-weight: 500;"> Deleting any Return Trip (RT) booking deletes the two trips. More info at bottom of page.</center></p>
+            </div>
+
         <div class="col-md-12">
             <div>
                 <ul class="list-inline" style="">
@@ -213,29 +219,38 @@
             </div>
             
            
-           <div class="main">
+           <div class="main" style="font-family: Arial;">
            <center> <i class="fa fa-edit" style="font-size: 32px;color: #000;"></i><br>Edit Booking Info</center> 
            <br>
-                @if(!$uniqueOWs->count())
-                no trip history found
+           <!--  @if(!count($combined_trip_dates))
+             no combined_trip_dates
+            @else
+                @foreach($combined_trip_dates as $cb)
+                {{$cb}}
+                @endforeach
+            @endif -->
+
+
+                @if(!$uniqueOWs->count() && !$uniqueRTs->count())
+                no trip booking found
                 @else
-                    @if (!$ow_trip_dates)
+                    @if (!$combined_trip_dates)
                     no ow trip dates
                     @else
                     <div style="background-color: #f8f8f8;padding: 2%;border: 1px solid #E8E8E8;">
-                &nbsp;&nbsp;<span style="font-weight: 300;" class="text-success">Current Bookings  </span>
+                &nbsp;&nbsp;<span style="font-weight: 300;">Active Bookings 
             </div>
-                    @foreach ($ow_trip_dates as $trip_date)
+                    @foreach ($combined_trip_dates as $trip_date)
 
+<!-- ow bookings -->
                     @foreach ($uniqueOWs as $ow)
 
                          @php
                          
-                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[3] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[1];
+                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[1] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[3];
 
                          $ow_trip_date = strtotime($ow_trip_date);
-                         $ow_trip_date+= 1209600; 
-
+                         
                          @endphp
 
                     @if (date('Ymd', $ow_trip_date) != date('Ymd', strtotime($trip_date)))
@@ -269,6 +284,7 @@
                     
                         
                     @endphp
+                    --OW-{{$ow->id}}
                     <span class="float-right"><i class="fas fa-chevron-down" style="color: inherit;"  onclick='
                         if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.children[1].style.display = "block";
@@ -284,7 +300,7 @@
                     <tr>
                       <th scope="row" style="border-top-style: none;" class="text-success"> {{$ow->trip->departure_time}} - {{$ow->trip->arrival_time}}</th>
                       <th style="border-top-style: none;">{{$ow->trip->departure->name}}( {{$ow->trip->departure->abbreviation}}) to {{$ow->trip->arrival->name}}( {{$ow->trip->arrival->abbreviation}}) via {{$ow->trip->via}}</th>
-                      <td style="border-top-style: none;">GHS {{$ow->trip->trip_fare}}</td>
+                      <td style="border-top-style: none;"><i class="material-icons text-success" style="font-size: 15px;">flight_takeoff</i></td>
                       <td style="border-top-style: none;">
                         <div class="dropdown dropleft float-right">
                         <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
@@ -293,7 +309,7 @@
                         <div class="dropdown-menu">
                           <a class="dropdown-item" href="#" style="cursor: ;">More from this booking</a>
                           <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history text-danger" data-pointid="{{$ow->id}}">Cancel booking</span></a>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_ow_booking text-danger" data-pointid="{{$ow->id}}">Cancel booking</span></a>
                         </div>
                       </div>
 
@@ -307,11 +323,33 @@
 
                    
                     <div class="card-body" style="display: none;padding: 1%;font-size: 12.5px;">
-                     <div class="card-body">   
+                     <div class="card-body">  
+                     <table class="class">
+                     <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-success"> {{$ow->trip->departure_time}} - {{$ow->trip->arrival_time}}</th>
+                      <th style="border-top-style: none;">{{$ow->trip->departure->name}}( {{$ow->trip->departure->abbreviation}}) to {{$ow->trip->arrival->name}}( {{$ow->trip->arrival->abbreviation}}) via {{$ow->trip->via}}</th>
+                      <td style="border-top-style: none;">GHS {{$ow->trip->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                        <!-- <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this booking</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history text-danger" data-pointid="{{$ow->id}}">Cancel booking</span></a>
+                        </div>
+                      </div> -->
+
+                        </td>
+                    </tr>    
+                            </tbody>
+                        </table> <br>
                     <i class="fas fa-user"></i> Personal <br>
 
                     <!-- this should be horizontal in design but not yet -->
-                    <form method="POST" action="{{route('edit.booking', ['booking_id' => $ow->id])}}">
+                    <form method="POST" action="{{route('edit.booking')}}">
                         @csrf
                         
                     <ul class="list-group">
@@ -369,12 +407,386 @@
                    
                 </div>
                       @endif
-                    @endforeach          
 
+                    @endforeach          
+<!-- end ow bookings -->
+
+<!-- start of rt bookings -->
+                        @foreach ($uniqueRTs as $rt)
+
+                         @php
+                         
+                         $rt_departing_date = explode(" ", $rt->departing->departure_date)[1] . "-" . explode(" ", $rt->departing->departure_date)[2] . "-" . explode(" ", $rt->departing->departure_date)[3];
+
+                         $rt_returning_date = explode(" ", $rt->returning->departure_date)[1] . "-" . explode(" ", $rt->returning->departure_date)[2] . "-" . explode(" ", $rt->returning->departure_date)[3];
+
+                         $rt_departing_date = strtotime($rt_departing_date);
+                         
+
+                         $rt_returning_date = strtotime($rt_returning_date);
+                         
+
+                         @endphp
+
+                    @if (date('Ymd', $rt_departing_date) == date('Ymd', strtotime($trip_date)))
+                <div class="card card-default" style="font-weight: 400;margin: 1%;margin-top: 2%;">
+                
+                    
+                <div class="card-header">
+                    @php
+                        
+                        $now = date('Ymd'); 
+                        $this_ow_date = date('Ymd', strtotime($trip_date));
+                        $diffDays = $now - $this_ow_date;
+                        
+                        
+                        switch ($diffDays) {
+                            case -1:
+
+                                echo "Tomorrow" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+
+                            case 0:
+                                echo "Today" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                            
+                            default:
+                                echo date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                        }
+                    
+                        
+                    @endphp
+                    --RT-{{$rt->id}}
+                    <span class="float-right"><i class="fas fa-chevron-down" style="color: inherit;"  onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></span>
+
+                        <table class="table" style="margin-bottom: 1%;">
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-primary"> {{$rt->departing->departure_time}} - {{$rt->departing->arrival_time}}</th>
+                      <th style="border-top-style: none;">{{$rt->departing->departure->name}}( {{$rt->departing->departure->abbreviation}}) to {{$rt->departing->arrival->name}}( {{$rt->departing->arrival->abbreviation}}) via {{$rt->departing->via}}</th>
+                      <td style="border-top-style: none;"><i class="material-icons text-primary" style="font-size: 15px;">flight_takeoff</i></td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this booking</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_rt_booking text-danger" data-pointid="{{$rt->id}}">Cancel this booking</span></a>
+                        </div>
+                      </div>
+
+                        </td>
+                    </tr>    
+                            </tbody>
+                        </table>
+                </div>
+                        
+                 <!-- ones with colors in the card body are the trips that are pending -->
+
+                   
+                    <div class="card-body" style="display: none;padding: 1%;font-size: 12.5px;">
+                     <div class="card-body"> 
+                     <table class="table"> 
+                     <tbody>  
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-primary"> {{$rt->departing->departure_time}} - {{$rt->departing->arrival_time}}</th>
+                      <th style="border-top-style: none;">{{$rt->departing->departure->name}}( {{$rt->departing->departure->abbreviation}}) to {{$rt->departing->arrival->name}}( {{$rt->departing->arrival->abbreviation}}) via {{$rt->departing->via}}</th>
+                      <td style="border-top-style: none;">GHS {{$rt->returning->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                        <!-- <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this booking</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_rt_booking text-danger" data-pointid="{{$rt->id}}">Cancel this booking</span></a>
+                        </div>
+                      </div> -->
+
+                        </td>
+                    </tr>    
+                     <tr>
+                      <th scope="row" style="border-top-style: none;"> {{$rt->returning->departure_time}} - {{$rt->returning->arrival_time}}</th>
+                      <td style="border-top-style: none;">{{$rt->returning->departure->name}}( {{$rt->returning->departure->abbreviation}}) to {{$rt->returning->arrival->name}}( {{$rt->returning->arrival->abbreviation}}) via {{$rt->returning->via}}</td>
+                      <td style="border-top-style: none;">GHS {{$rt->returning->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                        <!-- <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Remove from history</span></a>
+                        </div>
+                      </div> -->
+                        </td>
+                    </tr>
+                    </tbody> 
+                    </table> 
+
+                    <i class="fas fa-user"></i> Personal <br>
+
+                    <!-- this should be horizontal in design but not yet -->
+                    <form method="POST" action="{{route('edit.booking')}}">
+                        @csrf
+                        
+                    <ul class="list-group">
+                       <li class="list-group-item">
+                        <select type="text" name="title" value="{{$rt->user->title}}">
+                            <option>Mr</option>
+                            <option>Mrs</option>
+                            <option>Miss</option>
+                            <option>Ms</option>
+                        </select> 
+                       <li class="list-group-item"><input type="text" name="first_name" value="{{$rt->user->first_name}}"></li>
+                       <li class="list-group-item"><input type="text" name="last_name" value="{{$rt->user->last_name}}"></li>
+                       <li class="list-group-item"><input type="email" name="email" value="{{$rt->user->email}}"></li> 
+                       <li class="list-group-item"><input type="text" name="country" value="{{$rt->user->country}}"></li>
+                       <li class="list-group-item"><input type="tel" name="mobile_number" value="{{$rt->user->mobile_number}}"></li>
+                       <li class="list-group-item"><input type="text" name="contact_person" value="{{$rt->user->contact_person}}"></li>
+                       <li class="list-group-item">
+                        @if(Auth::user()->remind_me == "yes")
+
+                       Remind me
+                            <input type="checkbox" id="remind_me" name="remind_me" value="yes"  class="form-control passenger-details-inputs" onclick="
+                            if (this.is(':checked')) {
+                                this.val('yes');
+                            }else {
+                                this.val('no');
+                            }" checked required>
+                            
+                    
+                        
+                        @else
+                        Remind me
+                        <input type="checkbox" id="remind_me" name="remind_me" style=""  class="form-control passenger-details-inputs" placeholder="Title" required> 
+                        @endif
+                      </li>
+                    </ul>
+                    
+                    <br>
+                    <i class="fas fa-mobile-alt"></i> Payment <br>
+                    <ul class="list-group">
+                        <li class="list-group-item"><input type="text" name="phone_number" value="{{$rt->mobileMoney['phone_number']}}"></li>
+                        <li class="list-group-item">
+                            <select type="text" name="network">
+                                <option>{{$rt->mobileMoney['network']}}</option>
+                                <option value="mtn-gh">MTN</option>
+                                <option value="tigo-gh">TIGO</option>
+                                <option value="vodafone-gh">Vodafone</option>
+                                <option value="airtel-gh">Airtel</option>
+                            </select>
+                    </ul>
+                    <br>
+                    <center><button class="btn btn-success btn-lg">Save</button></center>
+                    </form>
+                    </div>
+                    </div>
+                   
+                </div>
+                    @endif
+                @if(date('Ymd', $rt_returning_date) == date('Ymd', strtotime($trip_date)))
+                <div class="card card-default" style="font-weight: 400;margin: 1%;margin-top: 2%;">
+                
+                    
+                <div class="card-header">
+                    @php
+                        
+                        $now = date('Ymd'); 
+                        $this_ow_date = date('Ymd', strtotime($trip_date));
+                        $diffDays = $now - $this_ow_date;
+                        
+                        
+                        switch ($diffDays) {
+                            case -1:
+
+                                echo "Tomorrow" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+
+                            case 0:
+                                echo "Today" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                            
+                            default:
+                                echo date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                        }
+                    
+                        
+                    @endphp
+                    --RT-{{$rt->id}}
+                    <span class="float-right"><i class="fas fa-chevron-down" style="color: inherit;"  onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></span>
+
+                        <table class="table" style="margin-bottom: 1%;">
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-primary"> {{$rt->returning->departure_time}} - {{$rt->returning->arrival_time}}</th>
+                      <th style="border-top-style: none;">{{$rt->returning->departure->name}}( {{$rt->returning->departure->abbreviation}}) to {{$rt->returning->arrival->name}}( {{$rt->returning->arrival->abbreviation}}) via {{$rt->returning->via}}</th>
+                      <td style="border-top-style: none;"><i class="material-icons text-primary" style="font-size: 15px;">flight_land</i> </td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this booking</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_rt_booking text-danger" data-pointid="{{$rt->id}}">Cancel this booking</span></a>
+                        </div>
+                      </div>
+
+                        </td>
+                    </tr>    
+                            </tbody>
+                        </table>
+                </div>
+                        
+             
+
+                   
+                    <div class="card-body" style="display: none;padding: 1%;font-size: 12.5px;">
+                     <div class="card-body"> 
+                     <table class="table"> 
+                     <tbody>
+                     <tr>
+                      <th scope="row" style="border-top-style: none;"> {{$rt->departing->departure_time}} - {{$rt->departing->arrival_time}}</th>
+                      <td style="border-top-style: none;">{{$rt->departing->departure->name}}( {{$rt->departing->departure->abbreviation}}) to {{$rt->departing->arrival->name}}( {{$rt->departing->arrival->abbreviation}}) via {{$rt->departing->via}}</td>
+                      <td style="border-top-style: none;">GHS {{$rt->departing->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                       <!--  <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Cancel this trip</span></a>
+                        </div>
+                      </div> -->
+                        </td>
+                    </tr>
+
+                     <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-primary"> {{$rt->returning->departure_time}} - {{$rt->returning->arrival_time}}</th>
+                      <td style="border-top-style: none;">{{$rt->returning->departure->name}}( {{$rt->returning->departure->abbreviation}}) to {{$rt->returning->arrival->name}}( {{$rt->returning->arrival->abbreviation}}) via {{$rt->returning->via}}</td>
+                      <td style="border-top-style: none;">GHS {{$rt->returning->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                        <!-- <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Cancel this trip</span></a>
+                        </div>
+                      </div> -->
+                        </td>
+                    </tr>
+                    </tbody> 
+                    </table> 
+                    <i class="fas fa-user"></i> Personal <br>
+
+                    <!-- this should be horizontal in design but not yet -->
+                    <form method="POST" action="{{route('edit.booking')}}">
+                        @csrf
+                        
+                    <ul class="list-group">
+                       <li class="list-group-item">
+                        <select type="text" name="title" value="{{$rt->user->title}}">
+                            <option>Mr</option>
+                            <option>Mrs</option>
+                            <option>Miss</option>
+                            <option>Ms</option>
+                        </select> 
+                       <li class="list-group-item"><input type="text" name="first_name" value="{{$rt->user->first_name}}"></li>
+                       <li class="list-group-item"><input type="text" name="last_name" value="{{$rt->user->last_name}}"></li>
+                       <li class="list-group-item"><input type="email" name="email" value="{{$rt->user->email}}"></li> 
+                       <li class="list-group-item"><input type="text" name="country" value="{{$rt->user->country}}"></li>
+                       <li class="list-group-item"><input type="tel" name="mobile_number" value="{{$rt->user->mobile_number}}"></li>
+                       <li class="list-group-item"><input type="text" name="contact_person" value="{{$rt->user->contact_person}}"></li>
+                       <li class="list-group-item">
+                        @if(Auth::user()->remind_me == "yes")
+
+                       Remind me
+                            <input type="checkbox" id="remind_me" name="remind_me" value="yes"  class="form-control passenger-details-inputs" onclick="
+                            if (this.is(':checked')) {
+                                this.val('yes');
+                            }else {
+                                this.val('no');
+                            }" checked required>
+                            
+                    
+                        
+                        @else
+                        Remind me
+                        <input type="checkbox" id="remind_me" name="remind_me" style=""  class="form-control passenger-details-inputs" placeholder="Title" required> 
+                        @endif
+                      </li>
+                    </ul>
+                    
+                    <br>
+                    <i class="fas fa-mobile-alt"></i> Payment <br>
+                    <ul class="list-group">
+                        <li class="list-group-item"><input type="text" name="phone_number" value="{{$rt->mobileMoney['phone_number']}}"></li>
+                        <li class="list-group-item">
+                            <select type="text" name="network">
+                                <option>{{$rt->mobileMoney['network']}}</option>
+                                <option value="mtn-gh">MTN</option>
+                                <option value="tigo-gh">TIGO</option>
+                                <option value="vodafone-gh">Vodafone</option>
+                                <option value="airtel-gh">Airtel</option>
+                            </select>
+                    </ul>
+                    <br>
+                    <center><button class="btn btn-success btn-lg">Save</button></center>
+                    </form>
+                    </div>
+                    </div>
+                   
+                </div>
+
+                      @endif
+
+                    @endforeach 
+<!-- end of rt bookings -->
                     @endforeach
                     @endif
                 @endif
                 <br>
+                <div class="container" style="color: #777;font-family: Arial;font-size: 12px;">
+                <ul class="list-inline">
+                    <li>RT-## = Return Trip ID.</li>
+                    <li>OW-## = One Way Trip ID.</li>
+                    <li>(<span class="text-success">OW</span>&nbsp;&nbsp;/&nbsp;&nbsp;<span class="text-primary">RT</span> - Out <i class="material-icons" style="font-size: 15px;">flight_takeoff</i>&nbsp;&nbsp;/&nbsp;In <i class="material-icons" style="font-size: 15px;">flight_land</i> </span>).</li>
+                    <li>All OW Trips are Outbounds.</li>
+                    <li>Deleting any RT trip deletes the two bookings.</li>
+                </ul>
+                </div>
+
+                
+                
            </div> 
         
 
@@ -386,6 +798,10 @@
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
         <script type="text/javascript">
+            $('#delete-info').fadeTo(12000, 500).slideUp(500, function() {
+                $('.alert-info').slideUp(500);
+            });
+
             $.ajaxSetup({
                 headers: {
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -422,10 +838,11 @@
                 this.options.add(c, 2);
             });
             // let deletehistory class element be for oneway trips and remove history for return trips
-            $('.delete_history').click(function(){
+            $('.delete_ow_booking').click(function(){
 
                 let pointid = $(this).attr("data-pointid");
 
+                // history.delete route also works for deleting one way trips
                 $.ajax({
                     url: "{{route('history.delete')}}",
                     type: 'DELETE',
@@ -434,9 +851,28 @@
                     
                 }).done(function(data){
                     
-                        alert('success');
+                        alert('Booking cancellation successful. You can refresh page to see changes');
+                        //location.reload();
                 });
-                alert(pointid);
+            
+            });
+
+            $('.delete_rt_booking').click(function(){
+
+                let pointid = $(this).attr("data-pointid");
+
+                $.ajax({
+                    url: "{{route('return.booking.delete')}}",
+                    type: 'DELETE',
+                    data: {'booking_id':pointid},
+
+                    
+                }).done(function(data){
+                    
+                        alert('Booking cancellation successful. You can refresh page to see changes');
+                        //location.reload();
+                });
+                
             });
 
             

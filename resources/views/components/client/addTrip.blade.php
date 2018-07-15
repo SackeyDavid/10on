@@ -15,7 +15,7 @@
 
                                     <button type="button" class="close" data-dismiss="modal" arial-label="Close" onclick="$('#ones_trip_modal').hide();">x</button>
                             </div>
-                        <div class="modal-body">
+                        <div class="modal-body container">
                     <table class="table">
                       <thead>
                         <tr>
@@ -30,9 +30,9 @@
                           <th scope="col" class="text-danger">via</th>
                           <th scope="col">total fare </th>
                           <th scope="col" class="text-warning"> total tax</th>
-                          <th scope="col" class="text-danger">bus</th>
+                          <th scope="col" class="text-primary">bus</th>
                           <th scope="col" class="text-success">remaining seats</th>
-                          <th scope="col" class="text-primary">Action</th>
+                          <th scope="col" class="text-danger">Action</th>
                         </tr>
                       </thead>
                      
@@ -121,7 +121,7 @@
                             @endphp
                             @endif
                         </td>
-                          <td class="text-danger">
+                          <td class="text-primary">
                             @if(!$trip->bus)
                             ---
                             @else
@@ -135,7 +135,7 @@
                             {{ $trip->remaining_seats }}
                             @endif
                         </td>
-                          <td><button class="btn btn-primary btn-sm" onclick="document.forms[{{ $loop->iteration }}+2].submit();">X</button></td>
+                          <td><button class="btn btn-danger btn-sm" onclick="document.forms[{{ $loop->iteration }}+2].submit();" title="Delete this trip">X</button></td>
                         </tr>
                          </tbody>
                          </table>
@@ -157,6 +157,7 @@
                         <li class="list-inline-item">Add Trip </li>
                         <li class="list-inline-item float-right"><i id="chevron" style="cursor: pointer;font-size: 16px;" class="fas fa-chevron-up" onclick='
                         $("#ones_trip_modal").show();
+                         $("body").css("overflow", "hidden");
                         // $(this).toggleClass("fa-chevron-up fa-chevron-down");
                         '></i></li>
                     </ul> 

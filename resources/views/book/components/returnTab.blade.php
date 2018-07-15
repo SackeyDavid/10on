@@ -97,7 +97,21 @@
 </center>
 
 <br>
-<a href="#selectDates" class="btn btn-lg" data-toggle="modal" style="width: 100%;font-weight: 600; height: 8vh; background-color: #D3D3D3;">Select dates</a>
+<a href="#selectDates" class="" data-toggle="modal" style="width: 100%;font-weight: 600; height: 13vh; background-color: #D3D3D3;"><span id="" class="btn btn-lg" style="width: 100%;font-weight: 600; height: 12vh; background-color: #D3D3D3;"><div class="clearfix">
+    @php
+    echo '<span style="font-size: 14px;" class="float-left">DEPARTING</span><br>';
+    echo  '<span class="float-left"><ul class="list-inline" style="font-size: 12px;margin-top: -15%;"><li id="ow_day"><span style="font-size: 38px;">' . date('d') . '</span></li><li><ul class="list-unstyled"><li id="ow_mnt_year"><span>' . date('M Y') . '</span></li><li style="margin-left: -65%;" id="week_day"><span>&nbsp;&nbsp;' . date('D') . '</span></li></ul></li></ul></span>';
+
+    echo '<span style="font-size: 14px;margin-top: -8%;" class="float-right">RETURNING</span><br>';
+    echo  '<span class="float-right"><ul class="list-inline" style="font-size: 12px;margin-top: -35%;"><li id="ow_day"><span style="font-size: 38px;">' . date('d') . '</span></li><li><ul class="list-unstyled"><li id="ow_mnt_year"><span>' . date('M Y') . '</span></li><li style="margin-left: -65%;" id="week_day"><span>&nbsp;&nbsp;' . date('D') . '</span></li></ul></li></ul></span>';
+    @endphp
+    
+</div></span>
+</a>
+<br><br>
+<div id="resultsBtn1" type="submit" class="modal-footer btn btn-lg" style="border-radius: 0;background-color: #ccc;width: 100%;">
+    <center><span style="font-size: 16px;height: inherit; font-weight: 500;color: #fff;"><strong>See results<br></strong></span></center>
+</div>
     
 <div class="modal slide" id="selectDates" tabindex="-1">
     <div class="modal-dialog" id="selectDates-dialog">
@@ -155,9 +169,9 @@
                 </div>
                 <center>
                 <div class="input-group input-daterange">
-                    <input id="from" name="departure_date" type="text" class="form-control" autofocus required>
+                    <input id="from" name="departure_date" value="" type="text" class="form-control" autofocus required>
                     <div class="input-group-addon">to</div>
-                    <input id="to" name="return_date" type="text" class="form-control">
+                    <input id="to" name="return_date" value="" type="text" class="form-control">
                 </div>
                 <!-- <input type="hidden" id="my_hidden_input"> -->
                 </center>
@@ -167,7 +181,7 @@
                 <li>
                 <span>
                     <ul class="list-unstyled">
-                    <br>
+                    
                     <li><span style="font-size: 18px;font-weight: 300">&nbsp;&nbsp; Trip duration:</span></li>
                     <li><span style="font-size: 24px;"></span></li>
                     </ul>

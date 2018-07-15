@@ -147,6 +147,8 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         OVAC\LaravelHubtelPayment\ServiceProvider::class,
+        Nexmo\Laravel\NexmoServiceProvider::class,
+        NotificationChannels\Hubtel\HubtelServiceProvider::class,
 
         /*
          * Package Service Providers...

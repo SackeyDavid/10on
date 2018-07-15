@@ -60,3 +60,9 @@ hr {
                 margin-bottom: 2%;
                 border-top: 1px solid #6495ED;
             }
+
+            #exampleModal {
+                
+                z-index: 1999; 
+
+            }

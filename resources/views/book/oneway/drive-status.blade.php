@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Drive Status | One Way Trip</title>
+        <title>Drive Status | Active Trips</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -197,19 +197,39 @@
                 </div>
             </div>
             
-           <div class="col-md-12">
-            @if(!$bookings)
+           <div class="col-md-12 container">
+            @if(!$ow_bookings->count() || !$rt_bookings->count())
             no bookings
             @else
-                @foreach($bookings as $booking)
+                @if(!count($combined_trip_dates))
+                <div class="container"> no active trips now</div>
+                @else
+        
+                @foreach($combined_trip_dates as $trip_date)
+
+                    @foreach($ow_bookings as $ow)
+
+                         @php
+                         
+                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[3] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[1];
+
+                         $ow_trip_date = strtotime($ow_trip_date);
+                         $ow_trip_date+= 1209600; 
+
+                         @endphp
+
+                    @if (date('Ymd', $ow_trip_date) != date('Ymd', strtotime($trip_date)))
+                    @continue
+                    @else
+
                     @php
 
-                    $trip = $booking->trip;
+                    $trip = $ow->trip;
 
-                    $date_booked = \Carbon\Carbon::parse($booking->created_at);
+                    $date_booked = \Carbon\Carbon::parse($ow->created_at);
                     $departing_date = \Carbon\Carbon::parse($trip->departure_date);
 
-                    $date = explode(" ", $booking->created_at);
+                    $date = explode(" ", $ow->created_at);
 
                     $days_left = $departing_date->diffInDays($date_booked) . ' days';
 
@@ -228,8 +248,8 @@
             <div class="card card-default" style="font-weight: 400;margin-bottom: 2%;">
                 <div class="card-header">
                     <ul class="list-inline">
-                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(OW-{{$booking->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
-                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;color: inherit;" class="fas fa-chevron-down" onclick='
+                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(OW-{{$ow->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
+                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;color: inherit;" class="fas fa-chevron-up" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "block";
                         } else {
@@ -254,7 +274,7 @@
                             </thead>
                             <tbody>
                                 <tr style="font-weight: 300;background-color: #fff;">
-                                    <td>{{$booking->created_at->diffForHumans()}}</td>
+                                    <td>{{$ow->created_at->diffForHumans()}}</td>
                                     <td>{{$days_left}} left</td>
                                 </tr>
                             </tbody>
@@ -262,9 +282,157 @@
                     </div>
                 </div>
             </div>
+                    @endif
+                    @endforeach
+
+                    <!-- end of ow active bookings -->
+                    <!-- start of rt active bookings -->
+                    @foreach($rt_bookings as $rt)
+
+                     @php
+                     
+                     $rt_departing_date = explode(" ", $rt->departing->departure_date)[3] . "-" . explode(" ", $rt->departing->departure_date)[2] . "-" . explode(" ", $rt->departing->departure_date)[1];
+
+                     $rt_returning_date = explode(" ", $rt->returning->departure_date)[3] . "-" . explode(" ", $rt->returning->departure_date)[2] . "-" . explode(" ", $rt->returning->departure_date)[1];
+
+                     $rt_departing_date = strtotime($rt_departing_date);
+                     $rt_departing_date+= 1209600; 
+
+                     $rt_returning_date = strtotime($rt_returning_date);
+                     $rt_returning_date+= 1209600; 
+
+                
+
+                    $outbound = $rt->departing;
+
+                    $inbound = $rt->returning;
+
+                    $date_booked = \Carbon\Carbon::parse($rt->created_at);
+
+                    $date = explode(" ", $rt->created_at);
+
+
+                    $departing_date = \Carbon\Carbon::parse($outbound->departure_date);
+
+                    $departing_days_left = $departing_date->diffInDays($date_booked) . ' days';
+
+                    if (explode(" ", $departing_days_left)[0] <= 1) {
+                        $days_left = $departing_date->diffInHours($date_booked) . ' hours';
+                        if (explode(" ", $departing_days_left)[0] <= 1 ) {
+                            $departing_days_left = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                            if (explode(" ", $days_left)[0] <= 1 ) {
+                            $departing_days_left = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+                        
+                            }
+                        }
+                    }
+
+                    $returning_date = \Carbon\Carbon::parse($inbound->departure_date);
+
+                    $returning_days_left = $returning_date->diffInDays($date_booked) . ' days';
+
+                    if (explode(" ", $returning_days_left)[0] <= 1) {
+                        $returning_days_left = $returning_date->diffInHours($date_booked) . ' hours';
+                        if (explode(" ", $returning_days_left)[0] <= 1 ) {
+                            $returning_days_left = $returning_date->diffInMinutes($date_booked) . ' mins';    
+                            if (explode(" ", $returning_days_left)[0] <= 1 ) {
+                            $returning_days_left = $returning_date->diffInSeconds($date_booked) . ' seconds';    
+                        
+                            }
+                        }
+                    }
+
+                    @endphp
+
+
+                @if (date('Ymd', $rt_departing_date) == date('Ymd', strtotime($trip_date)))
+            <div class="card card-default" style="font-weight: 400;margin-bottom: 2%;">
+                <div class="card-header">
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(RT-{{$rt->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
+                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;color: inherit;" class="fas fa-chevron-up" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></li>
+                    </ul> 
+                </div>
+                <div class="card-body" style="padding: 0%;">
+                    <div class="card-header" style="background-color: #B0E0E6;">
+                        Outbound  <span>({{$outbound->departure_location}} - {{$outbound->arrival_location}})</span>
+                    </div>
+                    <div class="card-body" style="padding: 0%;">
+                        <table class="table table-bordered" style="margin: 0%;">
+                        
+                            <thead>
+                                <tr style="font-size: 11px;">
+                                    <th>Booked </th>
+                                    <th>Check-in</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="font-weight: 300;background-color: #fff;">
+                                    <td>{{$rt->created_at->diffForHumans()}}</td>
+                                    <td>{{$departing_days_left}} left</td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+            </div>
+                    @endif
+                    @if (date('Ymd', $rt_returning_date) == date('Ymd', strtotime($trip_date)))
+                <div class="card card-default" style="font-weight: 400;margin-bottom: 2%;">
+                <div class="card-header">
+                    <ul class="list-inline">
+                        <li class="list-inline-item"><span style="font-family: Arial;">Booking(RT-{{$rt->id}}) on <span style="font-size: 12px;font-family: Arial;">{{$date[0]}} at {{$date[1]}}</span></span></li>
+                        <li class="list-inline-item float-right"><i style="cursor: pointer;font-size: 16px;color: inherit;" class="fas fa-chevron-up" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></li>
+                    </ul> 
+                </div>
+                    
+                <div class="card-body" style="padding: 0%;">
+                    <div class="card-header" style="background-color: #66CDAA;">
+                        Inbound  <span>({{$inbound->departure_location}} - {{$inbound->arrival_location}})</span>
+                    </div>
+                    <div class="card-body" style="padding: 0%;">
+                        <table class="table table-bordered" style="margin: 0%;">
+                        
+                            <thead>
+                                <tr style="font-size: 11px;">
+                                    <th>Booked </th>
+                                    <th>Check-in</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="font-weight: 300;background-color: #fff;">
+                                    <td>{{$rt->created_at->diffForHumans()}}</td>
+                                    <td>{{$returning_days_left}} left</td>
+                                </tr>
+                            </tbody>
+                         </table>
+                    </div>
+                </div>
+            </div>
+                    @endif
+            
+                    @endforeach
+
+                    <!-- end of rt active bookings -->
                 @endforeach
+            
+                @endif
             @endif
-        </div>
+        
         
         
         <br>

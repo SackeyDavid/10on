@@ -169,7 +169,7 @@
         <div class="col-md-12">
             <div>
                 <ul class="list-inline" style="">
-                    <li><span class="top-center" style="margin-top: -2%;">Travel Timeline</span></li>
+                    <li><span class="top-center" style="margin-top: -2%;">Trips Timeline</span></li>
                     <!-- <li><span class="top-right links"><a href="#"> <i class="fas fa-cog"></i> </a></span></li> -->
                     <li><span class="top-left links"> <a ><span style="font-size: 15px;" onclick='
                     document.getElementById("mySidenav").style.width = "60%";
@@ -209,34 +209,52 @@
                     </div>
                 </div>
             </div>
+            <!-- @if($test)
+            {{$test}} <br>
+            date('Ymd') - {{$test}}
+            @endif -->
+            <!-- @if(!$combined_past_trips)
+            no c b date
+            @else
+                @foreach($combined_past_trips as $cb)
+                {{$cb}}
+                @endforeach
+            @endif -->
+
+
             @if (!$uniqueOWs)
             no booking
             @else
-            <div class="inner-addon left-addon">
+            <!-- <div class="inner-addon left-addon">
                 <i class="fas fa-search"></i>
             <input style="border: none; box-shadow: none; font-size: 20px; min-width: 17em;" type="text" id="search_history" name="search_history" class="form-control" height="50px" width="90%" placeholder="Search history" autofocus>
-            </div>
+            </div> -->
+            <center><i class="fa fa-calendar-alt" style="font-size: 20px;"></i></center>
             @endif
            <br>
            <div class="main">
-
-                @if(!$uniqueOWs->count())
+                @if(!$uniqueOWs->count() || !$uniqueRTs->count())
                 no trip history found
                 @else
-                    @if (!$ow_trip_dates)
-                    no ow trip dates
+                    @if (!$combined_trip_dates)
+                    no trip dates
                     @else
-                    <div style="background-color: #f8f8f8;padding: 2%;border: 1px solid #E8E8E8;">
-                &nbsp;&nbsp;<span style="font-weight: 300;" class="text-success">Current <span class="float-right"><i class="fas fa-chevron-down text-success" onclick='
-                        if (this.parentNode.parentNode.parentNode.parentNode.children[6].children[0].style.display === "none") {
-                            this.parentNode.parentNode.parentNode.parentNode.children[6].children[0].style.display = "block";
+
+                    <div style="background-color: #f8f8f8;padding: 2%;border: 1px solid #E8E8E8;font-family: Arial;">
+                &nbsp;&nbsp;<span style="font-weight: 300;" class="text-success">Trips pending </span>- <span class="text-success">OW</span>&nbsp;&nbsp;/&nbsp;&nbsp;RT <span class="text-primary">Outbound</span>&nbsp;&nbsp;<span class="text-danger">Inbound</span><span class="float-right"><i class="fas fa-chevron-up text-success" onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
                         } else {
-                            this.parentNode.parentNode.parentNode.parentNode.children[6].children[0].style.display = "none";
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
                         }
                         $(this).toggleClass("fa-chevron-up fa-chevron-down");
-                        '></i></span> </span>
-            </div>
-                    @foreach ($ow_trip_dates as $trip_date)
+                        '></i></span>
+                    </div>
+
+                    <div class="">
+                    @foreach ($combined_trip_dates as $trip_date)
+
+
 
                 <div class="card card-default" style="font-weight: 400;margin: 1%;margin-top: 2%;">
                 
@@ -267,31 +285,35 @@
                         
                     @endphp
                 </div>
-                        @foreach ($uniqueOWs as $ow)
+
+                <!-- start of checking of ows -->
+                    @foreach ($uniqueOWs as $ow)
 
                          @php
                          
-                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[3] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[1];
+                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[1] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[3];
 
                          $ow_trip_date = strtotime($ow_trip_date);
-                         $ow_trip_date+= 1209600; 
+                         
 
                          @endphp
+                        
 
                         @if (date('Ymd', $ow_trip_date) != date('Ymd', strtotime($trip_date)))
+                        
                         @continue
                         @else
                         
 
                    
-                    <div class="card-body" style="padding: 1%;font-size: 12.5px;">
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;font-family: Arial;">
                
                 <table class="table" style="margin-bottom: 1%;">
                   
                   <tbody>
                     <tr>
                       <th scope="row" style="border-top-style: none;" class="text-success"> {{$ow->trip->departure_time}} - {{$ow->trip->arrival_time}}</th>
-                      <td style="border-top-style: none;">{{$ow->trip->departure->name}}( {{$ow->trip->departure->abbreviation}}) to {{$ow->trip->arrival->name}}( {{$ow->trip->arrival->abbreviation}}) via {{$ow->trip->via}}</td>
+                      <td style="border-top-style: none;">{{$ow->trip->departure->name}} ({{$ow->trip->departure->abbreviation}}) to {{$ow->trip->arrival->name}} ({{$ow->trip->arrival->abbreviation}}) via {{$ow->trip->via}}</td>
                       <td style="border-top-style: none;">GHS {{$ow->trip->trip_fare}}</td>
                       <td style="border-top-style: none;">
                         <div class="dropdown dropleft float-right">
@@ -311,28 +333,112 @@
                     </div>
                     @endif
                     @endforeach
-                </div>
-                               
+                <!-- end of ow bookings trips -->
 
-                    @endforeach
+                <!-- start of rt bookings trips -->
+                @foreach ($uniqueRTs as $rt)
+
+                         @php
+                         
+                         $rt_departing_date = explode(" ", $rt->departing->departure_date)[1] . "-" . explode(" ", $rt->departing->departure_date)[2] . "-" . explode(" ", $rt->departing->departure_date)[3];
+
+                         $rt_returning_date = explode(" ", $rt->returning->departure_date)[1] . "-" . explode(" ", $rt->returning->departure_date)[2] . "-" . explode(" ", $rt->returning->departure_date)[3];
+
+                         $rt_departing_date = strtotime($rt_departing_date);
+                         
+
+                         $rt_returning_date = strtotime($rt_returning_date);
+                         
+
+                         @endphp
+
+                        @if (date('Ymd', $rt_departing_date) == date('Ymd', strtotime($trip_date)))
+                        
+                   
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;font-family: Arial;">
+                    
+                <table class="table" style="margin-bottom: 1%;">
+                   
+                  <tbody>
+                    <!-- rt departing trip -->
+                    <tr>
+                      <th scope="row" style="" class="text-primary"> {{$rt->departing->departure_time}} - {{$rt->departing->arrival_time}}</th>
+                      <td style="">{{$rt->departing->departure->name}} ({{$rt->departing->departure->abbreviation}}) to {{$rt->departing->arrival->name}} ({{$rt->departing->arrival->abbreviation}}) via {{$rt->departing->via}}</td>
+                      <td style="">GHS {{$rt->departing->trip_fare}}</td>
+                      <td style="">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Remove from history</span></a>
+                        </div>
+                      </div>
+                        </td>
+                    </tr>   
+                    </tbody>
+                        </table>
+                    </div>
+                    @endif
+                        @if (date('Ymd', $rt_returning_date) == date('Ymd', strtotime($trip_date)))
+
+                        
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;font-family: Arial;">
+              
+                <table class="table" style="margin-bottom: 1%;">
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-danger"> {{$rt->returning->departure_time}} - {{$rt->returning->arrival_time}}</th>
+                      <td style="border-top-style: none;">{{$rt->returning->departure->name}} ({{$rt->returning->departure->abbreviation}}) to {{$rt->returning->arrival->name}} ({{$rt->returning->arrival->abbreviation}}) via {{$rt->returning->via}}</td>
+                      <td style="border-top-style: none;">GHS {{$rt->returning->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Remove from history</span></a>
+                        </div>
+                      </div>
+                        </td>
+                    </tr>    
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @endif
+                
+
+                <!-- end of rt bookings trips -->
+                @endforeach
+                </div>
+            @endforeach  
+                </div>
+                    @endif
+
                     @endif
 
                 <div style="background-color: #f8f8f8;padding: 2%;margin-top: 5%;border: 1px solid #E8E8E8;">
-                &nbsp;&nbsp;<span style="font-weight: 300;">Past <span class="float-right"><i class="fas fa-chevron-down" style="color: inherit;" onclick='
-                        if (this.parentNode.parentNode.parentNode.parentNode.children[8].children[0].style.display === "none") {
-                            this.parentNode.parentNode.parentNode.parentNode.children[8].children[0].style.display = "block";
+                &nbsp;&nbsp;<span style="font-weight: 300;">Past  <span class="float-right"><i class="fas fa-chevron-up" style="color: inherit;" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.children[3].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.children[3].style.display = "block";
                         } else {
-                            this.parentNode.parentNode.parentNode.parentNode.children[8].children[0].style.display = "none";
+                            this.parentNode.parentNode.parentNode.parentNode.children[3].style.display = "none";
                         }
                         $(this).toggleClass("fa-chevron-up fa-chevron-down");
                         '></i></span> </span>
                             
                 </div>
-                    @if (!$ow_dates_array)
-                    no One Way trips dates found in history
+                    @if (!$combined_past_trips)
+                    <div class="container">no past One Way or return trips dates found in history</div>
                     @else
-                    
-                    @foreach ($ow_dates_array as $ow_date)
+                    <div class="">
+                    @foreach ($combined_past_trips as $ow_date)
 
                     <div class="card card-default" style="font-weight: 400;margin: 1%;margin-bottom: 2%;margin-top: 2%;">
                     
@@ -372,20 +478,32 @@
 
                         @foreach ($uniqueOWs as $ow)
                          
-                        @if (date('Ymd', strtotime(explode(" ", $ow->created_at)[0])) != $ow_date)
+                        
+
+                         @php
+                         
+                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[1] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[3];
+
+                         $ow_trip_date = strtotime($ow_trip_date);
+                         
+
+                         @endphp
+                        
+
+                        @if (date('Ymd', $ow_trip_date) != date('Ymd', strtotime($ow_date)))
+                        
                         @continue
                         @else
-                        
                 
                    
-                    <div class="card-body" style="padding: 1%;font-size: 12.5px;">
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;font-family: Arial;">
                
                 <table class="table" style="margin-bottom: 1%;">
                   
                   <tbody>
                     <tr>
-                      <th scope="row" style="border-top-style: none;"> {{$ow->trip->departure_time}} - {{$ow->trip->arrival_time}}</th>
-                      <td style="border-top-style: none;">{{$ow->trip->departure->name}}( {{$ow->trip->departure->abbreviation}}) to {{$ow->trip->arrival->name}}( {{$ow->trip->arrival->abbreviation}}) via {{$ow->trip->via}}</td>
+                      <th scope="row" class="text-success" style="border-top-style: none;"> {{$ow->trip->departure_time}} - {{$ow->trip->arrival_time}}</th>
+                      <td style="border-top-style: none;">{{$ow->trip->departure->name}} ({{$ow->trip->departure->abbreviation}}) to {{$ow->trip->arrival->name}} ({{$ow->trip->arrival->abbreviation}}) via {{$ow->trip->via}}</td>
                       <td style="border-top-style: none;">GHS {{$ow->trip->trip_fare}}</td>
                       <td style="border-top-style: none;">
                         <div class="dropdown dropleft float-right">
@@ -409,11 +527,96 @@
                         @endif
 
                         @endforeach
+
+
+                <!-- start of rt bookings trips -->
+                @foreach ($uniqueRTs as $rt)
+
+                        @php
+                         
+                         $rt_departing_date = explode(" ", $rt->departing->departure_date)[1] . "-" . explode(" ", $rt->departing->departure_date)[2] . "-" . explode(" ", $rt->departing->departure_date)[3];
+
+                         $rt_returning_date = explode(" ", $rt->returning->departure_date)[1] . "-" . explode(" ", $rt->returning->departure_date)[2] . "-" . explode(" ", $rt->returning->departure_date)[3];
+
+                         $rt_departing_date = strtotime($rt_departing_date);
+                         
+
+                         $rt_returning_date = strtotime($rt_returning_date);
+                         
+
+                         @endphp
+
+                        @if (date('Ymd', $rt_departing_date) == date('Ymd', strtotime($ow_date)))
+                        
+                   
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;font-family: Arial;">
+                    
+                <table class="table" style="margin-bottom: 1%;">
+                   
+                  <tbody>
+                    <!-- rt departing trip -->
+                    <tr>
+                      <th scope="row" style="" class="text-primary"> {{$rt->departing->departure_time}} - {{$rt->departing->arrival_time}}</th>
+                      <td style="">{{$rt->departing->departure->name}} ({{$rt->departing->departure->abbreviation}}) to {{$rt->departing->arrival->name}} ({{$rt->departing->arrival->abbreviation}}) via {{$rt->departing->via}}</td>
+                      <td style="">GHS {{$rt->departing->trip_fare}}</td>
+                      <td style="">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Remove from history</span></a>
+                        </div>
+                      </div>
+                        </td>
+                    </tr>   
+                    </tbody>
+                        </table>
                     </div>
-                    @endforeach
+                    @endif
+                        @if (date('Ymd', $rt_returning_date) == date('Ymd', strtotime($ow_date)))
+
+                        
+                    <div class="card-body" style="padding: 1%;font-size: 12.5px;font-family: Arial;">
+              
+                <table class="table" style="margin-bottom: 1%;">
+                  
+                  <tbody>
+                    <tr>
+                      <th scope="row" style="border-top-style: none;" class="text-danger"> {{$rt->returning->departure_time}} - {{$rt->returning->arrival_time}}</th>
+                      <td style="border-top-style: none;">{{$rt->returning->departure->name}} ({{$rt->returning->departure->abbreviation}}) to {{$rt->returning->arrival->name}} ({{$rt->returning->arrival->abbreviation}}) via {{$rt->returning->via}}</td>
+                      <td style="border-top-style: none;">GHS {{$rt->returning->trip_fare}}</td>
+                      <td style="border-top-style: none;">
+                        <div class="dropdown dropleft float-right">
+                        <i class="fas fa-ellipsis-v" data-toggle="dropdown"></i>
+                          
+                        
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" style="cursor: ;">More from this trip</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" style="cursor: pointer;"><span class="delete_history" data-pointid="{{$ow->id}}"> Remove from history</span></a>
+                        </div>
+                      </div>
+                        </td>
+                    </tr>    
+                            </tbody>
+                        </table>
+                    </div>
 
                     @endif
-                @endif
+                
+
+                <!-- end of rt bookings trips -->
+                    
+                    @endforeach
+                    </div>
+                 @endforeach
+                </div>
+            
+        @endif
+        
                     
             
 
@@ -423,7 +626,7 @@
            
            
 
-        </div>
+        
         
         <br>
         <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -467,6 +670,7 @@
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
         <script type="text/javascript">
+
             $.ajaxSetup({
                 headers: {
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -57,7 +57,6 @@ class RegisterController extends Controller
             'country' => 'required|string|max:255',
             'mobile_number' => 'required|string|max:255',
             'agree' => 'required|string|max:255',
-            'remind_me' => 'required|string|max:255',
             'password' => 'required|string|min:6|confirmed',
         ]);
     }
@@ -80,7 +79,7 @@ class RegisterController extends Controller
             'contact_person' => $data['contact_person'],
             'country' => $data['country'],
             'mobile_number' => $data['mobile_number'],
-            'remind_me' => $data['remind_me'],
+            'remind_me' => 'yes',
             'agree' => $data['agree'],
             'membership_number' => $membership_number,
             'password' => bcrypt($data['password']),

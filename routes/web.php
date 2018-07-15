@@ -12,8 +12,9 @@
 */
 
 Route::get('/', function () {
-    return view('welcome', ['msg' => "Hello, you're welcome!"]);
-});
+    
+        return view('welcome', ['msg' => "Hello, you're welcome!"]);
+    });
 
 Auth::routes();
 
@@ -54,9 +55,9 @@ Route::get('/search/trips/oneway', 'SearchController@search')->name('trips.searc
 
 Route::get('/history/trips/search', 'SearchController@searchHistory')->name('search.history');
 
-Route::get('/oneway/drive/status/', 'SearchController@driveStatusShow')->name('oneway.drive.status');
+Route::get('/drive/status/', 'SearchController@driveStatusShow')->name('oneway.drive.status');
 
-Route::get('/oneway/trips/my/', 'SearchController@showMyTrips')->name('my.trips.oneway');
+// Route::get('/oneway/return/trips/my/', 'SearchController@showMyTrips')->name('my.trips.oneway');
 
 Route::get('/return/drive/status/10120120020010', 'BookingController@driveStatusShow')->name('return.drive.status');
 
@@ -97,9 +98,11 @@ Route::group(['middleware'=>['auth']],function(){
 
     Route::get('/auth/manage/booking', 'SearchController@manageBooking')->name('manage.auth.booking');
 
-    Route::post('/edit/booking/{booking_id}', 'SearchController@editBooking')->name('edit.booking');
+    Route::post('/edit/booking/', 'SearchController@editBooking')->name('edit.booking');
 
     Route::get('/traveler/bus/', 'SearchController@showBus')->name('bus.info');
+
+    Route::get('/oneway/return/trips/my/', 'SearchController@showMyTrips')->name('my.trips.oneway');
 
 });
 
@@ -109,9 +112,18 @@ Route::get('/return/payment/success/{booking_id}/{lpos}/{lpis}/{passenger_num}/{
 
 Route::delete('/history/delete', 'SearchController@deleteHistory')->name('history.delete');
 
+Route::delete('/returnbooking/delete', 'SearchController@deleteReturnBooking')->name('return.booking.delete');
+
 Route::get('/manage/booking', 'SearchController@manageBooking')->name('manage.booking');
 
-
+Route::get('/sms/send/{to}', function(\Nexmo\Client $nexmo, $to){
+    $message = $nexmo->message()->send([
+        'to' => $to,
+        'from' => '@leggetter',
+        'text' => 'Sending SMS from Laravel. Woohoo!'
+    ]);
+    Log::info('sent message: ' . $message['message-id']);
+});
 
 View::composer(['book.components.returnTab', 'book.components.onewayTab', 'book.components.multicityTab', 'book.search-trip'], function ($view) {
              $fares = App\Fare::orderBy('created_at', 'DESC')->paginate(10);

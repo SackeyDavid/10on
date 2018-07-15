@@ -62,3 +62,33 @@ Lessons
 
 Appreciation
 A big thanks to stackoverflow
+
+I really need no hope , I can finish this project alone
+
+When an approach to implementing something seem bewildering or confusing, try another approach
+
+*Have an online forums panel where users of this application can share comments
+
+For the searching of trips, an empty input returns a whole web page which could be battery draining because of network calls so that must be improved.
+
+@Trip id with 4 will be used for cancelled trips with corresponding departure_station_id and arrival_station_id of 1. We'll work on deleting individual trips froma return booking in the future.
+
+*I have to add terms and conditions
+
+The codes to return search results for return trips will have to be updated each year to have the current year as part of the search query.
+
+We should add AI to learn what users frequently specify
+
+Disabling search trips timeline for now will come back later
+
+Sometimes be trying other interface designs 
+
+Individual dates in trips timeline should be collapseable.
+
+Use an accordion for myaccount collapseables.
+
+Multi city bookings will come later
+
+Work on selecting return trips with just a tap from return results.
+
+Create a custom error page 

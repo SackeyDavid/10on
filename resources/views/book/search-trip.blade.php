@@ -117,9 +117,9 @@
                       <li class="nav-item active">
                         <a href="#onewayTab" data-toggle="tab">One Way</a>
                       </li>
-                      <li class="nav-item">
+                     <!--  <li class="nav-item">
                         <a href="#multicityTab" data-toggle="tab">Multicity</a>
-                      </li>
+                      </li> -->
                     </ul>
 
                     
@@ -143,8 +143,8 @@
     @component('book.components.onewayTab')
     @endcomponent
                            <!-- multicityTab -->
-    @component('book.components.multicityTab')
-    @endcomponent
+    <!-- @component('book.components.multicityTab')
+    @endcomponent -->
 </div>
 
                     <!-- <div style="height: 40%; width: 100%; background-color: #333333;">
@@ -188,6 +188,10 @@
         
         
         <script>
+            $('.modal').on('shown.bs.modal', function() {
+              $(this).find('[autofocus]').focus();
+            });
+                        
             $.ajaxSetup({
                 headers: {
                   'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -375,6 +379,10 @@
                    $('#arrival_station').val($('#search_arrival_station').val());
 
                    $('#search-arrival-station').modal('hide');
+                   if ($('#arrival_station').val() != '' && $('#departure_station').val() != '') 
+                    {
+                        $('#resultsBtn1').css('background-color', '#ff3345');
+                    }
                    
                 }
                 else if ($('#ow_searchstation').is(':visible')) 
@@ -459,10 +467,10 @@
             $('#passenger_num_plus').on('click',function(){
                 var $qty= $('#passenger_num');
                 var currentVal = parseInt($qty.val());
-                if (currentVal > 4) {
-                  alert('maximum number of passengers reached')
+                if (currentVal >= 1) {
+                  alert('maximum number of 1 passenger reached')
                 }
-                if (!isNaN(currentVal) && currentVal <= 4) {
+                if (!isNaN(currentVal) && currentVal <= 0) {
                     $qty.val(currentVal + 1);
                     if($qty.val() == 1){
                      $('#passenger_label').text('passenger');   
@@ -490,10 +498,10 @@
             $('#ow_passenger_num_plus').on('click',function(){
                 var $qty= $('#ow_passenger_num');
                 var currentVal = parseInt($qty.val());
-                if (currentVal > 4) {
-                  alert('maximum number of passengers reached')
+                if (currentVal >= 1) {
+                  alert('maximum number of 1 passenger reached')
                 }
-                if (!isNaN(currentVal) && currentVal <= 4) {
+                if (!isNaN(currentVal) && currentVal < 1) {
                     $qty.val(currentVal + 1);
                     if($qty.val() == 1){
                      $('#ow_passenger_label').text('passenger');   
@@ -537,7 +545,7 @@
 
             $(function() {
             $('.input-daterange').datepicker({
-                format: "dd MM",
+                format: "dd MM", // year is not added to exclude year from search results, to ease things
                 // startDate: new Date(),
                 maxViewMode: 2,
                 autoclose: true,
@@ -665,6 +673,35 @@
                 $('#to').val(return_day + ' ' + returnDate);
                 document.forms[0].submit();
             })
+
+
+            $('#resultsBtn1').click(function() {
+
+                const monthNames = ["January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"
+                ];
+
+                const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+                let today = new Date();
+                let dd = today.getDate();
+                let mm = today.getMonth(); //January is 0!
+
+                let yyyy = today.getFullYear();
+                if(dd<10){
+                    dd='0'+dd;
+                } 
+                // if(mm<10){
+                //     mm='0'+mm;
+                // } 
+                today = weekday[today.getDay()]+ ' ' + dd+' '+monthNames[mm];
+                //alert (today);
+                $('#from').val(today);
+                $('#to').val(today);
+                document.forms[0].submit();
+            });
+
+
             // $('.input-daterange').on('changeDate', function() {
             // $('#my_hidden_input').val(
             //     $('.input-daterange').datepicker('getFormattedDate')

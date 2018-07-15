@@ -7,8 +7,15 @@
 
         <title>Payment Details</title>
 
+        <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
+        <script type="text/javascript">
+            $(window).load(function() {
+                // Animate loader off screen
+                $(".se-pre-con").fadeOut("slow");;
+            });
+        </script>
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+        <!-- <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css"> -->
         <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('images/apple-icon-57x57.png') }}">
         <link rel="apple-touch-icon" sizes="60x60" href="/images/apple-icon-60x60.png">
         <link rel="apple-touch-icon" sizes="72x72" href="/images/apple-icon-72x72.png">
@@ -27,6 +34,7 @@
         <meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
         <meta name="theme-color" content="#ffffff">
 
+        <link rel="stylesheet" href="{{ URL::To('css/intlTelInput.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome-all.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}">
@@ -101,9 +109,23 @@
             .m-b-md {
                 margin-bottom: 30px;
             }
+
+            .no-js #loader { display: none;  }
+            .js #loader { display: block; position: absolute; left: 100px; top: 0; }
+            .se-pre-con {
+                position: fixed;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+                background: url('{{URL::To("images/loading-gifs/loader-64x/Preloader_8.gif")}}') center no-repeat #fff;
+            }
+
         </style>
     </head>
     <body>
+        <div class="se-pre-con"></div>
             @if(Session::has('msg'))
             <div class="alert alert-info" >
             <a href="#" data-dismiss="alert" class="close">&times;</a>
@@ -209,7 +231,7 @@
                                     <button type="button" class="close" data-dismiss="modal" arial-label="Close" onclick="$('#mobile-money-modal').hide();">x</button> -->
                             </div>
             <div class="modal-body">
-                    <center><i class="fas fa-mobile-alt" style="font-size: 32px;font-weight: 500;color: #000;" ></i> <br> <span style="font-size: 24px;font-weight: 500;color: #000;">Mobile Money</span>
+                    <center><i class="fa fa-mobile-alt" style="font-size: 32px;font-weight: 500;color: #000;" ></i> <br> <span style="font-size: 24px;font-weight: 500;color: #000;">Mobile Money</span>
                     </center>
                 
 
@@ -226,30 +248,59 @@
                     @if(Auth::user()->wallet)
                 <input type="text" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->wallet->phone_number}}" required>
                     @else
-                    <input type="text" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number" required>
+                        @if($booking)
+                    <input type="tel" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number"  value="{{$booking->passenger->mobile_number}}" required>
+                        @endif
                     @endif
                 @else
-                <input type="text" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number" required>
+                    @if($booking)
+                <input type="tel" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number" value="{{$booking->passenger->mobile_number}}" required>
+                    @endif
                 @endif
-               <br>
+               <br><br>
                 
                 @if(Auth::user())
                 <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value ="{{ Auth::user()->first_name}} {{Auth::user()->last_name}}" required>
                 @else
-                <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Name" required>
+                    @if($booking)
+                <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Name" value="{{$booking->passenger->first_name}} {{$booking->passenger->last_name}}" required>
+                    @else
+                <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Name" required>
+                    @endif
                 @endif
 
 
                 <br>
                 
                 @if(!Auth::user())
-                <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
-                    <option>---choose network---</option>
-                    <option value="mtn-gh">Mtn</option>
+               <!--  <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
+                    <option>---select phone network---</option>
+                    <option value="mtn-gh">MTN</option>
                     <option value="tigo-gh">Tigo</option>
                     <option value="airtel-gh">Airtel</option>
                     <option value="vodafone-gh">Vodafone</option>
-                </select>
+                </select> -->
+                <b>Select network operator <i class="fa fa-caret-down"></i></b> <br>
+                <ul class="list-inline">
+                    <li><img src="{{ URL::to('/images/mtn-momo.jpg') }}" height="70" width="70" class="img-responsive img-thumbnail"></li>
+                    <li><img src="{{ URL::to('/images/vod-momo.png') }}" height="70" width="70" class="img-responsive img-thumbnail"></li>
+                    <li><img src="{{ URL::to('/images/airtel-momo.jpg') }}" height="70" width="70" class="img-responsive img-responsive img-thumbnail"></li>
+                    <li><img src="{{ URL::to('/images/tigo-momo.png') }}" height="70" width="70" class="img-responsive img-responsive img-thumbnail"></li>
+                </ul>
+                <!-- <div class="dropdown dropright">
+                    
+                     <button type="submit" data-toggle="dropdown" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;"> Select network <i class="fa fa-caret-down"></i></button>
+                    
+                    <div class="dropdown-menu" style="margin-left: calc(50% - 80px);margin-right: calc(50% - 80px);">
+                      <a class="dropdown-item" href="#" style="cursor: ;"><span class="mtn_submit text-warning"> MTN</span></a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" style="cursor: pointer;"><span class="vod_submit text-danger" data-pointid="">Vodafone</span></a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" style="cursor: pointer;"><span class="air_submit text-danger" data-pointid="">Airtel</span></a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" style="cursor: pointer;"><span class="tig_submit text-primary" data-pointid="">Tigo</span></a>
+                    </div>
+                  </div> -->
                 @else
                 <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
                     @if(Auth::user()->wallet)
@@ -263,16 +314,16 @@
                 </select>
                 @endif
 
-                <br><br>
+                <!-- <br><br>
                 <div class="col-md-12" style="text-align: center;">
-                    <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Confirm</button>
+                    <button type="submit" id="momo-submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Confirm</button>
                     <br><br>
                     <p style="font-family: Corbel; font-weight: 500;text-align: center;">You won't be charged until you confirm your drive in the next step </p>
                 <br>
 
                 
                 <br>
-                </div>
+                </div> -->
                 </form>
 
                 </div>
@@ -308,10 +359,18 @@
                     <td><i class="fas fa-user-circle"></i></td>
                     <td  style="width: 80%;padding-left: 1%;padding-right: 1.5%;">
                         <ul class="list-unstyled">
-                            <li style="font-weight: 600;font-family: Century Gothic;font-size: 15px;">Pay with Cash + Kilometers</li>
+                            
                             @if(Auth::user())
-                            <li style="font-weight: 300;font-size: 15px;" class="text-success">Logged in. You can pay with your saved cards or wallets</li>
+                            <li style="font-weight: 600;font-family: Century Gothic;font-size: 15px;">{{Auth::user()->first_name}} : {{Auth::user()->kilometers}} km</li>
+                            <li style="font-weight: 300;font-size: 15px;" class="text-success">Logged in. You will earn <b style="font-family: Arial;">
+                                @if(!$outbound || !$inbound)
+                                0
+                                @else
+                                @php echo  $outbound->kilometers + $inbound->kilometers; @endphp kilometers
+                                @endif
+                            </b> more.</li>
                             @else
+                            <li style="font-weight: 600;font-family: Century Gothic;font-size: 15px;">Pay with Cash + Kilometers</li>
                             <li style="font-weight: 300;"><p style="font-size: 12px;">Log in to your account to pay with cash + kilometers and access your daved cards or wallets</p></li>
                             @endif
                         </ul>
@@ -489,15 +548,34 @@
                        <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
                     </div>
                      </div>
-        <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
+       
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="{{ asset('js/intlTelInput.min.js') }}"></script>
+        <script src="{{ asset('js/modernizr.js') }}"></script>
+        <script src="{{ asset('js/utils.js') }}"></script>
+
         <script type="text/javascript">
+            $(window).load(function() {
+                // Animate loader off screen
+                $(".se-pre-con").fadeOut("slow");;
+            });
+
             $('#open-mobile-money-modal').click(function(){
                 $('#mobile-money-modal').show();
                 
+            });
+
+            $("#phone_number").intlTelInput({
+              preferredCountries: ["gh", "tg", "ci", "bf", "ng", "us", "gb"],
+              nationalMode: true,
+              utilsScript: "{{ asset('js/utils.js') }}"
+            });
+
+            $("#momo-submit").click(function(){
+              $("#phone_number").val($("#phone_number").intlTelInput("getNumber"));
+              document.getElementById("mobile-money-form").submit();
             });
 
             $('input[name="network"]').focus(function() {

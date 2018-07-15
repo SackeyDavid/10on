@@ -110,7 +110,7 @@
                             <label for="mobile_number" class="col-md-4 col-form-label text-md-right">Mobile number</label>
 
                             <div class="col-md-6">
-                                <input id="mobile_number" type="number" min="0" class="form-control{{ $errors->has('mobile_number') ? ' is-invalid' : '' }}" name="mobile_number" value="{{ old('mobile_number') }}" required>
+                                <input id="mobile_number" type="tel" style="width: 100%;" min="0" class="form-control{{ $errors->has('mobile_number') ? ' is-invalid' : '' }}" name="mobile_number" value="{{ old('mobile_number') }}" required>
 
                                 @if ($errors->has('mobile_number'))
                                     <span class="invalid-feedback">
@@ -142,7 +142,7 @@
                             </div>
                         </div>
 
-                        <center> <input type="checkbox" name="remind_me" value="yes"> Would you like to be reminded of your drives when check-in time opens?</center>
+                        <!-- <center> <input type="checkbox" name="remind_me" value="yes"> I'll like to be reminded of my drives when check-in time opens?</center> -->
                         <br>
                        <center> <input type="checkbox" name="agree" value="agreed"> I Agree to terms and conditions</center>
 
@@ -150,7 +150,7 @@
 
                         <div class="col-md-offset-4">
                             <center>
-                                <button type="submit" class="col-md-6 btn btn-lg" style="background-color: #ff3345;color: #fff;">
+                                <button id="register-submit" type="submit" class="col-md-6 btn btn-lg" style="background-color: #ff3345;color: #fff;">
                                     Register
                                 </button>
                             </center>

@@ -211,14 +211,14 @@
            
            <div class="col-md-12" style="background-color: #00000008;min-height: 91%;">
             <br>
-             @if(!$uniqueOWs->count())
+             @if(!$uniqueOWs->count() || !$uniqueRTs->count())
                 no trip history found
                 @else
-                    @if (!$ow_trip_dates)
+                    @if (!$combined_trip_dates)
                     no ow trip dates
                     @else
 
-                    @foreach ($ow_trip_dates as $trip_date)
+                    @foreach ($combined_trip_dates as $trip_date)
 
                     @foreach ($uniqueOWs as $ow)
 
@@ -261,6 +261,7 @@
                     
                         
                     @endphp
+                    <span class="text-success">One Way Trip Outbound <i class="material-icons text-success" style="font-size: 15px;">flight_takeoff</i></span>
                       <span class="float-right"><i class="fa fa-chevron-down" style="color: inherit;" onclick='
                         if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.children[1].style.display = "block";
@@ -335,8 +336,234 @@
             </div>
             
              @endif
-                    @endforeach          
+                    @endforeach
 
+                    <!-- end of ow bookings           -->
+                    <!-- start of rt bookings -->
+                    @foreach ($uniqueRTs as $rt)
+
+                         @php
+                         
+                         $rt_departing_date = explode(" ", $rt->departing->departure_date)[3] . "-" . explode(" ", $rt->departing->departure_date)[2] . "-" . explode(" ", $rt->departing->departure_date)[1];
+
+                         $rt_returning_date = explode(" ", $rt->returning->departure_date)[3] . "-" . explode(" ", $rt->returning->departure_date)[2] . "-" . explode(" ", $rt->returning->departure_date)[1];
+
+                         $rt_departing_date = strtotime($rt_departing_date);
+                         $rt_departing_date+= 1209600; 
+
+                         $rt_returning_date = strtotime($rt_returning_date);
+                         $rt_returning_date+= 1209600; 
+
+                         @endphp
+
+                    @if (date('Ymd', $rt_departing_date) == date('Ymd', strtotime($trip_date)))
+                    <div class="card card-default" style="border-radius: 0;margin: -3%;margin-bottom: 5%;font-weight: 500;">
+                <div class="card-header" style="background-color: #fff;">
+                    {{$ow->trip->departure_time}} - {{$ow->trip->arrival_time}} --
+                     @php
+                        
+                        $now = date('Ymd'); 
+                        $this_ow_date = date('Ymd', strtotime($trip_date));
+                        $diffDays = $now - $this_ow_date;
+                        
+                        
+                        switch ($diffDays) {
+                            case -1:
+
+                                echo "Tomorrow" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+
+                            case 0:
+                                echo "Today" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                            
+                            default:
+                                echo date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                        }
+                    
+                        
+                    @endphp
+                    <span class="text-primary">Return Trip Outbound <i class="material-icons text-primary" style="font-size: 15px;">flight_takeoff</i></span>
+                      <span class="float-right"><i class="fa fa-chevron-down" style="color: inherit;" onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></span>
+                </div>
+                <div class="card-body" style="display: none;">
+                    
+                    <div class="col-xs-12" style="padding: 0%;">    
+                    <div class="col-xs-4" style="padding: 0%;"><center> <i class="fa fa-user-circle"></i> </center> <center>{{$rt->departing->bus->driver}}</center><center><span style="font-size: 11px;color: #777;">driver</span></center></div>
+                    <div class="col-xs-4" style="padding: 0%;"><center><i class="fa fa-bus"></i> </center><center> {{$rt->departing->bus->bus_number}}</center><center><span style="font-size: 11px;color: #777;">bus number</span></center></div> 
+                    <div class="col-xs-4" style="padding: 0%;"><center> <span style="font-size: 15px;">{{$rt->departing->bus->capacity}}</span></center><center> passengers</center><center><span style="font-size: 11px;color: #777;">capacity</span></center></div>
+                    </div>
+                            
+                        
+                    <br><br>
+                    <div class="col-xs-12" style="padding: 0%;margin-top: 2%;margin-bottom: 2%;">
+                    <div class="col-xs-6" style="border-color: green;padding: 1%;font-weight: 600;">
+                    <center>{{$rt->departing->departure->name}}( {{$rt->departing->departure->abbreviation}})  </center>
+                    <center>to</center>
+                    <center>{{$rt->departing->arrival->name}}( {{$rt->departing->arrival->abbreviation}})</center>
+                    <center>via {{$rt->departing->via}}</center>
+                    
+
+                    </div>
+                    <div class="col-xs-6">
+                        <a href="{{ URL::to('/images/'.$rt->departing->bus->photo) }}"><img src="{{ URL::to('/images/'.$rt->departing->bus->photo) }}" alt="Trip bus" class="img-thumbnail"></a>
+                    </div>
+                    </div>
+                    
+                    <br><br>
+                    Features <i class="fa fa-star"></i>
+                    <br>
+                    <ul class="list-inline">
+                        <li>&#183; <i class="material-icons">local_gas_station</i> {{$rt->departing->bus->specialFeatures['fuel']}}</li>
+                        <li>&#183; <i class="fa fa-tv"></i>
+                        @if ($rt->departing->bus->specialFeatures['television'] == "yes") 
+                        Television
+                        @else
+                        <s>Television</s>
+                        @endif
+                        </li>
+                        <li>&#183; <i class="fa fa-wifi"></i>  
+                        @if ($rt->departing->bus->specialFeatures['wifi'] == "yes") 
+                        Wifi
+                        @else
+                        <s>Wifi</s>
+                        @endif
+                        </li>
+                        <li>
+                            @if ($rt->departing->bus->specialFeatures['ac'] == "yes") 
+                        &#183; Air Condition
+                        @else
+                        &#183; <s>Air Condition</s>
+                        @endif
+                        </li>
+                        <li>&#183; <i class="fas fa-wheelchair"></i>
+                         @if ($rt->departing->bus->specialFeatures['wheel_lift'] == "yes") 
+                        Wheel lift
+                        @else
+                        <s>Wheel Lift</s>
+                        @endif
+                        </li>
+                        <li>&#183; <i class="fas fa-bus"></i> {{$rt->departing->bus->specialFeatures['articulation']}}</li>
+                        <li>&#183; {{$rt->departing->bus->specialFeatures['decker']}}</li>
+                    </ul>
+                    
+                </div>
+            </div>
+                    @endif
+                    @if (date('Ymd', $rt_returning_date) == date('Ymd', strtotime($trip_date)))
+            <div class="card card-default" style="border-radius: 0;margin: -3%;margin-bottom: 5%;font-weight: 500;">
+                <div class="card-header" style="background-color: #fff;">
+                    {{$rt->returning->departure_time}} - {{$rt->returning->arrival_time}} --
+                     @php
+                        
+                        $now = date('Ymd'); 
+                        $this_ow_date = date('Ymd', strtotime($trip_date));
+                        $diffDays = $now - $this_ow_date;
+                        
+                        
+                        switch ($diffDays) {
+                            case -1:
+
+                                echo "Tomorrow" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+
+                            case 0:
+                                echo "Today" . " - "  . date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                            
+                            default:
+                                echo date('l', strtotime($trip_date)) . ", " . date('F', strtotime($trip_date)) . " " . date('d', strtotime($trip_date)) . ", " . date('Y', strtotime($trip_date));
+                                break;
+                        }
+                    
+                        
+                    @endphp
+                    <span class="text-primary">Return Trip Inbound <i class="material-icons text-primary" style="font-size: 15px;">flight_land</i></span>
+                      <span class="float-right"><i class="fa fa-chevron-down" style="color: inherit;" onclick='
+                        if (this.parentNode.parentNode.parentNode.children[1].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.children[1].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></span>
+                </div>
+                <div class="card-body" style="display: none;">
+                    
+                    <div class="col-xs-12" style="padding: 0%;">    
+                    <div class="col-xs-4" style="padding: 0%;"><center> <i class="fa fa-user-circle"></i> </center> <center>{{$rt->returning->bus->driver}}</center><center><span style="font-size: 11px;color: #777;">driver</span></center></div>
+                    <div class="col-xs-4" style="padding: 0%;"><center><i class="fa fa-bus"></i> </center><center> {{$rt->returning->bus->bus_number}}</center><center><span style="font-size: 11px;color: #777;">bus number</span></center></div> 
+                    <div class="col-xs-4" style="padding: 0%;"><center> <span style="font-size: 15px;">{{$rt->returning->bus->capacity}}</span></center><center> passengers</center><center><span style="font-size: 11px;color: #777;">capacity</span></center></div>
+                    </div>
+                            
+                        
+                    <br><br>
+                    <div class="col-xs-12" style="padding: 0%;margin-top: 2%;margin-bottom: 2%;">
+                    <div class="col-xs-6" style="border-color: green;padding: 1%;font-weight: 600;">
+                    <center>{{$rt->returning->departure->name}}( {{$rt->returning->departure->abbreviation}})  </center>
+                    <center>to</center>
+                    <center>{{$rt->returning->arrival->name}}( {{$rt->returning->arrival->abbreviation}})</center>
+                    <center>via {{$rt->returning->via}}</center>
+                    
+
+                    </div>
+                    <div class="col-xs-6">
+                        <a href="{{ URL::to('/images/'.$rt->returning->bus->photo) }}"><img src="{{ URL::to('/images/'.$rt->returning->bus->photo) }}" alt="Yutong bus" class="img-thumbnail"></a>
+                    </div>
+                    </div>
+                    
+                    <br><br>
+                    Features <i class="fa fa-star"></i>
+                    <br>
+                    <ul class="list-inline">
+                        <li>&#183; <i class="material-icons">local_gas_station</i> {{$rt->returning->bus->specialFeatures['fuel']}}</li>
+                        <li>&#183; <i class="fa fa-tv"></i>
+                        @if ($rt->returning->bus->specialFeatures['television'] == "yes") 
+                        Television
+                        @else
+                        <s>Television</s>
+                        @endif
+                        </li>
+                        <li>&#183; <i class="fa fa-wifi"></i>  
+                        @if ($rt->returning->bus->specialFeatures['wifi'] == "yes") 
+                        Wifi
+                        @else
+                        <s>Wifi</s>
+                        @endif
+                        </li>
+                        <li>
+                            @if ($rt->returning->bus->specialFeatures['ac'] == "yes") 
+                        &#183; Air Condition
+                        @else
+                        &#183; <s>Air Condition</s>
+                        @endif
+                        </li>
+                        <li>&#183; <i class="fas fa-wheelchair"></i>
+                         @if ($rt->returning->bus->specialFeatures['wheel_lift'] == "yes") 
+                        Wheel lift
+                        @else
+                        <s>Wheel Lift</s>
+                        @endif
+                        </li>
+                        <li>&#183; <i class="fas fa-bus"></i> {{$rt->returning->bus->specialFeatures['articulation']}}</li>
+                        <li>&#183; {{$rt->returning->bus->specialFeatures['decker']}}</li>
+                    </ul>
+                    
+                </div>
+            </div>
+            
+                 @endif
+                    @endforeach
+
+                    <!-- end of rt bookings -->
                     @endforeach
                     @endif
                 @endif

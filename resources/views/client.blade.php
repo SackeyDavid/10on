@@ -21,6 +21,13 @@
             <p class=""><center> {{ Session::get('msg') }}</center></p>
             </div>
             @endif
+
+            @if(Session::has('msg-error'))
+            <div class="alert alert-danger" >
+            <a href="#" data-dismiss="alert" class="close">&times;</a>
+            <p class=""><center> {{ Session::get('msg-error') }}</center></p>
+            </div>
+            @endif
             
             @if ($buses->count() && $fares->count() && $special_features->count() && $stations->count() && !$trips->count())
             

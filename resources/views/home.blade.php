@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Myaccount | Home</title>
+        <title>MyAccount | @guest @else {{Auth::user()->first_name}} {{Auth::user()->last_name}} @endguest | Home</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -215,29 +215,167 @@
             
             </div>
             <ul class="list-group" >
-                <li class="list-group-item" style="border-radius: 1px;font-weight: 400;">
+                <li class="list-group-item" style="border-radius: 1px;font-weight: 400;" onclick='
+                        if (this.parentNode.children[1].style.display === "none") {
+                            this.parentNode.children[1].style.display = "block";
+                        } else {
+                            this.parentNode.children[1].style.display = "none";
+                        }
+                        $(this.children[0].children[1].children[0]).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>
                     <ul class="list-inline"> 
                         <li>About 10ndrives</li>
                         <li class="float-right"><i class="fas fa-chevron-down"></i></li>
                     </ul>
+                    
+
                 </li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;">
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;"><br>
+                     <b>10ondrives</b> is an online platform that acts as an intermediary service between travelers and transport companies in Ghana.
+                     <br>
+                     <ul class="list-unstyled">
+                     <li>
+                         <ul class="list-inline">
+                             <li><i class="fa fa-phone"></i> +861 821 510 7127</li>
+                             <li>+233 24 669 2117</li>
+                             <li>+233 27 304 3428</li>
+                         </ul>
+                     </li>
+                     <li>
+                        <ul class="list-inline">
+                            <li><i class="fa fa-envelope"></i> 10ondrives@gmail.com</li>
+                        </ul> 
+                     </li>
+                     <li>
+                         <ul class="list-inline">
+                             <li><i class="fa fa-globe"></i> http://10ondrives.com/about</li>
+                         </ul>
+                     </li>
+                     </ul>
+                        <br>
+                    </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;" onclick='
+                        if (this.parentNode.children[3].style.display === "none") {
+                            this.parentNode.children[3].style.display = "block";
+                        } else {
+                            this.parentNode.children[3].style.display = "none";
+                        }
+                         $(this.children[0].children[1].children[0]).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>
                     <ul class="list-inline"> 
                         <li>About trips</li>
                         <li class="float-right"><i class="fas fa-chevron-down"></i></li>
                     </ul>
+                    
                 </li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My statement</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My personal details</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My contact details</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My preferences</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;">My friends & Family</li>
-                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;"> 
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                         <br>
+                         Trips are <b>hosted</b> by transport companies in Ghana. Travelers or users of 10ondrives book those trips by providing <b>personal and payment details</b>. Personal details are meant for identification of the user and payment details for allowing users to make payments online. Trips booked can be cancelled afterwards after booking them.
+                         <br>
+                    </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;" onclick='
+                        if (this.parentNode.children[5].style.display === "none") {
+                            this.parentNode.children[5].style.display = "block";
+                        } else {
+                            this.parentNode.children[5].style.display = "none";
+                        }
+                        // $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>My statement</li>
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                         <br>
+                         Using 10ondrives means I'm agreeing to <a href="#"> terms and conditions</a> attached to this service.
+                         <br>
+                </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;" onclick='
+                        if (this.parentNode.children[7].style.display === "none") {
+                            this.parentNode.children[7].style.display = "block";
+                        } else {
+                            this.parentNode.children[7].style.display = "none";
+                        }
+                        // $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>My personal details</li>
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                    <br>
+                         @guest
+                         You're not logged in yet. Kindly <a href="{{route('login')}}"> log in</a>
+                         @else
+                         <ul class="list-unstyled">
+                             <li>Title: {{Auth::user()->title}}</li>
+                             <li>First name: {{Auth::user()->first_name}}</li>
+                             <li>Last name: {{Auth::user()->last_name}}</li>
+                             <li>Membership number: {{Auth::user()->membership_number}}</li>
+                             <li>Receive notification: {{Auth::user()->remind_me}}</li>
+                         </ul>
+                         @endguest
+                         <br>
+                    </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;" onclick='
+                        if (this.parentNode.children[9].style.display === "none") {
+                            this.parentNode.children[9].style.display = "block";
+                        } else {
+                            this.parentNode.children[9].style.display = "none";
+                        }
+                        // $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>My contact details</li>
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                         <br>
+                         <ul class="list-unstyled"> 
+                             <li>Email: {{Auth::user()->email}}</li>
+                             <li>Contact Person: {{Auth::user()->contact_person}}</li>
+                             <li>Country: {{Auth::user()->country}}</li>
+                             <li>Mobile Number: {{Auth::user()->mobile_number}}</li>
+                         </ul>
+                         <br>
+                    </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;" onclick='
+                        if (this.parentNode.children[11].style.display === "none") {
+                            this.parentNode.children[11].style.display = "block";
+                        } else {
+                            this.parentNode.children[11].style.display = "none";
+                        }
+                        // $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>My preferences</li>
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                         <br><span class="">Preferences not set yet</span><br>
+                    </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;" onclick='
+                        if (this.parentNode.children[13].style.display === "none") {
+                            this.parentNode.children[13].style.display = "block";
+                        } else {
+                            this.parentNode.children[13].style.display = "none";
+                        }
+                        // $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '>My friends & Family</li>
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                      <br>
+                      <span>Friends and family not set yet</span>
+                      <br>   
+                    </div>
+                <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;" onclick='
+                        if (this.parentNode.children[15].style.display === "none") {
+                            this.parentNode.children[15].style.display = "block";
+                        } else {
+                            this.parentNode.children[15].style.display = "none";
+                        }
+                        $(this.children[0].children[1].children[0]).toggleClass("fa-chevron-up fa-chevron-down");
+                        '> 
                     <ul class="list-inline"> 
                         <li>My app settings</li>
-                        <li class="float-right"><i class="fas fa-chevron-down"></i></li>
+                        <li class="float-right"><i class="fas fa-chevron-down" onclick='
+                        if (this.parentNode.parentNode.parentNode.parentNode.children[15].style.display === "none") {
+                            this.parentNode.parentNode.parentNode.parentNode.children[15].style.display = "block";
+                        } else {
+                            this.parentNode.parentNode.parentNode.parentNode.children[15].style.display = "none";
+                        }
+                        $(this).toggleClass("fa-chevron-up fa-chevron-down");
+                        '></i></li>
                     </ul>
                 </li>
+                <div class="container" style="display: none;font-weight: 400;font-family: Century;">
+                         <br>
+                         <span>App settings not set yet</span>
+                         
+                    </div>
             </ul>
             <br>
 

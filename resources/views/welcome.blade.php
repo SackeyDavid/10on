@@ -208,7 +208,7 @@
                     <div class="hpage col-1-3">
                         <div class="wrap-col">
                             <div class="post">
-                                <img src="images/2.jpg" class="img-explore">
+                                <img src="images/1a.jpg" class="img-explore">
                                 <h5>Stations</h5>
                                 <!-- <div class="upload">
                                     <p>April 14, 2015</p>
@@ -220,7 +220,7 @@
                     <div class="hpage col-1-3">
                         <div class="wrap-col">
                             <div class="post">
-                                <img src="images/3.jpg" class="img-explore">
+                                <img src="images/1b.jpg" class="img-explore">
                                 <h5>Cities</h5>
                                 <!-- <div class="upload">
                                     <p>April 14, 2015</p>
@@ -232,7 +232,7 @@
                     <div class="hpage col-1-3">
                         <div class="wrap-col">
                             <div class="post">
-                                <img src="images/4.jpg" class="img-explore">
+                                <img src="images/1c.jpg" class="img-explore">
                                 <h5>Experiences</h5>
                                 <!-- <div class="upload">
                                     <p>April 14, 2015</p>
@@ -356,7 +356,7 @@
                     <li>Terms</li>
                     <li>Privacy</li>
                     <li>Site Map</li>
-                    <li><i class="fab fa-facebook-square"></i></li>
+                    <li><i href="http://fb.me/WestPrimes" class="fab fa-facebook-square"></i></li>
                     <li><i class="fab fa-twitter"></i></li>
                     <li><i class="fab fa-instagram"></i></li>
                 </ul>

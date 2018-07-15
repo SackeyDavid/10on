@@ -176,15 +176,17 @@
                 <a href="javascript:void(0)" style="font-size: 25px;font-weight: 900;color: #fff;" class="closebtn top-right" onclick="
                 document.getElementById('mySidenav').style.width = '0';">&times;</a>
                 <div class="col-md-12" style="color: #fff;font-weight: 700;font-size: 20px;">
-                    <hr>
-                    My Trips <br>
+                    <hr> <a href="{{ route('my.trips.oneway') }}" style="color: #fff;cursor: pointer;">
+                    My Trips</a> <br>
                     <hr>
                     <a href="{{ route('search.trips') }}" style="color: #fff;cursor: pointer;">Book a drive</a> <br>
                     <hr>
-                    <a href="{{ route('return.drive.status', ['booking_id' => $booking->id]) }}" style="color: #fff;cursor: pointer;">
-                    Drive Status </a><br>
+                    
+                    <a href="{{ route('oneway.drive.status') }}" style="color: #fff;cursor: pointer;">
+                    Drive Status</a> <br>
                     <hr>
-                    My Account <br>
+                    <a href="{{ URL::to('/home') }}" style="color: #fff;cursor: pointer;">
+                    My Account</a> <br>
                     <hr>
                     Notifications <br>
                     <hr>
@@ -196,6 +198,7 @@
                     <form id="logout-form" action="{{ route('user.logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+                    <a href="/" style="text-decoration: none;color: #fff;"> Home <i class="fa fa-home"></i></a>
                     </div>
                 </div>
             </div>
@@ -214,8 +217,9 @@
                     
                     @endif
                 </span> <br>
-                <span>Your booking with ID <span style="font-weight: 800">RT-{{$booking->id}}</span> has been <span style="font-weight: 800">submitted.</span> You will receive notification when check-in opens</span>
+                
             </center>
+            <span>Your booking with ID <span style="font-weight: 800">RT-{{$booking->id}}</span> has been <span style="font-weight: 800">submitted.</span> You will receive notification before check-in opens.</span>
             </div>
             
             
@@ -227,8 +231,8 @@
                               <th colspan="2">
                                   <ul class="list-inline">
                                       <li style="color: #000;font-size: 16px;">
-                                      Your Trip</li>
-                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
+                                      Your Trip (Return Trip)</li>
+                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><i style="color: inherit;cursor: pointer;" class="fas fa-chevron-down" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
                         } else {
@@ -385,7 +389,7 @@
                     @endif
                 
                 </div>
-                
+                <br>
                 <i class="material-icons" style="font-size: 15px;color: #66CDAA">flight_land</i> Inbound
                 <table class="table table-bordered"  style="border: 0.5px solid #ccc;margin-bottom: 0%;">
                           <thead style="background-color: #7FFFD4">
@@ -464,7 +468,7 @@
                                       @else
                                         Passenger
                                       @endif</li>
-                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><u style="color: #ff3345;cursor: pointer;" class="fas fa-chevron" onclick='
+                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><a href="{{route('manage.booking')}}" style="color: inherit;cursor: pointer;"><u>Edit</u></a> &nbsp;&nbsp; <i class="fas fa-chevron-up" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
                         } else {
@@ -472,7 +476,7 @@
                         }
                         
                         $(this).toggleClass("fa-chevron-up fa-chevron-down");
-                                      '>Edit</u></li>
+                                      '></i></li>
                                   </ul>
                               </th>
                               
@@ -511,7 +515,7 @@
                               <th colspan="2">
                                   <ul class="list-inline">
                                       <li style="color: #000;font-size: 16px;">Payment details</li>
-                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><u style="color: #ff3345;cursor: pointer;" class="fas fa-chevron" onclick='
+                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><a href="{{route('manage.booking')}}" style="color: inherit;cursor: pointer;"><u>Edit</u></a>&nbsp;&nbsp; <i class="fas fa-chevron-up" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
                         } else {
@@ -519,7 +523,7 @@
                         }
                         
                         $(this).toggleClass("fa-chevron-up fa-chevron-down");
-                                      '>Edit</u></li>
+                                      '></i></li>
                                   </ul>
                               </th>
                               
@@ -532,11 +536,11 @@
                               <td style="padding: 5%; ">
                                 <ul class="list-unstyled" style="font-weight: 400;">
                                     @if($option == 'wallet')
-                                    <li>Paying with mobile money</li>
+                                    <li>Payment with mobile money</li>
                                     <li>{{$payment_details->phone_number}}</li>
                                      <li>{{$payment_details->network}}</li>                                    
                                     @else
-                                    <li>Paying with card</li>
+                                    <li>Payment with card</li>
                                     <li>{{$payment_details->card_number}}</li>
                                     @endif
                                 
@@ -559,23 +563,26 @@
                               <th colspan="2">
                                   <ul class="list-inline">
                                       <li style="color: #000;font-size: 16px;">You will earn</li>
-                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">Show breakdown&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
+                                      <li class="float-right"><i style="color: inherit;cursor: pointer;" class="fas fa-chevron-up" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
+                            // $(".show").text("Show less");
                         } else {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "none";
+                            // $(".show").text("Show breakdown");
                         }
                         
                         $(this).toggleClass("fa-chevron-up fa-chevron-down");
-                                      '></i></li>
+                                      '></i><span class="show" style="font-weight: 600;font-size: 11px;font-family: Corbel;color: #777"></span> </li>
                                   </ul>
                               </th>
                               
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
                             <div style="padding: 0%;">
+                            <tr>
+                            
                               <td style=" ">
                                   @php
                                 $kilometers = (float)$outbound->kilometers + (float)$inbound->kilometers;
@@ -594,9 +601,9 @@
                                 </li></ul>';
                                 @endphp 
                               </td>
-                              </div>
+                              
                             </tr>
-                           
+                           </div>
                           </tbody>
                         </table>
                         <br>
@@ -607,7 +614,7 @@
                                   <ul class="list-inline">
                                       <li style="color: #000;font-size: 16px;">
                                       Terms and conditions</li>
-                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
+                                      <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">&nbsp;&nbsp; </span><i style="color: inherit;cursor: pointer;" class="fas fa-chevron-up" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
                         } else {
@@ -626,21 +633,24 @@
                             <div style="padding: 0%;">
                              
                               <td style="padding: 5%; ">
-                                <ul class="list-unstyled" style="font-weight: 400;">
-                                    @if(Auth::user())
-                                    <li>{{ Auth::user()->title}} {{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</li>
-                                                                    
-                                    @else
-                                        @if($passenger_details == 'session expired')
-                                        
-                                        @else
-                                    <li>{{$passenger_details->title}} {{$passenger_details->first_name}} {{$passenger_details->last_name}}</li>
-                                        @endif
-                                    
-                                    @endif
-                                
-                                
-                                </ul>
+                        <p>
+                            <ul class="list-unstyled">
+                                <li>
+                            <ul class="list-inline">
+                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Fare conditions</li>
+                                <li><i class="fas fa-info-circle logo-color"></i></li>
+                            </ul>
+                        </li>
+                        <li style="font-size: 14px;font-family: Corbel;">
+                            <ul style="margin-left: -7%;">
+                                <li>Note: Upgrade prices and seat selection are only applicable to 10ondrives-operated flights.</li>
+                                <li><span style="font-weight: 600;">Important:</span> Change fees will be charged in addition to any applicable fare difference.
+The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are per person. Upgrades with Kilometers are subject to availability.</li>
+                            </ul>
+                            </li>
+                        </ul>
+                        </p>
+
                               </td>
                               </div>
                             </tr>
@@ -1119,25 +1129,10 @@
                             
                         </div>
 
-                        <p>
-                            <ul class="list-unstyled">
-                                <li>
-                            <ul class="list-inline">
-                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Fare conditions</li>
-                                <li><i class="fas fa-info-circle logo-color"></i></li>
-                            </ul>
-                        </li>
-                        <li style="font-size: 14px;font-family: Corbel;">
-                            <ul style="margin-left: -7%;">
-                                <li>Note: Upgrade prices and seat selection are only applicable to 10ondrives-operated flights.</li>
-                                <li><span style="font-weight: 600;">Important:</span> Change fees will be charged in addition to any applicable fare difference.
-The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are per person. Upgrades with Kilometers are subject to availability.</li>
-                            </ul>
-                            </li>
-                        </ul>
-                        </p>
-
-                        <button class="col-md-12 btn btn-lg" type="submit" style="background-color: #ff3345;">
+                       <br>
+                        <center style="background-color: #ff3345;font-size: 15px;font-weight: 700;border-radius: 5px;padding: 3%;"> <a href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}" target="_blank" style="color: #fff;"><i class="fas fa-download"></i> Download receipt</a>
+                        </center>
+                        <!-- <button class="col-md-12 btn btn-lg" type="submit" style="background-color: #ff3345;">
                             <center style="color: #fff;font-size: 15px;font-weight: 700">GH&#8373;
                             @php
                             
@@ -1145,17 +1140,16 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
                             @endphp
                             <br>
                             Select these drives</center>
-                        </button>
+                        </button> -->
                         <br>
                 
              </div>
             </div>
             <br>
-           <center> <a href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}"><i class="fas fa-download"></i> Download receipt</a>
-           </center>
+           
             </div>
             
-            <br>
+            <br><br><br>
          <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 
         <div class="modal-dialog" role="document">
