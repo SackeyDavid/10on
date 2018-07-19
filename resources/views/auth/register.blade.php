@@ -16,7 +16,6 @@
 
                             <div class="col-md-6">
                                 <select id="title" type="text" class="form-control{{ $errors->has('title') ? ' is-invalid' : '' }}" name="title" value="{{ old('title') }}" required autofocus>
-                                    <option>Title</option>
                                     <option>Mr</option>
                                     <option>Mrs</option>
                                     <option>Ms</option>
@@ -79,7 +78,6 @@
 
                             <div class="col-md-6">
                                 <select id="contact_person" type="text" class="form-control{{ $errors->has('contact_person') ? ' is-invalid' : '' }}" name="contact_person" value="{{ old('contact_person') }}" required>
-                                    <option>Contact person</option>
                                     <option>Travel Manager</option>
 
                                 </select>
@@ -144,7 +142,7 @@
 
                         <!-- <center> <input type="checkbox" name="remind_me" value="yes"> I'll like to be reminded of my drives when check-in time opens?</center> -->
                         <br>
-                       <center> <input type="checkbox" name="agree" value="agreed"> I Agree to terms and conditions</center>
+                       <center> <input type="checkbox" name="agree" value="agreed" style="height: 4vh;width: 10%;" checked> I Agree to <a href="{{route('terms')}}" target="_blank"> terms and conditions</a></center>
 
                        <br>
 

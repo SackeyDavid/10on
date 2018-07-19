@@ -173,7 +173,7 @@
 
                             <li> <input type="text" id="search-input" name="arrival_location" data-provide="typeahead"  autocomplete="off" class="typeahead form-control welcome-search-bar" placeholder="Arrival Station"></li>
 
-                            <li> <button type="submit" class="btn btn-lg btn-warning" style=" height: 8vh;">continue</button></li>
+                            <li> <button onclick="alert('This page has not be optimised for desktop. Kindly resize the screen to mobile phone size to continue using this application');" class="btn btn-lg btn-warning" style=" height: 8vh;">continue</button></li>
                             </div>
                         </ul>
                         
@@ -244,7 +244,7 @@
                     <div class="hpage col-1-3">
                         <div class="wrap-col">
                             <div class="post">
-                                <img src="images/5.jpg" class="img-explore">
+                                <img src="images/tour1.jpg" class="img-explore">
                                 <h5>Tourist Sites</h5>
                                 <!-- <div class="upload">
                                     <p>April 14, 2015</p>
@@ -353,8 +353,8 @@
                 <hr>
                 © 10ondrives, Inc. <br>
                 <ul class="list-inline">
-                    <li>Terms</li>
-                    <li>Privacy</li>
+                    <li><a href="{{route('terms')}}" class="footer_links" target="_blank" style="text-decoration: none;"> Terms</a></li>
+                    <li><a href="{{route('privacy')}}" class="footer_links" target="_blank" style="text-decoration: none;"> Privacy</a></li>
                     <li>Site Map</li>
                     <li><i href="http://fb.me/WestPrimes" class="fab fa-facebook-square"></i></li>
                     <li><i class="fab fa-twitter"></i></li>

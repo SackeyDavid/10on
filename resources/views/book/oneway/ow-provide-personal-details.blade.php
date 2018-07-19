@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Passenger Details</title>
+        <title>One Way | Passenger Details</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -34,7 +34,7 @@
         <link rel="stylesheet" type="text/css" href="{{ asset('css/search-trips.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/material-icons.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/provide-personal-details.css') }}">
-        
+        <link rel="stylesheet" href="{{ URL::To('css/intlTelInput.min.css') }}">
 
         <!-- Styles -->
         <style>
@@ -100,6 +100,10 @@
 
             .m-b-md {
                 margin-bottom: 30px;
+            }
+
+            .country-list {
+                font-weight: 500;
             }
         </style>
     </head>
@@ -213,25 +217,22 @@
                 </select>
                 @endif
                 <br>
-                <ul class="list-inline" style="margin-right: -1%;">
-                    <li style="width: 45%;">
+               
                 @if(Auth::user())
-                <input type="text" id="ow_country" name="ow_country" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->country}}" required>
+                <input type="tel" id="ow_mobile_number" name="ow_mobile_number" style="height: 8vh;width: 100%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->mobile_number}}" required>
                 @else
-                <input type="text" id="ow_country" name="ow_country" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="Ghana(+233)" required>
-                @endif   
-                    </li>
-                    
-                    <li class="float-right" style="width: 50%;">
-                @if(Auth::user())
-                <input type="text" id="ow_mobile_number" name="ow_mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->mobile_number}}" required>
-                @else
-                <input type="text" id="ow_mobile_number" name="ow_mobile_number" style="height: 8vh;"  class="form-control passenger-details-inputs" placeholder="Mobile number" required>
+                <input type="tel" id="ow_mobile_number" name="ow_mobile_number" style="height: 8vh;width: 100%;"  class="form-control passenger-details-inputs" placeholder="Mobile number" required>
                 @endif
-                    </li>
-                </ul>
+                
+                @if(Auth::user())
+                <input type="hidden" id="ow_country" name="ow_country" style="height: 8vh;"  class="form-control passenger-details-inputs" value="{{Auth::user()->country}}" required>
+                @else
+                <input type="hidden" id="ow_country" name="ow_country" style="height: 8vh;"  class="form-control passenger-details-inputs" value ="Ghana(+233)" required>
+                @endif 
+                <br><br>
+
                  
-                 <div class="input-group">
+                 <div class="input-group"> 
                 @if(Auth::user())
                     @if(Auth::user()->remind_me == "yes")
                 <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" checked required>
@@ -239,49 +240,21 @@
                 <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" required> 
                     @endif
                 @else 
-                 <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs">
+                 <input type="checkbox" id="ow_remind_me" name="ow_remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" checked>
                  @endif
-                    <span style="font-size: 11px;color: #000;font-weight: 500;"> Would you like to receive an sms reminder when check-in opens?</span>
+
+                <span style="font-size: 11px;color: #000;font-weight: 500;"> I'd like to receive sms reminder when check-in opens?</span>
                     
                 </div>
                 <br>
-                <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Continue</button>
+                <button id="ow-personal-submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Continue</button>
             </form>
             @endif
                 <br>
             </div>
             <br>
 
-
-            <!-- <div style="height: 40%; width: 100%; background-color: #333333;">
-                    <div class="col-md-12">
-                        <br>
-                       <span class="footer-heads">Site tools</span> 
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Book a bus</li>
-                           <li>Manage a booking</li>
-                       </ul>
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Online Check-in</li>
-                           <li>Country</li>
-                       </ul>
-                       <span class="footer-styles">Full website</span>
-                       <br>
-                       <ul class="list-inline" class="footer-styles">
-                           <li>Home</li>
-                           <li>Contact us</li>
-                           <li>Privacy policy</li>
-
-                       </ul>
-                       <span class="footer-styles">Terms and conditions</span>
-                       <br>
-                       <br>
-                       <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
-                    </div>
-                     </div> -->
-                     <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 
         <div class="modal-dialog" role="document">
 
@@ -316,11 +289,30 @@
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="{{ asset('js/intlTelInput.min.js') }}"></script>
+        <script src="{{ asset('js/utils.js') }}"></script>
+
         <script type="text/javascript">
             $('#ow_contact_person').focus(function(){
                 var c  = document.createElement("option");
                 c.text = $('#ow_title').val() + ' ' + $('input[name="ow_first_name"]').val() + ' ' + $('input[name="ow_last_name"]').val(); 
                 this.options.add(c, 2);
+            });
+
+            $("#ow_mobile_number").intlTelInput({
+              preferredCountries: ["gh", "ke", "ng", "tg", "ci", "bf", "us", "gb"],
+              nationalMode: true,
+              utilsScript: "js/utils.js"
+            });
+
+            $("#ow-personal-submit").click(function(){
+               
+              let country = $('#ow_mobile_number').intlTelInput('getSelectedCountryData');
+
+               $('#ow_country').val(country['name']);
+            
+              $("#ow_mobile_number").val($("#ow_mobile_number").intlTelInput("getNumber"));
+              document.forms[0].submit();
             });
         </script>
     </body>

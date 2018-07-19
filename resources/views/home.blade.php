@@ -283,7 +283,7 @@
                         '>My statement</li>
                 <div class="container" style="display: none;font-weight: 400;font-family: Century;">
                          <br>
-                         Using 10ondrives means I'm agreeing to <a href="#"> terms and conditions</a> attached to this service.
+                         Using 10ondrives means I'm agreeing to <a href="{{route('terms')}}"> terms and conditions</a> attached to this service.
                          <br>
                 </div>
                 <li class="list-group-item"  style="border-radius: 1px;font-weight: 400;background-color: #FFFF99;" onclick='
@@ -373,7 +373,7 @@
                 </li>
                 <div class="container" style="display: none;font-weight: 400;font-family: Century;">
                          <br>
-                         <span>App settings not set yet</span>
+                         <span>App settings not supported yet</span>
                          
                     </div>
             </ul>

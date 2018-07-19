@@ -224,10 +224,10 @@
 
                          @php
                          
-                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[3] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[1];
+                         $ow_trip_date = explode(" ", $ow->trip->departure_date)[1] . "-" . explode(" ", $ow->trip->departure_date)[2] . "-" . explode(" ", $ow->trip->departure_date)[3];
 
                          $ow_trip_date = strtotime($ow_trip_date);
-                         $ow_trip_date+= 1209600; 
+                         
 
                          @endphp
 
@@ -294,7 +294,11 @@
                         <a href="{{ URL::to('/images/'.$ow->trip->bus->photo) }}"><img src="{{ URL::to('/images/'.$ow->trip->bus->photo) }}" alt="Yutong bus" class="img-thumbnail"></a>
                     </div>
                     </div>
-                    
+                    @if($ow->checked_in != "yes")
+                    <button data-pointid="{{$ow->id}}" class="ow_checkin col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;"><i class="fas fa-user-check"></i> Check-in</button>
+                    @else
+                    <button data-pointid="{{$ow->id}}" class="ow_checkin col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;"><i class="fas fa-user-check"></i> UnCheck-in</button>
+                    @endif
                     <br><br>
                     Features <i class="fa fa-star"></i>
                     <br>
@@ -417,7 +421,12 @@
                         <a href="{{ URL::to('/images/'.$rt->departing->bus->photo) }}"><img src="{{ URL::to('/images/'.$rt->departing->bus->photo) }}" alt="Trip bus" class="img-thumbnail"></a>
                     </div>
                     </div>
-                    
+                    <br>
+                    @if($rt->depart_checked_in != "yes")
+                    <button data-pointid="{{$rt->id}}" class="rt_depart_checkin col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;"><i class="fas fa-user-check"></i> Check-in</button>
+                    @else
+                    <button data-pointid="{{$rt->id}}" class="rt_depart_checkin col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;"><i class="fas fa-user-check"></i> UnCheck-in</button>
+                    @endif
                     <br><br>
                     Features <i class="fa fa-star"></i>
                     <br>
@@ -519,7 +528,11 @@
                         <a href="{{ URL::to('/images/'.$rt->returning->bus->photo) }}"><img src="{{ URL::to('/images/'.$rt->returning->bus->photo) }}" alt="Yutong bus" class="img-thumbnail"></a>
                     </div>
                     </div>
-                    
+                    @if($rt->return_checked_in != "yes")
+                    <button data-pointid="{{$rt->id}}" class="rt_return_checkin col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;"><i class="fas fa-user-check"></i> Check-in</button>
+                    @else
+                    <button data-pointid="{{$rt->id}}" class="rt_return_checkin col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;"><i class="fas fa-user-check"></i> UnCheck-in</button>
+                    @endif
                     <br><br>
                     Features <i class="fa fa-star"></i>
                     <br>
@@ -661,9 +674,63 @@
                     
                 }).done(function(data){
                     
-                        alert('success');
+                        alert('successfully deleted');
                 });
                 alert(pointid);
+            });
+
+            //  for ow trips check-in
+            $('.ow_checkin').click(function(){
+
+                let pointid = $(this).attr("data-pointid");
+
+                $.ajax({
+                    url: "{{route('checkin.oneway')}}",
+                    type: 'PUT',
+                    data: {'booking_id':pointid},
+
+                    
+                }).done(function(data){
+                    
+                        alert('successful');
+                });
+                //alert(pointid);
+            });
+
+            //  for rt depart trips check-in
+            $('.rt_depart_checkin').click(function(){
+
+                let pointid = $(this).attr("data-pointid");
+
+                $.ajax({
+                    url: "{{route('depart.checkin.rt')}}",
+                    type: 'PUT',
+                    data: {'booking_id':pointid},
+
+                    
+                }).done(function(data){
+                    
+                        alert('successful');
+                });
+                //alert(pointid);
+            });
+
+            //  for rt return trips check-in
+            $('.rt_return_checkin').click(function(){
+
+                let pointid = $(this).attr("data-pointid");
+
+                $.ajax({
+                    url: "{{route('return.checkin.rt')}}",
+                    type: 'PUT',
+                    data: {'booking_id':pointid},
+
+                    
+                }).done(function(data){
+                    
+                        alert('successful');
+                });
+                //alert(pointid);
             });
 
             

@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>My Trips @guest @else | {{Auth::user()->first_name}} {{Auth::user()->last_name}} @endguest</title>
+        <title>Trip Timeline @guest @else | {{Auth::user()->first_name}} {{Auth::user()->last_name}} @endguest</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -234,7 +234,7 @@
            <br>
            <div class="main">
                 @if(!$uniqueOWs->count() || !$uniqueRTs->count())
-                no trip history found
+                <div class="container" style="font-weight: 500;"> No active trip booking found</div>
                 @else
                     @if (!$combined_trip_dates)
                     no trip dates

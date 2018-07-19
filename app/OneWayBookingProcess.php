@@ -14,7 +14,7 @@ class OneWayBookingProcess extends Model
      * @var array
      */
     protected $fillable = [
-        'trip_id', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id'
+        'trip_id', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id', 'checked_in'
     ];
 
     /**

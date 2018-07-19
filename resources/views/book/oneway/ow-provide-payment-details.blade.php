@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Payment Details</title>
+        <title>One Way | Payment Details</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -27,6 +27,7 @@
         <meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png">
         <meta name="theme-color" content="#ffffff">
 
+        <link rel="stylesheet" href="{{ URL::To('css/intlTelInput.min.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome-all.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}">
@@ -101,13 +102,25 @@
             .m-b-md {
                 margin-bottom: 30px;
             }
+
+            .no-js #loader { display: none;  }
+            .js #loader { display: block; position: absolute; left: 100px; top: 0; }
+            .se-pre-con {
+                position: fixed;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+                background: url('{{URL::To("images/loading-gifs/loader-64x/Preloader_8.gif")}}') center no-repeat #fff;
+            }   
         </style>
     </head>
     <body>
             @if(Session::has('msg'))
-            <div class="alert alert-info">
+            <div class="alert alert-info" style="margin-bottom: 0%;font-weight: 500;font-family: Arial;">
             <a href="#" data-dismiss="alert" class="close">&times;</a>
-            <p><center> {{ Session::get('msg') }}</center></p>
+            <p><center> {{ Session::get('msg') }}  Kindly visit <a href="{{route('search.trips')}}"> {{route('search.trips')}}</a> to choose another trip.</center></p>
             </div>
             @endif
          <div class="modal" id="credit-card-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -224,55 +237,42 @@
                             @csrf
                 @if(Auth::user())
                     @if(Auth::user()->wallet)
-                <input type="text" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->wallet->phone_number}}" required>
+                <input type="tel" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->wallet->phone_number}}" required>
                     @else
-                    <input type="text" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number" required>
+                        @if($booking)
+                    <input type="tel" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number"  value="{{$booking->user->mobile_number}}" required>
+                        @endif
                     @endif
                 @else
-                <input type="text" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number" required>
+                    @if($booking)
+                <input type="tel" id="phone_number" name="phone_number" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Phone number" value="{{$booking->passenger->mobile_number}}" required>
+                    @endif
                 @endif
                <br>
                 
                 @if(Auth::user())
                 <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value ="{{ Auth::user()->first_name}} {{Auth::user()->last_name}}" required>
                 @else
-                <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder ="Name" required>
-                @endif
-
-
-                <br>
-                
-                @if(!Auth::user())
-                <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
-                    <option>---choose network---</option>
-                    <option value="mtn-gh">Mtn</option>
-                    <option value="tigo-gh">Tico</option>
-                    <option value="airtel-gh">Airtel</option>
-                    <option value="vodafone-gh">Vodafone</option>
-                </select>
-                @else
-                <select type="text" id="network" name="network" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" required>
-                    @if(Auth::user()->wallet)
-                    <option>{{ Auth::user()->wallet->network}}</option>
+                    @if($booking)
+                <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Name" value="{{$booking->passenger->first_name}} {{$booking->passenger->last_name}}" required>
                     @else
-                    <option value="mtn-gh">Mtn</option>
-                    <option value="tigo-gh">Tico</option>
-                    <option value="airtel-gh">Airtel</option>
-                    <option value="vodafone-gh">Vodafone</option>
+                <input type="text" id="name" name="name" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Name" required>
                     @endif
-                </select>
                 @endif
 
-                <br><br>
-                <div class="col-md-12" style="text-align: center;">
-                    <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;">Confirm</button>
-                    <br><br>
-                    <p style="font-family: Corbel; font-weight: 500;text-align: center;">You won't be charged until you confirm your drive in the next step </p>
-                <br>
 
-                
                 <br>
-                </div>
+                <input type="hidden" id="network" name="network" value="">
+                
+                <b>Select network operator <i class="fa fa-caret-down"></i></b> <br>
+                <ul class="list-inline">
+                    <li><img src="{{ URL::to('/images/mtn-momo.jpg') }}" id="mtn" height="70" width="70" class="img-responsive img-thumbnail"></li>
+                    <li><img src="{{ URL::to('/images/vod-momo.png') }}" id="vodafone" height="70" width="70" class="img-responsive img-thumbnail"></li>
+                    <li><img src="{{ URL::to('/images/airtel-momo.jpg') }}" id="airtel" height="70" width="70" class="img-responsive img-responsive img-thumbnail"></li>
+                    <li><img src="{{ URL::to('/images/tigo-momo.png') }}" id="tigo" height="70" width="70" class="img-responsive img-responsive img-thumbnail"></li>
+    
+                </ul>
+                
                 </form>
 
                 </div>
@@ -308,11 +308,24 @@
                     <td><i class="fas fa-user-circle"></i></td>
                     <td  style="width: 80%;padding-left: 1%;padding-right: 1.5%;">
                         <ul class="list-unstyled">
-                            <li style="font-weight: 600;font-family: Century Gothic;font-size: 15px;">Pay with Cash + Kilometers</li>
                             @if(Auth::user())
-                            <li style="font-weight: 300;font-size: 15px;" class="text-success">Logged in. You can pay with your saved cards or wallets</li>
+                            <li style="font-weight: 600;font-family: Century Gothic;font-size: 15px;">{{Auth::user()->first_name}} : 
+                                @if(Auth::user()->kilometers > 0) 
+                                {{Auth::user()->kilometers}}
+                                @else
+                                0
+                                @endif
+                                 km</li>
+                            <li style="font-weight: 300;font-size: 15px;" class="text-success">Logged in. You will earn <b style="font-family: Arial;">
+                                @if(!$trip)
+                                0
+                                @else
+                                @php echo  $trip->kilometers; @endphp more kilometers
+                                @endif
+                            </b> .</li>
                             @else
-                            <li style="font-weight: 300;"><p style="font-size: 12px;">Log in to your account to pay with cash + kilometers and access your daved cards or wallets</p></li>
+                            <li style="font-weight: 600;font-family: Century Gothic;font-size: 15px;">Pay with Cash + Kilometers</li>
+                            <li style="font-weight: 300;"><p style="font-size: 12px;">Log in to your account to pay with cash + kilometers and access your saved cards or wallets</p></li>
                             @endif
                         </ul>
                     </td>
@@ -361,7 +374,7 @@
                             <ul class="list-unstyled">
                                 <li> Mobile Money</li>
                                 <li style="font-size: 12px;" class="text-success">
-                                @if(Auth::user())
+                                @if(Auth::user()->wallet)
                                 Ready
                                 @else
                                 <!-- <span style="color: #fff;">Ready</span> -->
@@ -387,7 +400,11 @@
                 <br>
                 <button class="col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;" disabled><i class="fas fa-mobile-alt"></i> Proceed to Verify</button>
                 @else
+                    @if(Auth::user()->wallet)
                 <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;"><i class="fas fa-mobile-alt"></i> Proceed to Pay</button>
+                    @else
+                 <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;" disabled><i class="fas fa-mobile-alt"></i> Proceed to Pay</button>
+                    @endif
                 @endif
                 <br>
             </form>
@@ -412,27 +429,34 @@
                             </li>
                         </ul> 
                     </div>
+                    <!-- credit card modal  href is credit-card-modal. It has been disabled for now-->
                     <div class="card-body" style="background-color: #f8f8f8;">
-                        <a href="#credit-card-modal" data-toggle="modal"><div class="col-md-12" style="border: 1px solid #DCDCDC;padding: 7%;background-color: #fff;">
+                        <a href="#" data-toggle="modal"><div class="col-md-12" style="border: 1px solid #DCDCDC;padding: 7%;background-color: #fff;">
                         <ul class="list-inline" style="margin-bottom: 0%;">
                             <li style="font-size: 20px; font-weight: 500;color: #000;"><i class="fas fa-credit-card"></i></li> 
                             @if(!Auth::user())
-                            <li style="font-size: 15px;font-weight: 800;color: #000;">Credit or Debit card</li>
+                            <li style="font-size: 15px;font-weight: 800;color: #000;line-height: 10px;">Credit or Debit card
+                            <ul class="list-inline">
+                                <li><span class="text-danger" style="font-size: 10px;">not supported yet</span>
+                                </li>
+                                </ul>
+                            </li>
                             @else
                             <li style="font-size: 15px;font-weight: 800;color: #000;">
                             <ul class="list-unstyled">
-                                <li>Credit or Debit card</li>
+                                <li>Credit or Debit card
+                                </li>
                                 <li style="font-size: 12px;" class="text-success">
-                                @if(Auth::user())
+                                @if(Auth::user()->card)
                                 Ready
                                 @else
-                                <!-- <span style="color: #fff;">Ready</span> -->
+                               <span class="text-danger">not supported yet</span>
                                 @endif
                             </li>
                             </ul>
                             </li>
                             @endif
-                            <li class="float-right"><i class="fas fa-chevron-right logo-color"></i></li>
+                            <li class="float-right"><i class="fas fa-chevron-right logo-color" style="color: #fff;"></i></li>
                         </ul>
                         </div>
                         </a>
@@ -441,13 +465,13 @@
 
                 </div>
                 <br>
-                
+                 <!-- credit card button disabled for now -->
                 @if(!Auth::user())
                 <p style="font-family: Corbel; font-weight: 500;text-align: center;">You won't be charged until you confirm your drive in the next step </p>
                 <br>
                 <button class="col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;" disabled><i class="fas fa-credit-card"></i> Proceed to verify</button>
                 @else
-                <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #ff3345;color: #fff;"><i class="fas fa-credit-card"></i> Proceed to Pay</button>
+                <button type="submit" class="col-md-12 btn btn-lg" style="background-color: #DCDCDC;color: #fff;" disabled><i class="fas fa-credit-card"></i> Proceed to Pay</button>
                 @endif
                 <br>
 
@@ -461,35 +485,8 @@
             <br>
             
         
-            <div style="height: 40%; width: 100%; background-color: #333333;">
-                    <div class="col-md-12">
-                        <br>
-                       <span class="footer-heads">Site tools</span> 
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Book a bus</li>
-                           <li>Manage a booking</li>
-                       </ul>
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Online Check-in</li>
-                           <li>Country</li>
-                       </ul>
-                       <span class="footer-styles">Full website</span>
-                       <br>
-                       <ul class="list-inline" class="footer-styles">
-                           <li>Home</li>
-                           <li>Contact us</li>
-                           <li>Privacy policy</li>
-
-                       </ul>
-                       <span class="footer-styles">Terms and conditions</span>
-                       <br>
-                       <br>
-                       <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
-                    </div>
-                     </div>
-                     <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        
+        <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 
         <div class="modal-dialog" role="document">
 
@@ -524,7 +521,32 @@
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
+        <script src="{{ asset('js/intlTelInput.min.js') }}"></script>
+        <script src="{{ asset('js/modernizr.js') }}"></script>
+        <script src="{{ asset('js/utils.js') }}"></script>
+
         <script type="text/javascript">
+            $(window).load(function() {
+                // Animate loader off screen
+                $(".se-pre-con").fadeOut("slow");;
+            });
+
+            $('#open-mobile-money-modal').click(function(){
+                $('#mobile-money-modal').show();
+                
+            });
+
+            $("#phone_number").intlTelInput({
+              preferredCountries: ["gh", "tg", "ci", "bf", "ng", "us", "gb"],
+              nationalMode: true,
+              utilsScript: "{{ asset('js/utils.js') }}"
+            });
+
+            $("#momo-submit").click(function(){
+              $("#phone_number").val($("#phone_number").intlTelInput("getNumber"));
+              document.getElementById("mobile-money-form").submit();
+            });
+
             $('#open-mobile-money-modal').click(function(){
                 $('#mobile-money-modal').show();
                 
@@ -605,6 +627,47 @@
                 $('#credit-card-modal').hide();
                 $('.modal-backdrop').hide();
                 $("body").removeClass("modal-open");
+            });
+
+            $('#mtn').click(function(){
+
+                $("#phone_number").val($("#phone_number").intlTelInput("getNumber"));
+                $("#network").val('mtn-gh');
+                document.getElementById("mobile-money-form").submit();
+                $('#mobile-money-modal').hide();
+                $('.modal-backdrop').hide();
+                $("body").removeClass("modal-open");
+                alert('submitted, just a second');
+            });
+
+            $('#vodafone').click(function(){
+                $("#phone_number").val($("#phone_number").intlTelInput("getNumber"));
+                $("#network").val('vodafone-gh');
+                document.getElementById("mobile-money-form").submit();
+                $('#mobile-money-modal').hide();
+                $('.modal-backdrop').hide();
+                $("body").removeClass("modal-open");
+                alert('submitted, just a second');
+            });
+
+            $('#airtel').click(function(){
+                $("#phone_number").val($("#phone_number").intlTelInput("getNumber"));
+                $("#network").val('airtel-gh');
+                document.getElementById("mobile-money-form").submit();
+                $('#mobile-money-modal').hide();
+                $('.modal-backdrop').hide();
+                $("body").removeClass("modal-open");
+                alert('submitted, just a second');
+            });
+
+            $('#tigo').click(function(){
+                $("#phone_number").val($("#phone_number").intlTelInput("getNumber"));
+                $("#network").val('tigo-gh');
+                document.getElementById("mobile-money-form").submit();
+                $('#mobile-money-modal').hide();
+                $('.modal-backdrop').hide();
+                $("body").removeClass("modal-open");
+                alert('submitted, just a second');
             });
 
 

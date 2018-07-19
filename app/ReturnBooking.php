@@ -14,7 +14,7 @@ class ReturnBooking extends Model
      * @var array
      */
     protected $fillable = [
-        'outbound', 'inbound', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id'
+        'outbound', 'inbound', 'passenger_id', 'card_id', 'made_payment', 'user_id', 'mobile_money_id', 'depart_checked_in', 'return_checked_in',
     ];
 
     /**

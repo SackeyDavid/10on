@@ -2067,34 +2067,7 @@
   </div>
 </div>
 
-                    <div style="height: 40%; width: 100%; background-color: #333333;">
-                    <div class="col-md-12">
-                        <br>
-                       <span class="footer-heads">Site tools</span> 
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Book a bus</li>
-                           <li>Manage a booking</li>
-                       </ul>
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Online Check-in</li>
-                           <li>Country</li>
-                       </ul>
-                       <span class="footer-styles">Full website</span>
-                       <br>
-                       <ul class="list-inline" class="footer-styles">
-                           <li>Home</li>
-                           <li>Contact us</li>
-                           <li>Privacy policy</li>
-
-                       </ul>
-                       <span class="footer-styles">Terms and conditions</span>
-                       <br>
-                       <br>
-                       <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
-                    </div>
-                     </div>
+                    
 
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         

@@ -32,7 +32,6 @@
         <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/fontawesome-all.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}">
-        <link rel="stylesheet" type="text/css" href="{{ asset('css/search-trips.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/style.css') }}">
         
         
@@ -119,7 +118,7 @@
 
         </style>
     </head>
-    <body  style="font-weight: 500;">
+    <body class="container" style="font-weight: 500;">
          @if(Session::has('msg'))
             <div class="alert alert-info" role="alert">
             <button type="button" data-dismiss="alert" class="close" onclick="$('.alert').alert('close');"><span aria-hidden="true">&times;</span></button>
@@ -127,12 +126,10 @@
             </div>
         @endif
 
-        <div class="container">
-
  <h2>Welcome to 10ondrives</h2>
     <p>These terms and conditions outline the rules and regulations for the use of 10ondrives's Website.</p> <br /> 
     <span style="text-transform: capitalize;"> 10ondrives</span> is located at:<br /> 
-    <address>Greater Accra, Accra<br />Greater Accra - (233)24-669-2117., Ghana<br />
+    <address>Accra Accra, Accra<br />Greater Accra - 00233., Ghana<br />
     </address>
     <p>By accessing this website we assume you accept these terms and conditions in full. Do not continue to use 10ondrives's website 
     if you do not accept all of the terms and conditions stated on this page.</p>
@@ -260,44 +257,24 @@
     we will not be liable for any loss or damage of any nature.</p>
 <h2>Terms and Conditions</h2>
     <p></p>
-<h2>Contact Information</h2>
-    <p><ul class="list-unstyled">
-        <li>(233)246692117</li>
-        <li>(86)18215107127</li>
-        <li>(233)273043428</li>
-        <li>(233)245004247</li>
-    </ul></p>
+<h2>Credit & Contact Information</h2>
+    <p>This Terms and conditions page was created at <a style="color:inherit;text-decoration:none;cursor:text;"
+        href="https://termsandconditionstemplate.com">termsandconditionstemplate.com</a> generator. If you have
+    any queries regarding any of our terms, please contact us.</p>
+        
+
+        <div class="footer">
+                <hr>
+                © 10ondrives, Inc. <br>
+                <ul class="list-inline">
+                    <li><a href="{{route('terms')}}" class="footer_links" target="_blank" style="text-decoration: none;"> Terms</a></li>
+                    <li><a href="{{route('privacy')}}" class="footer_links" target="_blank" style="text-decoration: none;"> Privacy</a></li>
+                    <li>Site Map</li>
+                    <li><i class="fab fa-facebook-square"></i></li>
+                    <li><i class="fab fa-twitter"></i></li>
+                    <li><i class="fab fa-instagram"></i></li>
+                </ul>
         </div>
-
-        <div style="height: 40%; width: 100%; background-color: #333333;">
-                    <div class="col-md-12">
-                        <br>
-                       <span class="footer-heads">Site tools</span> 
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li><a href="{{route('search.trips')}}" class="footer_links"> Book a bus</a></li>
-                           <li><a href="{{route('manage.auth.booking')}}"  class="footer_links"> Manage a booking </a></li>
-                       </ul>
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Online Check-in</li>
-                           <li>Country</li>
-                       </ul>
-                       <span class="footer-styles">Full website</span>
-                       <br>
-                       <ul class="list-inline" class="footer-styles">
-                           <li>Home</li>
-                           <li>Contact us</li>
-                           <li>Privacy policy</li>
-
-                       </ul>
-                       <span class="footer-styles">Terms and conditions</span>
-                       <br>
-                       <br>
-                       <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
-                    </div>
-                    <br>
-                     </div>
         
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

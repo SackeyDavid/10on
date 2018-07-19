@@ -155,10 +155,10 @@
 
         <div class="card-body tab-pane" id="previousDay" style="background-color: #fff;margin: 1%;">
             <div class="col-sm-4">
-                asdlkf
+                
             </div>
             <div class="col-sm-8">
-                alfklsa
+                
             </div>
 
         </div>
@@ -174,10 +174,10 @@
 
         <div class="card-body tab-pane" id="nextDay" style="background-color: #fff;margin: 1%;">
             <div class="col-sm-4">
-                asdlkf
+                
             </div>
             <div class="col-sm-8">
-                alfklsa
+        
             </div>
 
         </div>

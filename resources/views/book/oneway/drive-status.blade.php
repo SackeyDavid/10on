@@ -199,7 +199,7 @@
             
            <div class="col-md-12 container">
             @if(!$ow_bookings->count() || !$rt_bookings->count())
-            no bookings
+             <div class="container" style="font-weight: 500;"> No active trip booking found</div>
             @else
                 @if(!count($combined_trip_dates))
                 <div class="container"> no active trips now</div>

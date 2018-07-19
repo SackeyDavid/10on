@@ -21,6 +21,7 @@ class CreateOneWayBookingProcessTable extends Migration
             $table->string('mobile_money_id')->nullable();
             $table->string('user_id')->nullable();
             $table->string('made_payment')->nullable();
+            $table->string('checked_in')->nullable();
             $table->timestamps();
         });
     }

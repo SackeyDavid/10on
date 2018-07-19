@@ -14,13 +14,30 @@
 Route::get('/', function () {
     
         return view('welcome', ['msg' => "Hello, you're welcome!"]);
-    });
+    })->name('welcome');
+
+Auth::routes();
+
+Route::get('/primary', function () {
+    
+        return view('primary');
+    })->name('primary');
+Route::get('/secondary', function () {
+    
+        return view('secondary');
+    })->name('secondary');
 
 Auth::routes();
 
 
-Route::get('/home', 'HomeController@index');
+Route::get('/home', 'HomeController@index')->name('home');
 
+Route::get('/terms', function () {
+        return view('terms');
+})->name('terms');
+Route::get('/privacy', function () {
+        return view('privacy');
+})->name('privacy');
 
 Route::post('/users/logout', 'Auth\LoginController@userLogout')->name('user.logout');
 Route::get('/search/from', 'BookingController@searchTrip')->name('search.trips');
@@ -102,7 +119,13 @@ Route::group(['middleware'=>['auth']],function(){
 
     Route::get('/traveler/bus/', 'SearchController@showBus')->name('bus.info');
 
-    Route::get('/oneway/return/trips/my/', 'SearchController@showMyTrips')->name('my.trips.oneway');
+    Route::get('/trips/my/', 'SearchController@showMyTrips')->name('my.trips.oneway');
+
+    Route::put('/checkin/oneway/', 'SearchController@onewayCheckin')->name('checkin.oneway');
+
+    Route::put('/depart/checkin/rt/', 'BookingController@departCheckin')->name('depart.checkin.rt');
+
+    Route::put('/return/checkin/rt/', 'BookingController@returnCheckin')->name('return.checkin.rt');
 
 });
 

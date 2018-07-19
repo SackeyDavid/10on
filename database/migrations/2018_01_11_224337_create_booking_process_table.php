@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBookingProcessTable extends Migration
+class CreateReturnBookingProcessTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateBookingProcessTable extends Migration
      */
     public function up()
     {
-        Schema::create('booking_process', function (Blueprint $table) {
+        Schema::create('return_booking_process', function (Blueprint $table) {
             $table->increments('id');
             $table->string('passenger_id')->nullable();
             $table->string('outbound')->nullable();
@@ -22,6 +22,8 @@ class CreateBookingProcessTable extends Migration
             $table->string('mobile_money_id')->nullable();
             $table->string('user_id')->nullable();
             $table->string('made_payment')->nullable();
+            $table->string('depart_checked_in')->nullable();
+            $table->string('return_checked_in')->nullable();
             $table->timestamps();
         });
     }

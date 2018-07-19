@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Payment Success</title>
+        <title>Payment Success | Return Trip</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -210,11 +210,11 @@
         <div style="margin: 0%;height: 36vh;font-weight: 400;">
             <div class="col-md-12" style="color: #000;font-weight: 300">
                <center>
-                <span style="font-size: 20px;">Thank you , 
-                    @if(Auth::user())
-                    {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
+                <span style="font-size: 20px;">Congratulations, 
+                    @if(!Auth::user())
+                    {{ $passenger_details->first_name}}! 
                     @else
-                    
+                    {{ Auth::user()->first_name}}! 
                     @endif
                 </span> <br>
                 
@@ -1130,7 +1130,7 @@ The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are
                         </div>
 
                        <br>
-                        <center style="background-color: #ff3345;font-size: 15px;font-weight: 700;border-radius: 5px;padding: 3%;"> <a href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}" target="_blank" style="color: #fff;"><i class="fas fa-download"></i> Download receipt</a>
+                        <center style="background-color: #ff3345;font-size: 15px;font-weight: 700;border-radius: 5px;padding: 3%;"> <a href="#" target="_blank" style="color: #fff;" disabled><i class="fas fa-download"></i> Download receipt</a>
                         </center>
                         <!-- <button class="col-md-12 btn btn-lg" type="submit" style="background-color: #ff3345;">
                             <center style="color: #fff;font-size: 15px;font-weight: 700">GH&#8373;

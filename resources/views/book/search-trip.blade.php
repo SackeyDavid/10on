@@ -468,7 +468,7 @@
                 var $qty= $('#passenger_num');
                 var currentVal = parseInt($qty.val());
                 if (currentVal >= 1) {
-                  alert('maximum number of 1 passenger reached')
+                  alert('sorry, maximum number of 1 passenger reached. We"ll be providing more passengers soon.')
                 }
                 if (!isNaN(currentVal) && currentVal <= 0) {
                     $qty.val(currentVal + 1);
@@ -499,7 +499,7 @@
                 var $qty= $('#ow_passenger_num');
                 var currentVal = parseInt($qty.val());
                 if (currentVal >= 1) {
-                  alert('maximum number of 1 passenger reached')
+                  alert('sorry, maximum number of 1 passenger reached. We"ll be providing more passengers soon.')
                 }
                 if (!isNaN(currentVal) && currentVal < 1) {
                     $qty.val(currentVal + 1);

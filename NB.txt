@@ -92,3 +92,9 @@ Multi city bookings will come later
 Work on selecting return trips with just a tap from return results.
 
 Create a custom error page 
+
+Be able to shorten users names to make it more friendly and human like instead of David in database, use AI to shorten it to Dav.
+
+Invalid amount. Transaction amount must be between 1.00 and 10000.00 for tigo-gh on RECEIVE.
+
+Download of payment succes receipts has been disabled

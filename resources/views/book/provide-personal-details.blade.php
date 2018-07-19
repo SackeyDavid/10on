@@ -193,9 +193,9 @@
                 
                 <span style="font-weight: 600; "><br>Contact details</span>
                 @if(Auth::user())
-                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" value="{{Auth::user()->email}}">
+                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;font-family: Arial;"  class="form-control passenger-details-inputs" value="{{Auth::user()->email}}">
                 @else
-                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;"  class="form-control passenger-details-inputs" placeholder="Email address">
+                <input type="text" id="title" name="email" style="height: 8vh;margin-top: 2%;font-family: Arial;"  class="form-control passenger-details-inputs" placeholder="Email address">
                 @endif
                 <br>
                 @if(Auth::user())
@@ -241,7 +241,7 @@
                 <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" placeholder="Title" required> 
                     @endif
                 @else 
-                 <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs">
+                 <input type="checkbox" id="remind_me" name="remind_me" style="height: 4vh;width: 10%;"  class="form-control passenger-details-inputs" checked>
                  @endif
                     <span style="font-size: 11px;color: #000;font-weight: 500;"> I'd like to receive an sms reminder when check-in opens?</span>
                     
@@ -255,34 +255,7 @@
             <br>
 
 
-            <div style="height: 40%; width: 100%; background-color: #333333;">
-                    <div class="col-md-12">
-                        <br>
-                       <span class="footer-heads">Site tools</span> 
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Book a bus</li>
-                           <li>Manage a booking</li>
-                       </ul>
-                       
-                       <ul class="list-inline" class="footer-styles" >
-                           <li>Online Check-in</li>
-                           <li>Country</li>
-                       </ul>
-                       <span class="footer-styles">Full website</span>
-                       <br>
-                       <ul class="list-inline" class="footer-styles">
-                           <li>Home</li>
-                           <li>Contact us</li>
-                           <li>Privacy policy</li>
-
-                       </ul>
-                       <span class="footer-styles">Terms and conditions</span>
-                       <br>
-                       <br>
-                       <span class="footer-heads" style="font-family: cursive;">© 10ondrives, Inc. All rights reserved</span>
-                    </div>
-                     </div>
+            
         <script src="{{ asset('js/jquery-2.0.0.min.js') }}"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>

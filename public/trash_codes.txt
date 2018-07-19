@@ -1,0 +1,48 @@
+// $receive_momo_request = array(
+                //           'CustomerName' => $request->name,
+                //           'CustomerMsisdn'=> $request->phone_number,
+                //           'CustomerEmail'=> $traveler->email,
+                //           'Channel'=> $request->network,
+                //           'Amount'=> 0.2,
+                //           'PrimaryCallbackUrl'=> route('primary'),
+                //           'SecondaryCallbackUrl'=> route('secondary'),
+                //           'Description'=> 'Online Bus Booking Payment',
+                //           'ClientReference'=> '23213',
+                //     );
+
+                //     //API Keys
+
+
+                //     $clientId = 'ahntkmmu';
+                //     $clientSecret = 'anxixrrt';
+                //     $basic_auth_key =  'Basic ' . base64_encode($clientId . ':' . $clientSecret);
+                //     $request_url = 'https://api.hubtel.com/v1/merchantaccount/merchants/HM2604180034/receive/mobilemoney';
+                //     $receive_momo_request = json_encode($receive_momo_request);
+
+                //     $ch =  curl_init($request_url);  
+                //             curl_setopt( $ch, CURLOPT_POST, true );  
+                //             curl_setopt( $ch, CURLOPT_POSTFIELDS, $receive_momo_request);  
+                //             curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );  
+                //             curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
+                //                 'Authorization: '.$basic_auth_key,
+                //                 'Cache-Control: no-cache',
+                //                 'Content-Type: application/json',
+                //               ));
+
+                //     $result = curl_exec($ch); 
+                //     $err = curl_error($ch);
+                //     curl_close($ch);
+
+                    // if($err){
+                    //     $content = $err;
+                        
+
+                         
+                    // }else{
+                        
+                    // }
+sms
+// $sms =  (new HubtelMessage)
+                    // ->from("10ondrives")
+                    // ->to(Auth::user()->wallet->phone_number)
+                    // ->content("Thanks " . Auth::user()->first_name . ' ' . Auth::user()->last_name . ". Your booking has been issued with booking ID: RT-" . $booking_id);

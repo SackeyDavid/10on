@@ -5,7 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Payment Success</title>
+        <title>Payment Success | One Way</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
@@ -203,15 +203,15 @@
         <div style="margin: 0%;font-weight: 400;">
             <div class="col-md-12" style="color: #000;font-weight: 300">
                <center>
-                <span style="font-size: 20px;">Thank you , 
-                    @if(Auth::user())
-                    {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
+                <span style="font-size: 20px;">Congratulations, 
+                    @if(!Auth::user())
+                    {{ $passenger_details->first_name}}! 
                     @else
-                    
+                    {{Auth::user()->first_name}}! 
                     @endif</span> <br>
                
             </center>
-             <span>Your booking on {{$booking->created_at}} with ID <span style="font-weight: 800">OW-{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification before check-in opens in {{$days_left}}.</span>
+             <span>Your booking on {{$booking->created_at}} with ID <span style="font-weight: 500;font-family: Arial;">OW-{{$booking->id}}</span>  has been <span style="font-weight: 800">submitted.</span> You will receive notification before check-in opens in {{$days_left}}.</span>
             </div>
         </div>
         <br>
@@ -417,13 +417,11 @@
                                     <li>{{ Auth::user()->title}} {{ Auth::user()->first_name}} {{ Auth::user()->last_name}}</li>
                                                                     
                                     @else
-                                    <li>
-                                        @if(Auth::user())
-                                        {{ $passenger_details->title}} {{ $passenger_details->first_name}} {{ $passenger_details->last_name}}
-                                        @else
-                                        
-                                        @endif</li>
-                                    
+                                     @if($passenger_details == 'session expired')
+                                     
+                                     @else
+                                    <li>{{$passenger_details->title}} {{$passenger_details->first_name}} {{$passenger_details->last_name}}</li>
+                                     @endif
                                     @endif
                                 
                                 
@@ -488,7 +486,7 @@
                             <tr>
                               <th colspan="2">
                                   <ul class="list-inline">
-                                      <li style="color: #000;font-size: 16px;">You will earn</li>
+                                      <li style="color: #000;font-size: 16px;">You have earned</li>
                                       <li class="pull-right"><span style="font-weight: 600;font-size: 13px;font-family: Corbel;color: #777">Kilometer breakdown&nbsp;&nbsp; </span><i style="color: #ff3345;cursor: pointer;" class="fas fa-chevron-down" onclick='
                         if (this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display === "none") {
                             this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.children[1].childNodes[1].style.display = "block";
@@ -553,14 +551,27 @@
                           </thead>
                           <tbody>
                             <tr>
-                            <div style="padding: 0%;">
+                             <div style="padding: 0%;">
                              
                               <td style="padding: 5%; ">
-                                <ul class="list-unstyled" style="font-weight: 400;">
-                                    
-                                
-                                
-                                </ul>
+                        <p>
+                            <ul class="list-unstyled">
+                                <li>
+                            <ul class="list-inline">
+                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Fare conditions</li>
+                                <li><i class="fas fa-info-circle logo-color"></i></li>
+                            </ul>
+                        </li>
+                        <li style="font-size: 14px;font-family: Corbel;">
+                            <ul style="margin-left: -7%;">
+                                <li>Note: Upgrade prices and seat selection are only applicable to 10ondrives-operated flights.</li>
+                                <li><span style="font-weight: 600;">Important:</span> Change fees will be charged in addition to any applicable fare difference.
+The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are per person. Upgrades with Kilometers are subject to availability.</li>
+                            </ul>
+                            </li>
+                        </ul>
+                        </p>
+
                               </td>
                               </div>
                             </tr>
@@ -924,31 +935,10 @@
                             </div>
                             
                         </div>
-
-                        <p>
-                            <ul class="list-unstyled">
-                                <li>
-                            <ul class="list-inline">
-                                <li style="color: #000;font-size: 14px;font-family: Corbel;">Fare conditions</li>
-                                <li><i class="fas fa-info-circle logo-color"></i></li>
-                            </ul>
-                        </li>
-                        <li style="font-size: 14px;font-family: Corbel;">
-                            <ul style="margin-left: -7%;">
-                                <li>Note: Upgrade prices and seat selection are only applicable to 10ondrives-operated flights.</li>
-                                <li><span style="font-weight: 600;">Important:</span> Change fees will be charged in addition to any applicable fare difference.
-The amounts quoted for refunds, change fees, Kilometers earned, and upgrades are per person. Upgrades with Kilometers are subject to availability.</li>
-                            </ul>
-                            </li>
-                        </ul>
-                        </p>
-
-                            
-                        <p></p>
                
 
              </div>
-             <center> <a style="color: #fff;font-weight: 300;background-color: #ff3345;" class="btn btn-sm" href="{{URL::to('pdf/Standard Hubtel POS Verification Request.pdf')}}"><i class="fas fa-download"></i> Download receipt</a>
+             <center> <a style="color: #fff;font-weight: 300;background-color: #ff3345;" class="btn btn-sm" href="#" disabled><i class="fas fa-download"></i> Download receipt</a>
             </center>
             <br><br>
     <div class="modal" id="login-modal" style="z-index: 1999;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

@@ -343,68 +343,18 @@ class BookingController extends Controller
 
                     DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => Auth::user()->wallet->id]); 
                       
+                    $token = sprintf('%06d', mt_rand(100000,999999));
 
-                    // $payment = HubtelPayment::ReceiveMoney()
-                    // ->from(Auth::user()->wallet->phone_number)//- The phone number to send the prompt to. 
-                    // ->amount(1.00)                    //- The exact amount value of the transaction
-                    // ->description('Online Booking Payment')    //- Description of the transaction.
-                    // ->customerName(Auth::user()->first_name . ' ' . Auth::user()->last_name)     //- Name of the person making the payment.callback after payment. 
-                    // ->channel('mtn-gh')                 //- The mobile network Channel.configuration
-                    // ->run();
-                    $from = urlencode("10ondrives");
-                    $to = urlencode('233'. ltrim(Auth::user()->wallet->phone_number, '0'));
-                    $ClientId1 = urlencode('ahntkmmu');
-                    $ClientSecret1 = urlencode('anxixrrt');
+                    $payment = HubtelPayment::ReceiveMoney()
+                    ->from(Auth::user()->wallet->phone_number)//- The phone number to send the prompt to. 
+                    ->amount(((float)$out_trip->trip_fare + (float)$in_trip->trip_fare)*$passenger_num)                    //- The exact amount value of the transaction
+                    ->description('Online Bus Booking Payment')    //- Description of the transaction.
+                    ->customerName(Auth::user()->first_name . ' ' . Auth::user()->last_name)     //- Name of the person making the payment.callback after payment. 
+                    ->token($token)
+                    ->channel(Auth::user()->wallet->network)                 //- The mobile network Channel.configuration
+                    ->run();
 
-                    $content = urlencode('Congratulations '.Auth::user()->first_name . ' ' . Auth::user()->last_name . '! Your booking has been issued with booking ID: RT'. $booking_id . '. You now have ' . Auth::user()->kilometers . ' kilometers to your credit.');
-
-
-
-                    $arrContextOptions=array(
-                    "ssl"=>array(
-                        "verify_peer"=>false,
-                        "verify_peer_name"=>false,
-                    ),
-                    ); 
-
-                    
-
-                    $receive_momo_request = array(
-                          'CustomerName' => 'Customer Name',
-                          'CustomerMsisdn'=> Auth::user()->wallet->phone_number,
-                          'CustomerEmail'=> Auth::user()->email,
-                          'Channel'=> 'mtn-gh',
-                          'Amount'=> 0.8,
-                          'PrimaryCallbackUrl'=> 'http://requestb.in/1minotz1',
-                          'SecondaryCallbackUrl'=> 'http://requestb.in/1minotz1',
-                          'Description'=> 'Online Booking Payment',
-                          'ClientReference'=> '23213',
-                    );
-
-                    //API Keys
-
-
-                    $clientId = 'ahntkmmu';
-                    $clientSecret = 'anxixrrt';
-                    $basic_auth_key =  'Basic ' . base64_encode($clientId . ':' . $clientSecret);
-                    $request_url = 'https://api.hubtel.com/v1/merchantaccount/merchants/HM2604180034/receive/mobilemoney';
-                    $receive_momo_request = json_encode($receive_momo_request);
-
-                    $ch =  curl_init($request_url);  
-                            curl_setopt( $ch, CURLOPT_POST, true );  
-                            curl_setopt( $ch, CURLOPT_POSTFIELDS, $receive_momo_request);  
-                            curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );  
-                            curl_setopt( $ch, CURLOPT_HTTPHEADER, array(
-                                'Authorization: '.$basic_auth_key,
-                                'Cache-Control: no-cache',
-                                'Content-Type: application/json',
-                              ));
-
-                    $result = curl_exec($ch); 
-                    $err = curl_error($ch);
-                    curl_close($ch);
-
-                    
+                    DB::table('return_booking_process')->where('id', $booking_id )->update(['made_payment' => 'yes']);
                     
                     $out_rem_seats = $out_trip->remaining_seats;
                     $out_rem_seats--;
@@ -422,121 +372,119 @@ class BookingController extends Controller
                     // update users table
                     DB::table('users')->where('id', Auth::user()->id )->update(['kilometers' => $kilometers_earned ]);
 
-                    // $sms =  (new HubtelMessage)
-                    // ->from("10ondrives")
-                    // ->to(Auth::user()->wallet->phone_number)
-                    // ->content("Thanks " . Auth::user()->first_name . ' ' . Auth::user()->last_name . ". Your booking has been issued with booking ID: RT-" . $booking_id);
-                    if($err){
-                        $content = $err;
-                        $json = file_get_contents("https://{$ClientId1}:{$ClientSecret1}@api.hubtel.com/v1/messages/send?From={$from}&To={$to}&Content={$content}&ClientId={$ClientId1}ifrp&ClientSecret={$ClientSecret1}nml&RegisteredDelivery=true");
-
-                         
-                    }else{
-                        //$content = $result;
-                        $json = file_get_contents("https://{$ClientId1}:{$ClientSecret1}@api.hubtel.com/v1/messages/send?From={$from}&To={$to}&Content={$content}&ClientId={$ClientId1}ifrp&ClientSecret={$ClientSecret1}nml&RegisteredDelivery=true");
-                    }
-
                     
-                    $obj = json_decode($json, true);
-
 
                     return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . Auth::user()->wallet->id, 'option' => $option]);
 
                 }
+                // registered users without wallet details
                 elseif (Auth::user() && !Auth::user()->wallet)
                 {
-
-
                     $passenger = explode(" ", $traveler_id);
                     $bookers_id = $passenger[1];
 
                     
                         $wallet = MobileMoney::create([
                             'phone_number' => $request->phone_number,
-                            'email' => $request->email,
-                            'password' => $request->password,
+                            'network' => $request->network,
+                            'name' => $request->name,
                             'from_user' => Auth::user()->id,
                             'from_passenger' => null
                          ]);
                    
-
-                
+                $token = sprintf('%06d', mt_rand(100000,999999));
 
                 $payment = HubtelPayment::ReceiveMoney()
                         ->from($request->phone_number) //- The phone number to send the prompt to. 
-                        ->amount(0.20)                 //- The exact amount value of the transaction
+                        ->amount(((float)$out_trip->trip_fare + (float)$in_trip->trip_fare)*$passenger_num)                 //- The exact amount value of the transaction
                         ->description('Online booking payment')    //- Description of the transaction.
-                        ->customerName($booking->passenger->first_name . ' ' . $booking->passenger->last_name)     //- Name of the person making the payment.callback after payment. 
+                        ->customerName($booking->user->first_name . ' ' . $booking->user->last_name)     //- Name of the person making the payment.callback after payment.
+                        ->token($token) 
                         ->channel($request->network)    //- The mobile network Channel.configuration
                         ->run();  
                         
-                        DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
-
-                        DB::table('users')->where('id', Auth::user()->id )->update(['mobile_money_id' => $wallet->id ]);
-                            
-                        $out_trip = Trips::find($lpos);
                         $out_rem_seats = $out_trip->remaining_seats;
-                        $out_rem_seats--;
+                        
 
-                        $in_trip = Trips::find($lpis);
+                        
                         $in_rem_seats = $in_trip->remaining_seats;
-                        $in_rem_seats--;
+                        
 
+                        if ($out_rem_seats == 0) {
+                                    //refund money back to user and
+                            return redirect()->back()->with('msg', 'Aww, so sorry, the last seat for '.$out_trip->departure_location . ' to '. $out_trip->arrival_location .' trip got booked just after payment. Please screenshot this and please contact us at +23324 500 4247 / +23324 669 2117 to help us book you on another trip or refund your money as soon as possible.');
+                        }
+                        elseif ($in_rem_seats == 0) {
+                            //refund money back to user and
+                            return redirect()->back()->with('msg', 'Aww, so sorry, the last seat for '.$in_trip->departure_location . ' to '. $in_trip->arrival_location .' trip got booked just after payment. Please screenshot this and please contact us at +23324 500 4247 / +23324 669 2117 to help us book you on another trip or refund your money as soon as possible.');
+                        }
+                        else{
+
+                        $out_rem_seats = $out_rem_seats - $passenger_num;
+                        $in_rem_seats = $in_rem_seats - $passenger_num;
                         // update trips table
                         DB::table('trips')->where('id', $lpos )->update(['remaining_seats' => $out_rem_seats ]);
                         DB::table('trips')->where('id', $lpis )->update(['remaining_seats' => $in_rem_seats ]);
 
+                        DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+
+                        // user has made payment
+                        DB::table('return_booking_process')->where('id', $booking_id )->update(['made_payment' => 'yes']);
+
+                        DB::table('users')->where('id', Auth::user()->id )->update(['mobile_money_id' => $wallet->id ]);
                                 
 
 
-                                return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . $wallet->id, 'option' => $option]);
+                        return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'user' . ' ' . $wallet->id, 'option' => $option]);
+                        }
                     }
                     // if not logged in as user
                     else
                     {
                         $passenger = explode(" ", $traveler_id);
                         $bookers_id = $passenger[1];
+                        $traveler = PassengerDetails::find($bookers_id);
 
                     
                         $wallet = MobileMoney::create([
                             'phone_number' => $request->phone_number,
-                            'email' => $request->email,
-                            'password' => $request->password,
+                            'network' => $request->network,
+                            'name' => $request->name,
                             'from_user' => null,
                             'from_passenger' => $bookers_id
                          ]);
                    
 
-                
+                $token = sprintf('%06d', mt_rand(100000,999999));
 
                 $payment = HubtelPayment::ReceiveMoney()
                         ->from($request->phone_number) //- The phone number to send the prompt to. 
-                        ->amount(0.20)                 //- The exact amount value of the transaction
-                        ->description('Online booking payment')    //- Description of the transaction.
+                        ->amount(0.10) //((float)$out_trip->trip_fare + (float)$in_trip->trip_fare)*$passenger_num - The exact amount value of the transaction
+                        ->description('Online bus booking payment')    //- Description of the transaction.
                         ->customerName($booking->passenger->first_name . ' ' . $booking->passenger->last_name)     //- Name of the person making the payment.callback after payment. 
+                        ->token($token)
                         ->channel($request->network)    //- The mobile network Channel.configuration
-                        ->run();  
+                        ->run(); 
+
+                DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+
+                    
                         
-                        DB::table('return_booking_process')->where('id', $booking_id )->update(['mobile_money_id' => $wallet->id ]);
+                    
+                    $out_rem_seats = $out_trip->remaining_seats;
+                    $out_rem_seats--;
 
-                        
-                            
-                        $out_trip = Trips::find($lpos);
-                        $out_rem_seats = $out_trip->remaining_seats;
-                        $out_rem_seats--;
+                    
+                    $in_rem_seats = $in_trip->remaining_seats;
+                    $in_rem_seats--;
 
-                        $in_trip = Trips::find($lpis);
-                        $in_rem_seats = $in_trip->remaining_seats;
-                        $in_rem_seats--;
+                    // update trips table
+                    DB::table('trips')->where('id', $lpos )->update(['remaining_seats' => $out_rem_seats ]);
+                    DB::table('trips')->where('id', $lpis )->update(['remaining_seats' => $in_rem_seats ]);
 
-                        // update trips table
-                        DB::table('trips')->where('id', $lpos )->update(['remaining_seats' => $out_rem_seats ]);
-                        DB::table('trips')->where('id', $lpis )->update(['remaining_seats' => $in_rem_seats ]);
+                    
 
-                                
-
-
-                                return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $wallet->id, 'option' => $option]);
+                        return redirect()->route('return.payment.success.show', ['booking_id' => $booking_id, 'lpos' => $lpos, 'lpis' => $lpis, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => 'passenger' . ' ' . $wallet->id, 'option' => $option]);
                     }
                 }
 
@@ -599,6 +547,62 @@ class BookingController extends Controller
             $arrival_abbreviation = $arrive_abb->abbreviation;
         }
 
+        // days left to departure
+        $booking = ReturnBooking::find($booking_id);
+        $outbound = Trips::find($booking->outbound);
+
+        $inbound = Trips::find($booking->inbound);
+
+        $date_booked = Carbon::parse($booking->created_at);
+
+        $departing_date = Carbon::parse($outbound->departure_date);
+
+        $arriving_date = Carbon::parse($inbound->departure_date);
+
+        $date = explode(" ", $booking->created_at);
+
+        $days_left_to_departure = $departing_date->diffInDays($date_booked) . ' days';
+
+        $days_left_to_arrival = $arriving_date->diffInDays($date_booked) . ' days';
+
+        if (explode(" ",$days_left_to_departure)[0] <= 1) {
+            $days_left_to_departure = $departing_date->diffInHours($date_booked) . ' hours';
+            if (explode(" ", $days_left_to_departure)[0] <= 1 ) {
+                $days_left_to_departure = $departing_date->diffInMinutes($date_booked) . ' mins';    
+                if (explode(" ", $days_left_to_departure)[0] <= 1 ) {
+                $days_left_to_departure = $departing_date->diffInSeconds($date_booked) . ' seconds';    
+            
+                }
+            }
+        }
+
+
+        $from = urlencode("10ondrives");
+        $to = urlencode($passenger_details->mobile_number);
+        $ClientId1 = urlencode('ahntkmmu');
+        $ClientSecret1 = urlencode('anxixrrt');
+
+        $content = "";
+
+        if (Auth::user()) {
+            $content = urlencode('Congratulations '.$passenger_details->first_name .' '.$passenger_details->last_name. '! Your return booking has been issued with booking ID: RT'. $booking_id . '. You will be notified when check-in opens in '. $days_left_to_departure. ' for your trip from '.$outbound->departure_location .' to ' .$outbound->arrival_location.'.');
+        }
+        else
+        {
+            $content = urlencode('Congratulations '.$passenger_details->first_name .' '.$passenger_details->last_name. '! Your return booking has been issued with booking ID: RT'. $booking_id . '. You will be notified when check-in opens in '. $days_left_to_departure.' for your trip from '.$outbound->departure_location .' to ' .$outbound->arrival_location.'. Kindly sign up at '. route('register').' to start earning kilometers to your credit. ');
+        }
+
+
+        $arrContextOptions=array(
+        "ssl"=>array(
+            "verify_peer"=>false,
+            "verify_peer_name"=>false,
+        ),
+        ); 
+
+        $json = file_get_contents("https://{$ClientId1}:{$ClientSecret1}@api.hubtel.com/v1/messages/send?From={$from}&To={$to}&Content={$content}&ClientId={$ClientId1}ifrp&ClientSecret={$ClientSecret1}nml&RegisteredDelivery=true", false, stream_context_create($arrContextOptions));      
+
+
 
         return view('book.return-payment-success', ['booking_id' => $booking_id, 'passenger_num' => $passenger_num, 'traveler_id' => $traveler_id, 'payment_id' => $payment_id, 'option' => $option, 'booking' => $booking, 'outbound' => $outbound, 'inbound' => $inbound, 'passenger_details' => $passenger_details, 'payment_details' => $payment_details])->with('departure_abbreviation', $departure_abbreviation)->with('arrival_abbreviation', $arrival_abbreviation);
     }
@@ -648,7 +652,39 @@ class BookingController extends Controller
 
     }
     
+    public function departCheckin(Request $request) {
+        $booking = ReturnBooking::find($request->booking_id);
 
+        $checked_in = "";
+        if ($booking->checked_in != "yes") {
+            $checked_in = "yes";
+        }
+        else
+        {
+            $checked_in = null;
+        }
+        DB::table('return_booking_process')->where('id', $request->booking_id)->update(['depart_checked_in'=> $checked_in]);
+
+        return 'success';
+
+    }
+
+    public function returnCheckin(Request $request) {
+        $booking = ReturnBooking::find($request->booking_id);
+
+        $checked_in = "";
+        if ($booking->checked_in != "yes") {
+            $checked_in = "yes";
+        }
+        else
+        {
+            $checked_in = null;
+        }
+        DB::table('return_booking_process')->where('id', $request->booking_id)->update(['return_checked_in'=> $checked_in]);
+
+        return 'success';
+
+    }
 
 
 }
